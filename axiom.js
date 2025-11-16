@@ -1,88 +1,105 @@
 import { AXIOM } from "./modules/config.js";
+import axiomActor from "./modules/objects/axiomActor.js";
+import axiomCharacterSheet from "./modules/sheets/axiomCharacterSheet.js";
 
 Hooks.once("init", async () => {
+  console.log("AXIOM | Initializing Axiom//Core System");
 
-    console.log("AXIOM | Initializing Axiom//Core System")
+  // Setting up the Global Configuration Object
+  CONFIG.AXIOM = AXIOM;
+  CONFIG.INIT = true;
+  CONFIG.Actor.documentClass = axiomActor;
 
-    // Setting up the Global Configuration Object
-    CONFIG.AXIOM = NETHER;
-    CONFIG.INIT = true;
+  // Register custom Sheets and unregister the default Sheets
 
-    // Register custom Sheets and unregister the default Sheets
-    // Items.unregisterSheet("core", ItemSheet);
-    // Actors.unregisterSheet("core", ActorSheet);
+  const Actors = foundry.documents.collections.Actors;
+  Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
+  Actors.registerSheet("axiom", axiomCharacterSheet, {
+    types: ["Character"], // must match template.json
+    makeDefault: true,
+    label: "Character",
+  });
 
-    // Load all Partial-Handlebar Files
-    preloadHandlebarsTemplates();
+  // Load all Partial-Handlebar Files
+  preloadHandlebarsTemplates();
 
-    // Register Additional Handlebar Helpers
-    registerHandlebarsHelpers();
-
+  // Register Additional Handlebar Helpers
+  registerHandlebarsHelpers();
 });
 
 Hooks.once("ready", async () => {
+  //Finished Initialization Phase and release lock
+  CONFIG.INIT = false;
 
-    //Finished Initialization Phase and release lock
-    CONFIG.INIT = false;
-
-    // Only execute when run as Gamemaster
-    if(!Gamepad.user.isGM) return;
+  // Only execute when run as Gamemaster
+  if (!game.user.isGM) return;
 });
 
 function preloadHandlebarsTemplates() {
+  const templatePaths = [
+    "systems/axiom/templates/sheets/character/main.hbs",
+    "systems/axiom/templates/sheets/character/sidebar.hbs",
+    "systems/axiom/templates/sheets/character/trackers.hbs",
+    "systems/axiom/templates/partials/tabs/skills.hbs",
+    "systems/axiom/templates/partials/sidebar/attribute-tests.hbs",
+    "systems/axiom/templates/partials/sidebar/physical-limits.hbs",
+  ];
 
-    const templatePaths = [
-
-        // "systems/axiom/templates/partials/template.hbs"
-
-    ];
-
-    return loadTemplates(templatePaths);
-
-};
+  return foundry.applications.handlebars.loadTemplates(templatePaths);
+}
 
 function registerHandlebarsHelpers() {
+  Handlebars.registerHelper("equals", function (v1, v2) {
+    return v1 === v2;
+  });
 
-    Handlebars.registerHelper("equals", function(v1, v2) { return (v1 === v2)});
+  Handlebars.registerHelper("contains", function (element, search) {
+    return element.includes(search);
+  });
 
-    Handlebars.registerHelper("contains", function(element, search) { return (element.includes(search))});
+  Handlebars.registerHelper("concat", function (s1, s2, s3 = "") {
+    return s1 + s2 + s3;
+  });
 
-    Handlebars.registerHelper("concat", function(s1, s2, s3 = "") { return s1 + s2 + s3;});
+  Handlebars.registerHelper("isGreater", function (p1, p2) {
+    return p1 > p2;
+  });
 
-    Handlebars.registerHelper("isGreater", function(p1, p2) { return (p1 > p2)});
+  Handlebars.registerHelper("isEqualORGreater", function (p1, p2) {
+    return p1 >= p2;
+  });
 
-    Handlebars.registerHelper("isEqualORGreater", function(p1, p2) { return (p1 >= p2)});
+  Handlebars.registerHelper("ifOR", function (conditional1, conditional2) {
+    return conditional1 || conditional2;
+  });
 
-    Handlebars.registerHelper("ifOR", function(conditional1, conditional2) { return (conditional1 || conditional2)});
+  Handlebars.registerHelper("doLog", function (value) {
+    console.log(value);
+  });
 
-    Handlebars.registerHelper("doLog", function(value) { console.log(value)});
+  Handlebars.registerHelper("toBoolean", function (string) {
+    return string === "true";
+  });
 
-    Handlebars.registerHelper("toBoolean", function(string) { return (string === "true")});
+  Handlebars.registerHelper("for", function (from, to, incr, content) {
+    let result = "";
 
-    Handlebars.registerHelper('for', function(from, to, incr, content) {
+    for (let i = from; i < to; i += incr) result += content.fn(i);
 
-        let result = "";
+    return result;
+  });
 
-        for(let i = from; i < to; i += incr)
-            result += content.fn(i);
+  Handlebars.registerHelper("times", function (n, content) {
+    let result = "";
 
-        return result;
-    });
+    for (let i = 0; i < n; i++) result += content.fn(i);
 
-    Handlebars.registerHelper("times", function(n, content) {
-        
-        let result = "";
-        
-        for(let i = 0; i < n; i++)
-            result += content.fn(i);
+    return result;
+  });
 
-        return result;
-    });
-
-    Handlebars.registerHelper("notEmpty", function(value) {
-
-        if (value == 0 || value == "0") return true;
-        if (value == null|| value  == "") return false;
-        return true;
-    });
+  Handlebars.registerHelper("notEmpty", function (value) {
+    if (value == 0 || value == "0") return true;
+    if (value == null || value == "") return false;
+    return true;
+  });
 }

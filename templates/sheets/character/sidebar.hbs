@@ -1,0 +1,86 @@
+<div class="axiom-sidebar">
+
+  <!-- Static header -->
+  <div class="sidebar-header">
+    <div class="portrait">
+      <img src="{{actor.img}}" data-edit="img" />
+    </div>
+
+    <input type="text" name="name" value="{{actor.name}}" class="character-name" />
+
+    <textarea name="system.bio" rows="4" class="character-bio">
+      {{system.bio}}
+    </textarea>
+  </div>
+
+  <!-- Attributes block -->
+  <div class="sidebar-attributes">
+    <div class="attributes-grid">
+
+      <div class="attribute">
+        <label>STR</label>
+        <input type="number" name="system.attributes.strength.value"
+               value="{{system.attributes.strength.value}}" />
+      </div>
+
+      <div class="attribute">
+        <label>AGI</label>
+        <input type="number" name="system.attributes.agility.value"
+               value="{{system.attributes.agility.value}}" />
+      </div>
+
+      <div class="attribute">
+        <label>FOR</label>
+        <input type="number" name="system.attributes.fortitude.value"
+               value="{{system.attributes.fortitude.value}}" />
+      </div>
+
+      <div class="attribute">
+        <label>LOG</label>
+        <input type="number" name="system.attributes.logic.value"
+               value="{{system.attributes.logic.value}}" />
+      </div>
+
+      <div class="attribute">
+        <label>RES</label>
+        <input type="number" name="system.attributes.resolve.value"
+               value="{{system.attributes.resolve.value}}" />
+      </div>
+
+      <div class="attribute">
+        <label>CHA</label>
+        <input type="number" name="system.attributes.charisma.value"
+               value="{{system.attributes.charisma.value}}" />
+      </div>
+
+      <div class="attribute">
+        <label>INS</label>
+        <input type="number" name="system.attributes.instinct.value"
+               value="{{system.attributes.instinct.value}}" />
+      </div>
+
+      <div class="attribute attribute--empty"></div>
+
+    </div>
+  </div>
+
+  <!-- Sidebar Tabs -->
+  <nav class="sidebar-tabs" data-group="sidebar">
+    <a class="item" data-tab="attr-tests">Attribute Tests</a>
+    <a class="item" data-tab="phys-limits">Physical Limits</a>
+  </nav>
+
+  <!-- Sidebar Tab Content -->
+  <section class="sidebar-content">
+
+    <div class="tab" data-tab="attr-tests">
+      {{> "systems/axiom/templates/partials/sidebar/attribute-tests.hbs"}}
+    </div>
+
+    <div class="tab" data-tab="phys-limits">
+      {{> "systems/axiom/templates/partials/sidebar/physical-limits.hbs"}}
+    </div>
+
+  </section>
+
+</div>

@@ -2,15 +2,92 @@
     "Actor": {
 
         "types": [
-            "Prime Character"
+            "Character"
         ],
 
-        "PrimeCharacter": {
+        "Character": {
 
-            "gender": "male",
-            "age": "20",
-            "height": "180",
-            "weight": "80"
+            "details": {
+                "gender": "male",
+                "age": "20",
+                "height": "180",
+                "weight": "80"
+            },
+
+            "attributes": {
+                "strength": {
+                    "base": 0,
+                    "mod": [],
+                    "value": 0
+                },
+                "agility": {
+                    "base": 0,
+                    "mod": [],
+                    "value": 0
+                },
+                "fortitude": {
+                    "base": 0,
+                    "mod": [],
+                    "value": 0
+                },
+                "logic": {
+                    "base": 0,
+                    "mod": [],
+                    "value": 0
+                },
+                "resolve": {
+                    "base": 0,
+                    "mod": [],
+                    "value": 0
+                },
+                "charisma": {
+                    "base": 0,
+                    "mod": [],
+                    "value": 0
+                },
+                "instinct": {
+                    "base": 0,
+                    "mod": [],
+                    "value": 0
+                },
+                "power": {
+                    "base": 0,
+                    "mod": [],
+                    "value": 0
+                }
+            },
+            
+            "trackers": {
+                "health": {
+                    "base": 0,
+                    "value": 0,
+                    "max": 0
+                },
+                "stamina": {
+                    "base": 0,
+                    "value": 0,
+                    "max": 0
+                },
+                "focus": {
+                    "value": 0,
+                    "max": 0
+                },
+                "movement": {
+                    "base": 0,
+                    "value": 0,
+                    "max": 0
+                },
+                "corruption": {
+                    "base": 0,
+                    "value": 0,
+                    "max": 0
+                },
+                "toughness": {
+                    "base": 0,
+                    "mod": [],
+                    "value": 0
+                }
+            }          
         }
     },
 
