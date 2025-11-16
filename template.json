@@ -1,0 +1,40 @@
+{
+    "Actor": {
+
+        "types": [
+            "Prime Character"
+        ],
+
+        "PrimeCharacter": {
+
+            "gender": "male",
+            "age": "20",
+            "height": "180",
+            "weight": "80"
+        }
+    },
+
+    "Item": {
+
+        "types": [
+            "Item"
+        ],
+
+        "templates": {
+
+            "generalItems": {
+                
+                "weight": 10,
+                "value": 100,
+                "description": ""
+            }
+        },
+
+        "item": {
+            
+            "templates": ["generalItems"],
+            "type": "item",
+            "quantity": 1
+        }
+    }
+}
