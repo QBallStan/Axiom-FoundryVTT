@@ -12,12 +12,11 @@ Hooks.once("init", async () => {
 
   // Register custom Sheets and unregister the default Sheets
 
-  const Actors = foundry.documents.collections.Actors;
-  Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
-  Actors.registerSheet("axiom", axiomCharacterSheet, {
-    types: ["Character"], // must match template.json
+  foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
+  foundry.documents.collections.Actors.registerSheet("axiom", axiomCharacterSheet, {
+    types: ["character"], // must match template.json
     makeDefault: true,
-    label: "Character",
+    label: "AXIOM.SheetClassCharacter",
   });
 
   // Load all Partial-Handlebar Files
@@ -39,10 +38,9 @@ function preloadHandlebarsTemplates() {
   const templatePaths = [
     "systems/axiom/templates/sheets/character/main.hbs",
     "systems/axiom/templates/sheets/character/sidebar.hbs",
-    "systems/axiom/templates/sheets/character/trackers.hbs",
     "systems/axiom/templates/partials/tabs/skills.hbs",
     "systems/axiom/templates/partials/sidebar/attribute-tests.hbs",
-    "systems/axiom/templates/partials/sidebar/physical-limits.hbs",
+    "systems/axiom/templates/partials/sidebar/physical-limits.hbs"
   ];
 
   return foundry.applications.handlebars.loadTemplates(templatePaths);
@@ -57,7 +55,7 @@ function registerHandlebarsHelpers() {
     return element.includes(search);
   });
 
-  Handlebars.registerHelper("concat", function (s1, s2, s3 = "") {
+  Handlebars.registerHelper("customConcat", function (s1, s2, s3 = "") {
     return s1 + s2 + s3;
   });
 

@@ -2,10 +2,10 @@
     "Actor": {
 
         "types": [
-            "Character"
+            "character"
         ],
 
-        "Character": {
+        "character": {
 
             "details": {
                 "gender": "male",
@@ -86,6 +86,11 @@
                     "base": 0,
                     "mod": [],
                     "value": 0
+                },
+                "actionPoints": {
+                    "base": 0,
+                    "value": 0,
+                    "max": 0
                 }
             }          
         }

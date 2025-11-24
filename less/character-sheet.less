@@ -1,9 +1,18 @@
 // main: ./axiom.less
+
+@import url("https://fonts.googleapis.com/css2?family=Poltawski+Nowy:wght@400;600;700&display=swap");
+
 .axiom.sheet.characterSheet {
+  .sheet {
+    width: 800px;
+    height: 500px;
+  }
 
-    .sheet{
-        width: 800px;
-        height: 500px;
-    };
-
+  .window-content {
+    display: grid;
+    grid-template-columns: 35% 65%;
+    grid-template-rows: 100%;
+    overflow: hidden;
+    padding: 0;
+  }
 }

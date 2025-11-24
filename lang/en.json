@@ -1,8 +1,34 @@
 {
-    "AXIOM": {
+  "AXIOM": {
+    "SystemName": "Axiom//Core",
+    "SheetClassCharacter": "Character",
 
-        "SystemName": "Axiom//Core",
-        "SheetClassCharacter": "Character"
+    "Portrait": "Portrait",
 
-    }
+    "Health": "Health",
+    "Stamina": "Stamina",
+    "Toughness": "Toughness",
+    "Movement": "Movement",
+    "Corruption": "Corruption",
+    "FocusPoints": "Focus Points",
+    "ActionPoints": "Action Points",
+
+    "STR": "STR",
+    "AGI": "AGI",
+    "FOR": "FOR",
+    "INS": "INS",
+    "LOG": "LOG",
+    "RES": "RES",
+    "CHA": "CHA",
+    "POW": "POW",
+
+    "AttributeTests": "Attribute Tests",
+    "PhysicalLimits": "Physical Limits",
+
+    "Insight": "Insight",
+    "Perception": "Perception",
+    "Memory": "Memory",
+    "Composure": "Composure",
+    "LiftingCarrying": "Lifting & Carrying"
+  }
 }

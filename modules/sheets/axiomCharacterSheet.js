@@ -15,16 +15,16 @@ export default class axiomCharacterSheet extends api.HandlebarsApplicationMixin(
       closeOnSubmit: false,
     },
     position: {
-      width: 650,
+      width: 800,
+      height: 900,
     },
   };
 
   static PARTS = {
-
-    sidebar: { template: "systems/axiom/templates/sheets/character/sidebar.hbs" },
-    trackers: { template: "systems/axiom/templates/sheets/character/trackers.hbs" },
+    sidebar: {
+      template: "systems/axiom/templates/sheets/character/sidebar.hbs",
+    },
     main: { template: "systems/axiom/templates/sheets/character/main.hbs" },
-    
   };
 
   get title() {
@@ -66,18 +66,22 @@ export default class axiomCharacterSheet extends api.HandlebarsApplicationMixin(
 
   /** @override */
   _onRender(context, options) {
-    const tabs = new foundry.applications.ux.Tabs({
-      navSelector: ".tabs",
-      contentSelector: ".content",
-      initial: "tab1",
-    });
-    tabs.bind(this.element);
+    super._onRender(context, options);
 
-    const tabs2 = new foundry.applications.ux.Tabs({
-      navSelector: ".tabs2",
-      contentSelector: ".content",
-      initial: "tab2-1",
+    // Main tabs (skills, equipment, details, etc.)
+    const mainTabs = new foundry.applications.ux.Tabs({
+      navSelector: ".sheet-tabs",
+      contentSelector: ".sheet-content",
+      initial: "skills", // must match your first tab's data-tab!
     });
-    tabs2.bind(this.element);
+    mainTabs.bind(this.element);
+
+    // Sidebar tabs (attribute tests / physical limits)
+    const sidebarTabs = new foundry.applications.ux.Tabs({
+      navSelector: ".sidebar-tabs",
+      contentSelector: ".sidebar-content",
+      initial: "attr-tests", // must match your first sidebar tab
+    });
+    sidebarTabs.bind(this.element);
   }
 }

@@ -1,0 +1,169 @@
+// main: ./axiom.less
+.axiom.sheet.characterSheet {
+  .axiom-sidebar {
+    padding: 10px;
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden;
+    box-sizing: border-box;
+    border-right: 1px solid;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .sidebar-portrait {
+    margin-bottom: 10px;
+  }
+
+  .sidebar-portrait img {
+    cursor: pointer;
+    border-radius: 5px;
+  }
+
+  .sidebar-name {
+    padding-bottom: 10px;
+  }
+
+  .sidebar-name input#character-name {
+    font-family: "Poltawski Nowy", serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-align: center;
+    background: transparent;
+  }
+
+  .tracker-wrapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 10px;
+  }
+
+  .tracker-block {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .tracker-label {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .tracker-controls {
+    display: flex;
+    align-items: center;
+    margin: auto;
+    font-size: 20px;
+  }
+
+  .tracker-btn {
+    width: 1.2rem;
+    height: 2rem;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+  }
+
+  .tracker-controls input {
+    width: 1.5rem;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 0;
+  }
+
+  .tracker-bottom-row {
+    display: grid;
+  }
+
+  .tracker-toughness {
+    grid-column: 1;
+  }
+
+  .tracker-movement {
+    grid-column: 2;
+  }
+
+  .tracker-corruption {
+    grid-column: 3;
+  }
+
+  .attributes-grid {
+    display: grid;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: auto auto;
+    text-align: center;
+    gap: 4px;
+    margin: auto;
+    padding: 10px;
+  }
+
+  .attributes-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: auto;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .attribute {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding: 5px;
+  }
+
+  .attribute input {
+    width: 3rem;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .sidebar-tabs {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 10px;
+  }
+
+  .sidebar-tabs .item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .attribute-tests {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .attr-test-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .attr-test-roll {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .sidebar-tabs {
+    margin-bottom: 10px;
+  }
+}

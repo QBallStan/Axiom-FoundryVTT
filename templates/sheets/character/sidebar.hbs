@@ -1,86 +1,217 @@
 <div class="axiom-sidebar">
-
-  <!-- Static header -->
-  <div class="sidebar-header">
-    <div class="portrait">
-      <img src="{{actor.img}}" data-edit="img" />
-    </div>
-
-    <input type="text" name="name" value="{{actor.name}}" class="character-name" />
-
-    <textarea name="system.bio" rows="4" class="character-bio">
-      {{system.bio}}
-    </textarea>
+  <!-- PORTRAIT -->
+  <div class="sidebar-portrait">
+    <img
+      src="{{actor.img}}"
+      data-edit="img"
+      data-action="editImage"
+      title="{{actor.name}}"
+    />
   </div>
 
-  <!-- Attributes block -->
-  <div class="sidebar-attributes">
+  <!-- NAME -->
+  <div class="sidebar-name">
+    <input id="character-name" type="text" name="name" value="{{actor.name}}" />
+  </div>
+
+  <!-- STATS -->
+  <div class="sidebar-stats">
+    <div class="tracker-wrapper">
+      <!-- HEALTH -->
+      <div class="tracker-block">
+        <span class="tracker-label">{{localize "AXIOM.Health"}}</span>
+
+        <div class="tracker-controls">
+          <button
+            type="button"
+            class="tracker-btn"
+            data-action="adjust"
+            data-target="system.trackers.health.value"
+            data-amount="-1"
+          >
+            −
+          </button>
+
+          <input
+            type="number"
+            name="system.trackers.health.value"
+            value="{{system.trackers.health.value}}"
+          />
+
+          <span class="tracker-max">/{{system.trackers.health.max}}</span>
+
+          <button
+            type="button"
+            class="tracker-btn"
+            data-action="adjust"
+            data-target="system.trackers.health.value"
+            data-amount="+1"
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      <!-- STAMINA -->
+      <div class="tracker-block">
+        <span class="tracker-label">{{localize "AXIOM.Stamina"}}</span>
+
+        <div class="tracker-controls">
+          <button
+            type="button"
+            class="tracker-btn"
+            data-action="adjust"
+            data-target="system.trackers.stamina.value"
+            data-amount="-1"
+          >
+            −
+          </button>
+
+          <input
+            type="number"
+            name="system.trackers.stamina.value"
+            value="{{system.trackers.stamina.value}}"
+            min="0"
+          />
+
+          <span class="tracker-max">/{{system.trackers.stamina.max}}</span>
+
+          <button
+            type="button"
+            class="tracker-btn"
+            data-action="adjust"
+            data-target="system.trackers.stamina.value"
+            data-amount="+1"
+          >
+            +
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <!-- Row 1: Icons -->
+      <i class="fas fa-shield-alt" title="{{localize 'AXIOM.Toughness'}}"></i>
+      <i class="fas fa-shoe-prints" title="{{localize 'AXIOM.Movement'}}"></i>
+      <i class="fas fa-skull" title="{{localize 'AXIOM.Corruption'}}"></i>
+      <i class="fas fa-bolt" title="{{localize 'AXIOM.FocusPoints'}}"></i>
+      <i
+        class="fas fa-forward-step"
+        title="{{localize 'AXIOM.ActionPoints'}}"
+      ></i>
+
+      <!-- Row 2: Values -->
+      <span>{{system.trackers.toughness.value}}</span>
+      <span>{{system.trackers.movement.value}}</span>
+      <span>{{system.trackers.corruption.value}}</span>
+      <span>{{system.trackers.focus.value}}</span>
+      <span>{{system.trackers.actionPoints.value}}</span>
+    </div>
+
     <div class="attributes-grid">
-
+      <!-- Row 1 -->
       <div class="attribute">
-        <label>STR</label>
-        <input type="number" name="system.attributes.strength.value"
-               value="{{system.attributes.strength.value}}" />
+        <span>{{localize "AXIOM.STR"}}</span>
+        <input
+          type="number"
+          name="system.attributes.strength.value"
+          value="{{system.attributes.strength.value}}"
+        />
       </div>
 
       <div class="attribute">
-        <label>AGI</label>
-        <input type="number" name="system.attributes.agility.value"
-               value="{{system.attributes.agility.value}}" />
+        <span>{{localize "AXIOM.AGI"}}</span>
+        <input
+          type="number"
+          name="system.attributes.agility.value"
+          value="{{system.attributes.agility.value}}"
+        />
       </div>
 
       <div class="attribute">
-        <label>FOR</label>
-        <input type="number" name="system.attributes.fortitude.value"
-               value="{{system.attributes.fortitude.value}}" />
+        <span>{{localize "AXIOM.FOR"}}</span>
+        <input
+          type="number"
+          name="system.attributes.fortitude.value"
+          value="{{system.attributes.fortitude.value}}"
+        />
       </div>
 
       <div class="attribute">
-        <label>LOG</label>
-        <input type="number" name="system.attributes.logic.value"
-               value="{{system.attributes.logic.value}}" />
+        <span>{{localize "AXIOM.INS"}}</span>
+        <input
+          type="number"
+          name="system.attributes.instinct.value"
+          value="{{system.attributes.instinct.value}}"
+        />
+      </div>
+
+      <!-- Row 2 -->
+      <div class="attribute">
+        <span>{{localize "AXIOM.LOG"}}</span>
+        <input
+          type="number"
+          name="system.attributes.logic.value"
+          value="{{system.attributes.logic.value}}"
+        />
       </div>
 
       <div class="attribute">
-        <label>RES</label>
-        <input type="number" name="system.attributes.resolve.value"
-               value="{{system.attributes.resolve.value}}" />
+        <span>{{localize "AXIOM.RES"}}</span>
+        <input
+          type="number"
+          name="system.attributes.resolve.value"
+          value="{{system.attributes.resolve.value}}"
+        />
       </div>
 
       <div class="attribute">
-        <label>CHA</label>
-        <input type="number" name="system.attributes.charisma.value"
-               value="{{system.attributes.charisma.value}}" />
+        <span>{{localize "AXIOM.CHA"}}</span>
+        <input
+          type="number"
+          name="system.attributes.charisma.value"
+          value="{{system.attributes.charisma.value}}"
+        />
       </div>
 
       <div class="attribute">
-        <label>INS</label>
-        <input type="number" name="system.attributes.instinct.value"
-               value="{{system.attributes.instinct.value}}" />
+        <span>{{localize "AXIOM.POW"}}</span>
+        <input
+          type="number"
+          name="system.attributes.power.value"
+          value="{{system.attributes.power.value}}"
+        />
       </div>
+    </div>
 
-      <div class="attribute attribute--empty"></div>
+    <div class="sidebar-tabs-container">
+      <nav class="sidebar-tabs tabs" data-group="sidebar">
+        <a
+          class="item"
+          data-tab="attr-tests"
+          title="{{localize 'AXIOM.AttributeTests'}}"
+        >
+          <i class="fas fa-list-check"></i>
+        </a>
 
+        <a
+          class="item"
+          data-tab="phys-limits"
+          title="{{localize 'AXIOM.PhysicalLimits'}}"
+        >
+          <i class="fas fa-dumbbell"></i>
+        </a>
+      </nav>
+
+      <section class="sidebar-content">
+        <div class="tab" data-tab="attr-tests">
+          {{> "systems/axiom/templates/partials/sidebar/attribute-tests.hbs"}}
+        </div>
+
+        <div class="tab" data-tab="phys-limits">
+          {{> "systems/axiom/templates/partials/sidebar/physical-limits.hbs"}}
+        </div>
+      </section>
     </div>
   </div>
-
-  <!-- Sidebar Tabs -->
-  <nav class="sidebar-tabs" data-group="sidebar">
-    <a class="item" data-tab="attr-tests">Attribute Tests</a>
-    <a class="item" data-tab="phys-limits">Physical Limits</a>
-  </nav>
-
-  <!-- Sidebar Tab Content -->
-  <section class="sidebar-content">
-
-    <div class="tab" data-tab="attr-tests">
-      {{> "systems/axiom/templates/partials/sidebar/attribute-tests.hbs"}}
-    </div>
-
-    <div class="tab" data-tab="phys-limits">
-      {{> "systems/axiom/templates/partials/sidebar/physical-limits.hbs"}}
-    </div>
-
-  </section>
-
 </div>
