@@ -1,0 +1,66 @@
+<div class="item-header">
+  <div class="item-name-row">
+    <input
+      type="text"
+      name="name"
+      value="{{item.name}}"
+      class="item-name-input"
+      placeholder="Item Name"
+    />
+  </div>
+
+  <div class="item-header-grid">
+    <div class="item-image">
+      <img
+        src="{{item.img}}"
+        data-edit="img"
+        data-action="editImage"
+        alt="{{item.name}}"
+      />
+    </div>
+
+    <div class="item-meta">
+      <div class="meta-field meta-type-row">
+        <label>Type</label>
+        <div class="meta-value">{{this.type}}</div>
+      </div>
+
+      {{#if isPhysical}}
+      <div class="physical-grid">
+        <div class="meta-field">
+          <label>Quantity</label>
+          <input
+            type="number"
+            name="system.quantity"
+            value="{{system.quantity}}"
+          />
+        </div>
+
+        <div class="meta-field">
+          <label>Weight</label>
+          <input
+            type="number"
+            name="system.weight"
+            value="{{system.weight}}"
+            step="0.1"
+          />
+        </div>
+
+        <div class="meta-field">
+          <label>Price</label>
+          <input type="number" name="system.price" value="{{system.price}}" />
+        </div>
+
+        <div class="meta-field">
+          <label>Availability</label>
+          <input
+            type="text"
+            name="system.availability"
+            value="{{system.availability}}"
+          />
+        </div>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>

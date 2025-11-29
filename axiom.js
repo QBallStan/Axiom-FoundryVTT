@@ -1,6 +1,9 @@
 import { AXIOM } from "./modules/config.js";
 import axiomActor from "./modules/objects/axiomActor.js";
 import axiomCharacterSheet from "./modules/sheets/axiomCharacterSheet.js";
+import axiomItem from "./modules/objects/axiomItem.js";
+import axiomItemSheet from "./modules/sheets/axiomItemSheet.js";
+
 
 Hooks.once("init", async () => {
   console.log("AXIOM | Initializing Axiom//Core System");
@@ -9,14 +12,34 @@ Hooks.once("init", async () => {
   CONFIG.AXIOM = AXIOM;
   CONFIG.INIT = true;
   CONFIG.Actor.documentClass = axiomActor;
+  CONFIG.Item.documentClass = axiomItem;
 
-  // Register custom Sheets and unregister the default Sheets
+  const { DocumentSheetConfig } = foundry.applications.apps;
 
-  foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
-  foundry.documents.collections.Actors.registerSheet("axiom", axiomCharacterSheet, {
-    types: ["character"], // must match template.json
+  const actorClass = CONFIG.Actor.documentClass;
+  const itemClass = CONFIG.Item.documentClass;
+
+  DocumentSheetConfig.unregisterSheet(
+    actorClass,
+    "core",
+    foundry.appv1.sheets.ActorSheet
+  );
+
+  DocumentSheetConfig.registerSheet(actorClass, "axiom", axiomCharacterSheet, {
+    types: ["character"],
     makeDefault: true,
     label: "AXIOM.SheetClassCharacter",
+  });
+
+  DocumentSheetConfig.unregisterSheet(
+    itemClass,
+    "core",
+    foundry.appv1.sheets.ItemSheet
+  );
+
+  DocumentSheetConfig.registerSheet(itemClass, "axiom", axiomItemSheet, {
+    types: ["skill", "weapon", "armor"],
+    makeDefault: true,
   });
 
   // Load all Partial-Handlebar Files
@@ -36,11 +59,40 @@ Hooks.once("ready", async () => {
 
 function preloadHandlebarsTemplates() {
   const templatePaths = [
-    "systems/axiom/templates/sheets/character/main.hbs",
-    "systems/axiom/templates/sheets/character/sidebar.hbs",
-    "systems/axiom/templates/partials/tabs/skills.hbs",
-    "systems/axiom/templates/partials/sidebar/attribute-tests.hbs",
-    "systems/axiom/templates/partials/sidebar/physical-limits.hbs"
+    /* -------------------------------------------- */
+    /*  ITEM SHEET PARTS                            */
+    /* -------------------------------------------- */
+
+    // Item root parts
+    "systems/axiom/templates/item/header.hbs",
+    "systems/axiom/templates/item/tabs.hbs",
+
+    // Item tab content
+    "systems/axiom/templates/item/tabs/description.hbs",
+    "systems/axiom/templates/item/tabs/effects.hbs",
+
+    // Item types (details tab)
+    "systems/axiom/templates/item/types/skill.hbs",
+    "systems/axiom/templates/item/types/weapon.hbs",
+    "systems/axiom/templates/item/types/armor.hbs",
+
+    /* -------------------------------------------- */
+    /*  CHARACTER SHEET PARTS                       */
+    /* -------------------------------------------- */
+
+    // Sidebar + Main Tabs Header
+    "systems/axiom/templates/actor/sidebar.hbs",
+    "systems/axiom/templates/actor/tabs.hbs",
+
+    // Sidebar Mini-Tabs
+    "systems/axiom/templates/actor/mini-tabs/attribute-tests.hbs",
+    "systems/axiom/templates/actor/mini-tabs/physical-limits.hbs",
+
+    // Main Tabs
+    "systems/axiom/templates/actor/tabs/skills.hbs",
+    "systems/axiom/templates/actor/tabs/combat.hbs",
+    "systems/axiom/templates/actor/tabs/inventory.hbs",
+    "systems/axiom/templates/actor/tabs/details.hbs",
   ];
 
   return foundry.applications.handlebars.loadTemplates(templatePaths);
@@ -99,5 +151,27 @@ function registerHandlebarsHelpers() {
     if (value == 0 || value == "0") return true;
     if (value == null || value == "") return false;
     return true;
+  });
+
+  Handlebars.registerHelper("math", function (lvalue, operator, rvalue) {
+    lvalue = Number(lvalue);
+    rvalue = Number(rvalue);
+
+    switch (operator) {
+      case "+":
+        return lvalue + rvalue;
+      case "-":
+        return lvalue - rvalue;
+      case "*":
+        return lvalue * rvalue;
+      case "/":
+        return lvalue / rvalue;
+      default:
+        return 0;
+    }
+  });
+
+  Handlebars.registerHelper("attrValue", function (actor, attrKey) {
+    return actor.system.attributes[attrKey]?.value ?? 0;
   });
 }

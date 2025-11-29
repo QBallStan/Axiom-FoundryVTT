@@ -1,122 +1,140 @@
 {
-    "Actor": {
+  "Actor": {
+    "types": ["character"],
 
-        "types": [
-            "character"
-        ],
+    "character": {
+      "details": {
+        "gender": "male",
+        "age": "20",
+        "height": "180",
+        "weight": "80"
+      },
 
-        "character": {
-
-            "details": {
-                "gender": "male",
-                "age": "20",
-                "height": "180",
-                "weight": "80"
-            },
-
-            "attributes": {
-                "strength": {
-                    "base": 0,
-                    "mod": [],
-                    "value": 0
-                },
-                "agility": {
-                    "base": 0,
-                    "mod": [],
-                    "value": 0
-                },
-                "fortitude": {
-                    "base": 0,
-                    "mod": [],
-                    "value": 0
-                },
-                "logic": {
-                    "base": 0,
-                    "mod": [],
-                    "value": 0
-                },
-                "resolve": {
-                    "base": 0,
-                    "mod": [],
-                    "value": 0
-                },
-                "charisma": {
-                    "base": 0,
-                    "mod": [],
-                    "value": 0
-                },
-                "instinct": {
-                    "base": 0,
-                    "mod": [],
-                    "value": 0
-                },
-                "power": {
-                    "base": 0,
-                    "mod": [],
-                    "value": 0
-                }
-            },
-            
-            "trackers": {
-                "health": {
-                    "base": 0,
-                    "value": 0,
-                    "max": 0
-                },
-                "stamina": {
-                    "base": 0,
-                    "value": 0,
-                    "max": 0
-                },
-                "focus": {
-                    "value": 0,
-                    "max": 0
-                },
-                "movement": {
-                    "base": 0,
-                    "value": 0,
-                    "max": 0
-                },
-                "corruption": {
-                    "base": 0,
-                    "value": 0,
-                    "max": 0
-                },
-                "toughness": {
-                    "base": 0,
-                    "mod": [],
-                    "value": 0
-                },
-                "actionPoints": {
-                    "base": 0,
-                    "value": 0,
-                    "max": 0
-                }
-            }          
+      "attributes": {
+        "strength": {
+          "base": 0,
+          "mod": [],
+          "value": 0
+        },
+        "agility": {
+          "base": 0,
+          "mod": [],
+          "value": 0
+        },
+        "fortitude": {
+          "base": 0,
+          "mod": [],
+          "value": 0
+        },
+        "logic": {
+          "base": 0,
+          "mod": [],
+          "value": 0
+        },
+        "resolve": {
+          "base": 0,
+          "mod": [],
+          "value": 0
+        },
+        "charisma": {
+          "base": 0,
+          "mod": [],
+          "value": 0
+        },
+        "instinct": {
+          "base": 0,
+          "mod": [],
+          "value": 0
+        },
+        "power": {
+          "base": 0,
+          "mod": [],
+          "value": 0
         }
+      },
+
+      "trackers": {
+        "health": {
+          "base": 0,
+          "value": 0,
+          "max": 0
+        },
+        "stamina": {
+          "base": 0,
+          "value": 0,
+          "max": 0
+        },
+        "focus": {
+          "value": 0,
+          "max": 0
+        },
+        "movement": {
+          "base": 0,
+          "value": 0,
+          "max": 0
+        },
+        "corruption": {
+          "base": 0,
+          "value": 0,
+          "max": 0
+        },
+        "toughness": {
+          "base": 0,
+          "mod": [],
+          "value": 0
+        },
+        "actionPoints": {
+          "base": 0,
+          "value": 0,
+          "max": 0
+        }
+      }
+    }
+  },
+
+  "Item": {
+    "types": ["skill", "armor", "weapon"],
+
+    "templates": {
+      "generalItems": {
+        "weight": 10,
+        "value": 100,
+        "description": ""
+      }
     },
 
-    "Item": {
+    "skill": {
+      "attribute": "",
+      "level": {
+        "min": 0,
+        "max": 0,
+        "value": 0
+      },
+      "isExpertise": false,
+      "isSpecialized": false,
+      "spec": [],
+      "description": ""
+    },
 
-        "types": [
-            "Item"
-        ],
+    "armor": {
+      "value": 0,
+      "description": ""
+    },
 
-        "templates": {
-
-            "generalItems": {
-                
-                "weight": 10,
-                "value": 100,
-                "description": ""
-            }
-        },
-
-        "item": {
-            
-            "templates": ["generalItems"],
-            "type": "item",
-            "quantity": 1
-        }
+    "weapon": {
+      "category": "",
+      "skill": "",
+      "damage": {
+        "value": 0,
+        "class": "",
+        "type": ""
+      },
+      "ap": 0,
+      "range": {
+        "short": "",
+        "medium": "",
+        "long": ""
+      }
     }
+  }
 }

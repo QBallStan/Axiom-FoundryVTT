@@ -19,6 +19,10 @@
   font-display: swap;
   src: url(https://fonts.gstatic.com/s/poltawskinowy/v5/flUsRq6ww480U1xsUpFXD-iDBNlSAOLkKCLnWq8KTyKnDQ.ttf) format('truetype');
 }
+.axiom.sheet.characterSheet {
+  /* Base button style */
+  /* Icon size */
+}
 .axiom.sheet.characterSheet .sheet {
   width: 800px;
   height: 500px;
@@ -29,6 +33,36 @@
   grid-template-rows: 100%;
   overflow: hidden;
   padding: 0;
+}
+.axiom.sheet.characterSheet .main {
+  padding: 10px;
+}
+.axiom.sheet.characterSheet .sheet-tabs {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.axiom.sheet.characterSheet .sheet-tabs button.item {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.axiom.sheet.characterSheet .sheet-tabs button.item i {
+  font-size: 18px;
+  /* fits neatly inside 30×30 */
+  line-height: 1;
 }
 .axiom.sheet.characterSheet .axiom-sidebar {
   padding: 10px;
@@ -170,4 +204,61 @@
 }
 .axiom.sheet.characterSheet .sidebar-tabs {
   margin-bottom: 10px;
+}
+.axiom.sheet.itemSheet .item-header {
+  display: flex;
+  flex-direction: column;
+}
+.axiom.sheet.itemSheet .item-name-row {
+  display: flex;
+  margin-bottom: 10px;
+}
+.axiom.sheet.itemSheet .item-header-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: stretch;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.axiom.sheet.itemSheet .item-image {
+  display: flex;
+}
+.axiom.sheet.itemSheet .item-image img {
+  display: block;
+  width: 100%;
+  height: 100px;
+  object-fit: contain;
+  cursor: pointer;
+}
+.axiom.sheet.itemSheet .item-meta {
+  display: flex;
+  flex-direction: column;
+}
+.axiom.sheet.itemSheet .meta-field {
+  display: grid;
+  grid-template-columns: 100px 100px;
+  /* consistent alignment */
+  align-items: center;
+  margin: 2px;
+}
+.axiom.sheet.itemSheet .physical-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+}
+.axiom.sheet.itemSheet .meta-value {
+  display: flex;
+  align-items: center;
+}
+.axiom.sheet.itemSheet .item-name-input {
+  width: 100%;
+  display: block;
+  text-align: center;
+}
+.axiom.sheet.itemSheet .item-tabs {
+  display: flex;
+  flex-direction: row;
+}
+.axiom.sheet.itemSheet .axiom-prosemirror {
+  height: 300px;
 }

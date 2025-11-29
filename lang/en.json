@@ -29,6 +29,10 @@
     "Perception": "Perception",
     "Memory": "Memory",
     "Composure": "Composure",
-    "LiftingCarrying": "Lifting & Carrying"
+    "LiftingCarrying": "Lifting & Carrying",
+
+    "Description": "Description",
+    "Details": "Details",
+    "Effects": "Effects"
   }
 }

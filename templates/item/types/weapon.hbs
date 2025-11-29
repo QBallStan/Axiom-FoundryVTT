@@ -1,0 +1,78 @@
+<div class="weapon-section">
+
+  <!-- GENERAL INFORMATION -->
+  <h3 class="section-title">General Information</h3>
+
+  <div class="weapon-row-2col">
+
+    <!-- Category -->
+    <div class="field-label">Category</div>
+    <div class="field-input">
+      <select name="system.category">
+        {{selectOptions config.weaponCategories selected=system.category localize=false}}
+      </select>
+    </div>
+
+    <!-- Skill -->
+    <div class="field-label">Skill</div>
+    <div class="field-input">
+      <input type="text" name="system.skill" value="{{system.skill}}">
+    </div>
+
+  </div>
+
+
+  <!-- DAMAGE -->
+  <h3 class="section-title">Damage</h3>
+
+  <!-- Damage value + AP -->
+  <div class="weapon-row-2col">
+
+    <div class="field-label">Damage Value</div>
+    <div class="field-input">
+      <input type="number" name="system.damage.value" value="{{system.damage.value}}">
+    </div>
+
+    <div class="field-label">Armor Penetration</div>
+    <div class="field-input">
+      <input type="number" name="system.ap" value="{{system.ap}}">
+    </div>
+
+  </div>
+
+  <!-- Damage Class + Type -->
+  <div class="weapon-row-2col">
+
+    <div class="field-label">Damage Class</div>
+    <div class="field-input">
+      <select name="system.damage.class">
+        {{selectOptions config.damageClasses selected=system.damage.class localize=false}}
+      </select>
+    </div>
+
+    <div class="field-label">Damage Type</div>
+    <div class="field-input">
+      <select name="system.damage.type">
+        {{selectOptions config.damageTypes selected=system.damage.type localize=false}}
+      </select>
+    </div>
+
+  </div>
+
+
+  <!-- RANGE -->
+  <h3 class="section-title">Range</h3>
+
+  <div class="range-label-row">
+    <div class="range-sub-label">Short</div>
+    <div class="range-sub-label">Medium</div>
+    <div class="range-sub-label">Long</div>
+  </div>
+
+  <div class="range-input-row">
+    <input type="text" name="system.range.short"  value="{{system.range.short}}">
+    <input type="text" name="system.range.medium" value="{{system.range.medium}}">
+    <input type="text" name="system.range.long"   value="{{system.range.long}}">
+  </div>
+
+</div>

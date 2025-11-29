@@ -1,0 +1,74 @@
+// main: ./axiom.less
+
+.axiom.sheet.itemSheet {
+  // main: ./axiom.less
+
+  .item-header {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .item-name-row {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  .item-header-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .item-image {
+    display: flex;
+  }
+
+  .item-image img {
+    display: block;
+    width: 100%;
+    height: 100px;
+    object-fit: contain;
+    cursor: pointer;
+  }
+
+  .item-meta {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .meta-field {
+    display: grid;
+    grid-template-columns: 100px 100px;
+    /* consistent alignment */
+    align-items: center;
+    margin: 2px;
+  }
+
+  .physical-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  .meta-value {
+    display: flex;
+    align-items: center;
+  }
+
+  .item-name-input {
+    width: 100%;
+    display: block;
+    text-align: center;
+  }
+
+  .item-tabs {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .axiom-prosemirror {
+    height: 300px;
+  }
+}

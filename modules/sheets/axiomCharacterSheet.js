@@ -22,9 +22,12 @@ export default class axiomCharacterSheet extends api.HandlebarsApplicationMixin(
 
   static PARTS = {
     sidebar: {
-      template: "systems/axiom/templates/sheets/character/sidebar.hbs",
+      template: "systems/axiom/templates/actor/sidebar.hbs",
     },
-    main: { template: "systems/axiom/templates/sheets/character/main.hbs" },
+
+    tabs: {
+      template: "systems/axiom/templates/actor/tabs.hbs",
+    },
   };
 
   get title() {
