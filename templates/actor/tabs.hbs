@@ -1,44 +1,26 @@
-<div class="main">
-
-  <nav class="sheet-tabs" data-group="main">
-
-    <button type="button" class="item" data-tab="skills" title="Skills">
-      <i class="fas fa-graduation-cap"></i>
-    </button>
-
-    <button type="button" class="item" data-tab="combat" title="Combat">
-      <i class="fas fa-fist-raised"></i>
-    </button>
-
-    <button type="button" class="item" data-tab="inventory" title="Inventory">
-      <i class="fas fa-box-open"></i>
-    </button>
-
-    <button type="button" class="item" data-tab="details" title="Details">
-      <i class="fas fa-info-circle"></i>
-    </button>
-
+<div
+  class="axiom-main-tabs"
+  data-application-part="tabs"
+  data-application-tabs="sheet"
+>
+  <nav class="sheet-tabs tabs" aria-roledescription="Main Navigation">
+    {{#each tabs.sheet as |tab|}}
+    <a
+      data-action="tab"
+      data-group="{{tab.group}}"
+      data-tab="{{tab.id}}"
+      class="{{tab.cssClass}}"
+    >
+      {{#if tab.icon}}<i class="{{tab.icon}}"></i>{{/if}}
+    </a>
+    {{/each}}
   </nav>
 
-  <section class="sheet-content">
-
-    <div class="tab" data-tab="skills">
-      {{> "systems/axiom/templates/actor/tabs/skills.hbs"}}
-    </div>
-
-    <div class="tab" data-tab="combat">
-      {{> "systems/axiom/templates/actor/tabs/combat.hbs"}}
-    </div>
-
-    <div class="tab" data-tab="inventory">
-      {{> "systems/axiom/templates/actor/tabs/inventory.hbs"}}
-    </div>
-
-    <div class="tab" data-tab="details">
-      {{> "systems/axiom/templates/actor/tabs/details.hbs"}}
-    </div>
-
-  </section>
-
+  <!-- TAB CONTENT (injected by AppV2) -->
+  <div class="sheet-content">
+    <section data-application-part="skills"></section>
+    <section data-application-part="combat"></section>
+    <section data-application-part="inventory"></section>
+    <section data-application-part="details"></section>
+  </div>
 </div>
-

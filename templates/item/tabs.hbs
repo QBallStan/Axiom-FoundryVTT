@@ -1,35 +1,12 @@
-<div class="item-main">
-
-  <nav class="item-tabs" data-group="primary">
-
-    <button class="item" data-tab="description" title="Description">
-      <i class="fa-solid fa-list"> Description</i>
-    </button>
-
-    <button class="item" data-tab="details" title="Details">
-      <i class="fa-solid fa-gear"> Details</i>
-    </button>
-
-    <button class="item" data-tab="effects" title="Effects">
-      <i class="fa-solid fa-wand-magic-sparkles"> Effects</i>
-    </button>
-
-  </nav>
-
-  <section class="item-content">
-
-    <div class="tab" data-tab="description">
-      {{> "systems/axiom/templates/item/tabs/description.hbs"}}
-    </div>
-
-    <div class="tab" data-tab="details">
-      {{> (concat "systems/axiom/templates/item/types/" type ".hbs") }}
-    </div>
-
-    <div class="tab" data-tab="effects">
-      {{> "systems/axiom/templates/item/tabs/effects.hbs"}}
-    </div>
-
-  </section>
-
-</div>
+<nav class="sheet-tabs tabs" aria-roledescription="Tabs Navigation">
+  {{#each tabs as |tab|}}
+  <a
+    data-action="tab"
+    data-group="{{tab.group}}"
+    data-tab="{{tab.id}}"
+    class="{{tab.cssClass}}"
+  >
+    {{#if tab.icon}}<i class="{{tab.icon}}" inert></i>{{/if}} {{localize tab.label}}
+  </a>
+  {{/each}}
+</nav>

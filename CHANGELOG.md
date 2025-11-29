@@ -7,6 +7,24 @@ and this project adheres to **Semantic Versioning (SemVer)**.
 
 ---
 
+## **[0.0.3] – 2025-11-29**
+### Added
+
+- Implemented full AppV2 **PARTS** structure for actors & items  
+- Added new AppV2-compatible **Item Sheets** for:
+  - Skill items
+  - Weapon items
+  - Armor items  
+    (early WIP but functional structure and navigation)
+    
+### Changed
+
+- Fully migrated the Character sheet to **ApplicationV2 + Handlebars**, replacing all legacy template logic.
+- Rebuilt `sidebar.hbs`, `tabs.hbs`, and all actor tab templates to follow the AppV2 architecture.
+- Standardized tab navigation across Actor and Item sheets (consistent Handlebars loops, data-group / data-tab usage).
+
+---
+
 ## [0.0.2] - 2025-11-17
 ### Added
 - Completed initial sidebar layout for the Character sheet.

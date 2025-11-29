@@ -1,4 +1,8 @@
-<div class="axiom-sidebar">
+<div
+  class="axiom-sidebar"
+  data-application-part="sidebar"
+  data-application-tabs="sidebar"
+>
   <!-- PORTRAIT -->
   <div class="sidebar-portrait">
     <img
@@ -183,35 +187,19 @@
         />
       </div>
     </div>
-
-    <div class="sidebar-tabs-container">
-      <nav class="sidebar-tabs tabs" data-group="sidebar">
-        <a
-          class="item"
-          data-tab="attr-tests"
-          title="{{localize 'AXIOM.AttributeTests'}}"
-        >
-          <i class="fas fa-list-check"></i>
-        </a>
-
-        <a
-          class="item"
-          data-tab="phys-limits"
-          title="{{localize 'AXIOM.PhysicalLimits'}}"
-        >
-          <i class="fas fa-dumbbell"></i>
-        </a>
-      </nav>
-
-      <section class="sidebar-content">
-        <div class="tab" data-tab="attr-tests">
-          {{> "systems/axiom/templates/actor/mini-tabs/attribute-tests.hbs"}}
-        </div>
-
-        <div class="tab" data-tab="phys-limits">
-          {{> "systems/axiom/templates/actor/mini-tabs/physical-limits.hbs"}}
-        </div>
-      </section>
-    </div>
   </div>
+  <nav class="sidebar-tabs tabs">
+    {{#each tabs.sidebar}}
+    <a
+      data-action="tab"
+      data-group="{{this.group}}"
+      data-tab="{{this.id}}"
+      class="{{this.cssClass}}"
+    >
+      <span>{{localize this.label}}</span>
+    </a>
+    {{/each}}
+  </nav>
+  <section data-application-part="attribute-tests"></section>
+  <section data-application-part="physical-limits"></section>
 </div>

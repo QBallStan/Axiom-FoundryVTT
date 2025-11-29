@@ -1,0 +1,51 @@
+// main: ./axiom.less
+
+.axiom.sheet.item {
+  .section-title {
+    font-weight: 700;
+    font-size: 15px;
+    margin: 14px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.9;
+  }
+
+  .weapon-row-2col {
+    display: grid;
+    grid-template-columns: 120px 1fr 120px 1fr;
+    grid-column-gap: 16px;
+    grid-row-gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .field-label {
+    font-weight: 600;
+    font-size: 13px;
+    margin-top: 6px;
+  }
+
+  .field-input input,
+  .field-input select {
+    width: 100%;
+  }
+  
+  .range-label-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    font-weight: 600;
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .range-input-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column-gap: 16px;
+  }
+
+  .range-input-row input {
+    width: 100%;
+    text-align: center;
+  }
+}

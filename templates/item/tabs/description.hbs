@@ -1,12 +1,22 @@
-<section class="tab" data-group="primary" data-tab="description">
+<section
+  class="sheet-body tab flexcol {{tabs.description.cssClass}}"
+  data-tab="{{tabs.description.id}}"
+  data-group="{{tabs.description.group}}"
+>
+  {{#if isEditable}}
   <prose-mirror
     name="system.description"
     data-document-u-u-i-d="{{item.uuid}}"
     value="{{system.description}}"
     collaborate="true"
-    toggled="false"
+    toggled="true"
     class="axiom-prosemirror"
   >
-    {{{enrichedDescription}}}
+    {{{description.publicHTML}}}
   </prose-mirror>
+  {{else}}
+  <article class="editor-content scrollable">
+    {{{description.publicHTML}}}
+  </article>
+  {{/if}}
 </section>

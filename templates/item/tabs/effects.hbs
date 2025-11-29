@@ -1,3 +1,15 @@
-<section class="tab" data-group="primary" data-tab="effects">
-  <p>TEST</p>
+<section class="sheet-body tab flexcol {{tabs.effects.cssClass}}"
+         data-tab="{{tabs.effects.id}}"
+         data-group="{{tabs.effects.group}}">
+
+  <div class="effects-list">
+    {{#each effects}}
+    <div class="effect">
+      <span>{{this.label}}</span>
+    </div>
+    {{else}}
+    <p>No effects.</p>
+    {{/each}}
+  </div>
+
 </section>

@@ -19,52 +19,21 @@
   font-display: swap;
   src: url(https://fonts.gstatic.com/s/poltawskinowy/v5/flUsRq6ww480U1xsUpFXD-iDBNlSAOLkKCLnWq8KTyKnDQ.ttf) format('truetype');
 }
-.axiom.sheet.characterSheet {
-  /* Base button style */
-  /* Icon size */
-}
-.axiom.sheet.characterSheet .sheet {
+.axiom.sheet.character .sheet {
   width: 800px;
   height: 500px;
 }
-.axiom.sheet.characterSheet .window-content {
+.axiom.sheet.character .window-content {
   display: grid;
   grid-template-columns: 35% 65%;
   grid-template-rows: 100%;
   overflow: hidden;
   padding: 0;
 }
-.axiom.sheet.characterSheet .main {
+.axiom.sheet.character .main {
   padding: 10px;
 }
-.axiom.sheet.characterSheet .sheet-tabs {
-  display: flex;
-  flex-direction: row;
-  gap: 6px;
-  justify-content: flex-start;
-  align-items: center;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-.axiom.sheet.characterSheet .sheet-tabs button.item {
-  width: 30px;
-  height: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: none;
-  background: none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-  border-radius: 4px;
-}
-.axiom.sheet.characterSheet .sheet-tabs button.item i {
-  font-size: 18px;
-  /* fits neatly inside 30×30 */
-  line-height: 1;
-}
-.axiom.sheet.characterSheet .axiom-sidebar {
+.axiom.sheet.character .axiom-sidebar {
   padding: 10px;
   grid-column: 1;
   grid-row: 1;
@@ -76,45 +45,45 @@
   margin-top: 10px;
   margin-bottom: 10px;
 }
-.axiom.sheet.characterSheet .sidebar-portrait {
+.axiom.sheet.character .sidebar-portrait {
   margin-bottom: 10px;
 }
-.axiom.sheet.characterSheet .sidebar-portrait img {
+.axiom.sheet.character .sidebar-portrait img {
   cursor: pointer;
   border-radius: 5px;
 }
-.axiom.sheet.characterSheet .sidebar-name {
+.axiom.sheet.character .sidebar-name {
   padding-bottom: 10px;
 }
-.axiom.sheet.characterSheet .sidebar-name input#character-name {
+.axiom.sheet.character .sidebar-name input#character-name {
   font-family: "Poltawski Nowy", serif;
   font-size: 1.4rem;
   font-weight: 700;
   text-align: center;
   background: transparent;
 }
-.axiom.sheet.characterSheet .tracker-wrapper {
+.axiom.sheet.character .tracker-wrapper {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
   padding: 10px;
 }
-.axiom.sheet.characterSheet .tracker-block {
+.axiom.sheet.character .tracker-block {
   display: flex;
   flex-direction: column;
   width: 100%;
 }
-.axiom.sheet.characterSheet .tracker-label {
+.axiom.sheet.character .tracker-label {
   font-size: 20px;
   text-align: center;
 }
-.axiom.sheet.characterSheet .tracker-controls {
+.axiom.sheet.character .tracker-controls {
   display: flex;
   align-items: center;
   margin: auto;
   font-size: 20px;
 }
-.axiom.sheet.characterSheet .tracker-btn {
+.axiom.sheet.character .tracker-btn {
   width: 1.2rem;
   height: 2rem;
   text-align: center;
@@ -124,28 +93,28 @@
   align-items: center;
   border: none;
 }
-.axiom.sheet.characterSheet .tracker-controls input {
+.axiom.sheet.character .tracker-controls input {
   width: 1.5rem;
   text-align: center;
   box-sizing: border-box;
   padding: 0;
 }
-.axiom.sheet.characterSheet .tracker-bottom-row {
+.axiom.sheet.character .tracker-bottom-row {
   display: grid;
 }
-.axiom.sheet.characterSheet .tracker-toughness {
+.axiom.sheet.character .tracker-toughness {
   grid-column: 1;
 }
-.axiom.sheet.characterSheet .tracker-movement {
+.axiom.sheet.character .tracker-movement {
   grid-column: 2;
 }
-.axiom.sheet.characterSheet .tracker-corruption {
+.axiom.sheet.character .tracker-corruption {
   grid-column: 3;
 }
-.axiom.sheet.characterSheet .attributes-grid {
+.axiom.sheet.character .attributes-grid {
   display: grid;
 }
-.axiom.sheet.characterSheet .stats-grid {
+.axiom.sheet.character .stats-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: auto auto;
@@ -154,111 +123,152 @@
   margin: auto;
   padding: 10px;
 }
-.axiom.sheet.characterSheet .attributes-grid {
+.axiom.sheet.character .attributes-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: auto;
   padding: 10px;
   margin-bottom: 10px;
 }
-.axiom.sheet.characterSheet .attribute {
+.axiom.sheet.character .attribute {
   display: flex;
   flex-direction: column;
   text-align: center;
   padding: 5px;
 }
-.axiom.sheet.characterSheet .attribute input {
+.axiom.sheet.character .attribute input {
   width: 3rem;
   margin: 0 auto;
   text-align: center;
 }
-.axiom.sheet.characterSheet .sidebar-tabs {
+.axiom.sheet.character .sidebar-tabs {
   display: flex;
   gap: 0.25rem;
   margin-bottom: 10px;
 }
-.axiom.sheet.characterSheet .sidebar-tabs .item {
+.axiom.sheet.character .sidebar-tabs .item {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 2rem;
   height: 2rem;
 }
-.axiom.sheet.characterSheet .attribute-tests {
+.axiom.sheet.character .attribute-tests {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
-.axiom.sheet.characterSheet .attr-test-row {
+.axiom.sheet.character .attr-test-row {
   display: grid;
   grid-template-columns: 1fr auto auto;
   align-items: center;
   gap: 0.5rem;
 }
-.axiom.sheet.characterSheet .attr-test-roll {
+.axiom.sheet.character .attr-test-roll {
   width: 2rem;
   height: 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.axiom.sheet.characterSheet .sidebar-tabs {
+.axiom.sheet.character .sidebar-tabs {
   margin-bottom: 10px;
 }
-.axiom.sheet.itemSheet .item-header {
+.axiom.sheet.item .item-header {
   display: flex;
   flex-direction: column;
 }
-.axiom.sheet.itemSheet .item-name-row {
+.axiom.sheet.item .item-name-row {
   display: flex;
   margin-bottom: 10px;
 }
-.axiom.sheet.itemSheet .item-header-grid {
+.axiom.sheet.item .item-header-grid {
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: stretch;
   gap: 10px;
   margin-bottom: 10px;
 }
-.axiom.sheet.itemSheet .item-image {
+.axiom.sheet.item .item-image {
   display: flex;
 }
-.axiom.sheet.itemSheet .item-image img {
+.axiom.sheet.item .item-image img {
   display: block;
   width: 100%;
   height: 100px;
   object-fit: contain;
   cursor: pointer;
 }
-.axiom.sheet.itemSheet .item-meta {
+.axiom.sheet.item .item-meta {
   display: flex;
   flex-direction: column;
 }
-.axiom.sheet.itemSheet .meta-field {
+.axiom.sheet.item .meta-field {
   display: grid;
   grid-template-columns: 100px 100px;
   /* consistent alignment */
   align-items: center;
   margin: 2px;
 }
-.axiom.sheet.itemSheet .physical-grid {
+.axiom.sheet.item .physical-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: start;
 }
-.axiom.sheet.itemSheet .meta-value {
+.axiom.sheet.item .meta-value {
   display: flex;
   align-items: center;
 }
-.axiom.sheet.itemSheet .item-name-input {
+.axiom.sheet.item .item-name-input {
   width: 100%;
   display: block;
   text-align: center;
 }
-.axiom.sheet.itemSheet .item-tabs {
+.axiom.sheet.item .item-tabs {
   display: flex;
   flex-direction: row;
 }
-.axiom.sheet.itemSheet .axiom-prosemirror {
+.axiom.sheet.item .axiom-prosemirror {
   height: 300px;
+}
+.axiom.sheet.item .section-title {
+  font-weight: 700;
+  font-size: 15px;
+  margin: 14px 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+}
+.axiom.sheet.item .weapon-row-2col {
+  display: grid;
+  grid-template-columns: 120px 1fr 120px 1fr;
+  grid-column-gap: 16px;
+  grid-row-gap: 10px;
+  margin-bottom: 6px;
+}
+.axiom.sheet.item .field-label {
+  font-weight: 600;
+  font-size: 13px;
+  margin-top: 6px;
+}
+.axiom.sheet.item .field-input input,
+.axiom.sheet.item .field-input select {
+  width: 100%;
+}
+.axiom.sheet.item .range-label-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  font-weight: 600;
+  font-size: 12px;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.axiom.sheet.item .range-input-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-column-gap: 16px;
+}
+.axiom.sheet.item .range-input-row input {
+  width: 100%;
+  text-align: center;
 }
