@@ -1,6 +1,6 @@
-import AxiomBaseItemSheet from "./itemBaseSheet.js";
+import axiomBaseItemSheet from "./itemBaseSheet.js";
 
-export default class AxiomSkillItemSheet extends AxiomBaseItemSheet {
+export default class axiomSkillItemSheet extends axiomBaseItemSheet {
 
   static DEFAULT_OPTIONS = {
     item: {

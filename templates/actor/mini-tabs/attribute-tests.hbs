@@ -6,7 +6,7 @@
   <div class="attr-test-row">
     <span class="attr-test-label">{{localize "AXIOM.Insight"}}</span>
     <span class="attr-test-value">
-      {{math system.attributes.logic.value system.attributes.instinct.value}}
+      {{math system.attributes.logic.value "+" system.attributes.instinct.value}}
     </span>
     <button type="button"
             class="attr-test-roll"
@@ -20,7 +20,7 @@
   <div class="attr-test-row">
     <span class="attr-test-label">{{localize "AXIOM.Perception"}}</span>
     <span class="attr-test-value">
-      {{math system.attributes.resolve.value system.attributes.instinct.value}}
+      {{math system.attributes.resolve.value "+" system.attributes.instinct.value}}
     </span>
     <button type="button"
             class="attr-test-roll"
@@ -34,7 +34,7 @@
   <div class="attr-test-row">
     <span class="attr-test-label">{{localize "AXIOM.Memory"}}</span>
     <span class="attr-test-value">
-      {{math system.attributes.resolve.value system.attributes.logic.value}}
+      {{math system.attributes.resolve.value "+" system.attributes.logic.value}}
     </span>
     <button type="button"
             class="attr-test-roll"
@@ -48,7 +48,7 @@
   <div class="attr-test-row">
     <span class="attr-test-label">{{localize "AXIOM.Composure"}}</span>
     <span class="attr-test-value">
-      {{math system.attributes.charisma.value system.attributes.resolve.value}}
+      {{math system.attributes.charisma.value "+" system.attributes.resolve.value}}
     </span>
     <button type="button"
             class="attr-test-roll"
@@ -62,7 +62,7 @@
   <div class="attr-test-row">
     <span class="attr-test-label">{{localize "AXIOM.LiftingCarrying"}}</span>
     <span class="attr-test-value">
-      {{math system.attributes.strength.value system.attributes.fortitude.value}}
+      {{math system.attributes.strength.value "+" system.attributes.fortitude.value}}
     </span>
     <button type="button"
             class="attr-test-roll"

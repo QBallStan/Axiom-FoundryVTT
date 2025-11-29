@@ -77,12 +77,6 @@ export default class axiomCharacterSheet extends api.HandlebarsApplicationMixin(
   /*  Tab Definitions                             */
   /* -------------------------------------------- */
 
-  /**
-   * Define the structure of tabs used by this sheet.
-   * Two groups:
-   *  - "sheet"   → main body tabs (skills, combat, inventory, details)
-   *  - "sidebar" → mini-tabs in the sidebar (attribute tests, physical limits)
-   */
   static TABS = {
     sheet: [
       {

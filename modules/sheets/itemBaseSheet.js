@@ -4,7 +4,7 @@ const { ItemSheetV2 } = sheets;
 /**
  * Axiom Base Item Sheet built in the same architecture as Crucible.
  */
-export default class AxiomBaseItemSheet extends api.HandlebarsApplicationMixin(ItemSheetV2) {
+export default class axiomBaseItemSheet extends api.HandlebarsApplicationMixin(ItemSheetV2) {
 
   /* -------------------------------------------- */
   /*  DEFAULT OPTIONS                              */

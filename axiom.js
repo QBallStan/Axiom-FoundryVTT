@@ -2,9 +2,9 @@ import { AXIOM } from "./modules/config.js";
 import axiomActor from "./modules/objects/axiomActor.js";
 import axiomCharacterSheet from "./modules/sheets/actorCharacterSheet.js";
 import axiomItem from "./modules/objects/axiomItem.js";
-import AxiomWeaponItemSheet from "./modules/sheets/itemWeaponSheet.js";
-import AxiomArmorItemSheet from "./modules/sheets/itemArmorSheet.js";
-import AxiomSkillItemSheet from "./modules/sheets/itemSkillSheet.js";
+import axiomWeaponItemSheet from "./modules/sheets/itemWeaponSheet.js";
+import axiomArmorItemSheet from "./modules/sheets/itemArmorSheet.js";
+import axiomSkillItemSheet from "./modules/sheets/itemSkillSheet.js";
 
 Hooks.once("init", async () => {
   console.log("AXIOM | Initializing Axiom//Core System");
@@ -17,40 +17,35 @@ Hooks.once("init", async () => {
 
   const { DocumentSheetConfig } = foundry.applications.apps;
 
-  const actorClass = CONFIG.Actor.documentClass;
-  const itemClass = CONFIG.Item.documentClass;
+  const sheets = foundry.applications.apps.DocumentSheetConfig;
 
-  DocumentSheetConfig.unregisterSheet(
-    actorClass,
-    "core",
-    foundry.appv1.sheets.ActorSheet
-  );
+  // Unregister the core Actor sheet
+  sheets.unregisterSheet(Actor, "core", foundry.appv1.sheets.ActorSheet);
 
-  DocumentSheetConfig.registerSheet(actorClass, "axiom", axiomCharacterSheet, {
+  // Register the Axiom Actor sheet
+  sheets.registerSheet(Actor, "axiom", axiomCharacterSheet, {
     types: ["character"],
     makeDefault: true,
     label: "AXIOM.SheetClassCharacter",
   });
 
-  const sheets = foundry.applications.apps.DocumentSheetConfig;
-
   // Remove the core sheet
   sheets.unregisterSheet(Item, "core", foundry.appv1.sheets.ItemSheet);
 
   // Register Axiom item sheets
-  sheets.registerSheet(Item, "axiom", AxiomWeaponItemSheet, {
+  sheets.registerSheet(Item, "axiom", axiomWeaponItemSheet, {
     types: ["weapon"],
     label: "AXIOM.Sheets.Weapon",
     makeDefault: true,
   });
 
-  sheets.registerSheet(Item, "axiom", AxiomArmorItemSheet, {
+  sheets.registerSheet(Item, "axiom", axiomArmorItemSheet, {
     types: ["armor"],
     label: "AXIOM.Sheets.Armor",
     makeDefault: true,
   });
 
-  sheets.registerSheet(Item, "axiom", AxiomSkillItemSheet, {
+  sheets.registerSheet(Item, "axiom", axiomSkillItemSheet, {
     types: ["skill"],
     label: "AXIOM.Sheets.Skill",
     makeDefault: true,
