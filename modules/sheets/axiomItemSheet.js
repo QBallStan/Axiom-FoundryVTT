@@ -18,32 +18,13 @@ export default class AxiomItemSheet extends api.HandlebarsApplicationMixin(
     },
   };
 
-  static TABS = {
-    description: { id: "description", group: "primary", label: "Description" },
-    details: { id: "details", group: "primary", label: "Details" },
-    effects: { id: "effects", group: "primary", label: "Effects" },
-  };
-
   static PARTS = {
     header: {
       template: "systems/axiom/templates/item/header.hbs",
       classes: ["sheet-header"],
     },
-
     tabs: {
       template: "systems/axiom/templates/item/tabs.hbs",
-    },
-
-    description: {
-      template: "systems/axiom/templates/item/tabs/description.hbs",
-    },
-
-    details: {
-      template: "systems/axiom/templates/item/types/{{type}}.hbs",
-    },
-
-    effects: {
-      template: "systems/axiom/templates/item/tabs/effects.hbs",
     },
   };
 
