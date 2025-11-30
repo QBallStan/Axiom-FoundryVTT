@@ -24,7 +24,17 @@ export default class axiomCharacterSheet extends api.HandlebarsApplicationMixin(
     actor: {
       type: "character",
     },
-    actions: {},
+    actions: {
+      itemDelete: axiomCharacterSheet.#onItemDelete,
+      itemEdit: axiomCharacterSheet.#onItemEdit,
+      itemEquip: axiomCharacterSheet.#onItemEquip,
+      healthIncrease: axiomCharacterSheet.#onHealthIncrease,
+      healthDecrease: axiomCharacterSheet.#onHealthDecrease,
+      staminaIncrease: axiomCharacterSheet.#onStaminaIncrease,
+      staminaDecrease: axiomCharacterSheet.#onStaminaDecrease,
+      skillInc: axiomCharacterSheet.#onSkillIncrease,
+      skillDec: axiomCharacterSheet.#onSkillDecrease,
+    },
   };
 
   /* -------------------------------------------- */
@@ -176,9 +186,16 @@ export default class axiomCharacterSheet extends api.HandlebarsApplicationMixin(
    * You can extend this later if some parts need extra prep.
    */
   async _preparePartContext(partId, context) {
+    const items = context.actor.items;
+
     switch (partId) {
       case "skills":
-        // Example: later you might pre-group skills here.
+        context.skills = items.filter(
+          (i) => i.type === "skill" && !i.system.isExpertise
+        );
+        context.expertise = items.filter(
+          (i) => i.type === "skill" && i.system.isExpertise
+        );
         break;
 
       case "combat":
@@ -186,7 +203,46 @@ export default class axiomCharacterSheet extends api.HandlebarsApplicationMixin(
         break;
 
       case "inventory":
-        // Example: sort or group items before rendering.
+        const skills = items.filter((i) => i.type === "skill");
+
+        function computeDicePool(item) {
+          const skillName = item.system.skill;
+          if (!skillName) return null;
+
+          const skill = skills.find((s) => s.name === skillName);
+          if (!skill) return null;
+
+          const attrKey = skill.system.attribute;
+          const attrValue =
+            context.actor.system.attributes[attrKey]?.value ?? 0;
+          const skillLevel = skill.system.level?.value ?? 0;
+
+          return attrValue + skillLevel;
+        }
+
+        // Group items & attach dice pools
+        function mapWithPools(list) {
+          return list.map((i) => {
+            i.dicePool = computeDicePool(i);
+            return i;
+          });
+        }
+
+        context.inventory = {
+          melee: mapWithPools(
+            items.filter(
+              (i) => i.type === "weapon" && i.system.category === "melee"
+            )
+          ),
+          ranged: mapWithPools(
+            items.filter(
+              (i) => i.type === "weapon" && i.system.category === "ranged"
+            )
+          ),
+          ammo: items.filter((i) => i.type === "ammunition"),
+          armor: items.filter((i) => i.type === "armor"),
+          equipment: items.filter((i) => i.type === "equipment"),
+        };
         break;
 
       case "details":
@@ -229,5 +285,232 @@ export default class axiomCharacterSheet extends api.HandlebarsApplicationMixin(
     }
 
     return tabs;
+  }
+
+  /* -------------------------------------------- */
+  /*  Action Event Handlers                       */
+  /* -------------------------------------------- */
+
+  /**
+   * @this {axiomCharacterSheet}
+   * @param {PointerEvent} event
+   * @returns {Promise<void>}
+   */
+  static async #onItemDelete(event, target) {
+    const item = this.#getEventItem(event, target);
+    if (!item) return;
+    await item.deleteDialog();
+  }
+
+  /**
+   * Edit an embedded item sheet.
+   * @this {axiomCharacterSheet}
+   * @param {PointerEvent} event
+   * @param {HTMLElement} target
+   */
+  static async #onItemEdit(_event, target) {
+    const item = this.#getEventItem(_event, target);
+    if (!item) return;
+
+    await item.sheet.render(true); // force: true
+  }
+
+  /**
+   * Toggle an item's equipped state.
+   * @this {axiomCharacterSheet}
+   * @param {PointerEvent} event
+   * @param {HTMLElement} target
+   */
+  static async #onItemEquip(event, target) {
+    const item = this.#getEventItem(event, target);
+    if (!item) return;
+
+    const newState = !item.system.isEquipped;
+
+    // Update item
+    await item.update({ "system.isEquipped": newState });
+
+    // Force actor to recompute derived armor
+    item.actor.prepareData();
+
+    // Re-render sheet so sidebar updates
+    item.actor.render();
+  }
+
+  /**
+   * Increase Health by 1 (up to max)
+   * @this {axiomCharacterSheet}
+   */
+  static async #onHealthIncrease(event) {
+    const actor = this.actor;
+    const current = actor.system.trackers.health.value;
+    const max = actor.system.trackers.health.max;
+
+    const newValue = Math.min(max, current + 1);
+    return actor.update({ "system.trackers.health.value": newValue });
+  }
+
+  /**
+   * Decrease Health by 1 (can go below 0)
+   * @this {axiomCharacterSheet}
+   */
+  static async #onHealthDecrease(event) {
+    const actor = this.actor;
+    const current = actor.system.trackers.health.value;
+
+    const newValue = current - 1; // health allowed below zero
+    return actor.update({ "system.trackers.health.value": newValue });
+  }
+
+  /**
+   * Increase Stamina by 1 (clamped 0..max)
+   * @this {axiomCharacterSheet}
+   */
+  static async #onStaminaIncrease(event) {
+    const actor = this.actor;
+    const current = actor.system.trackers.stamina.value;
+    const max = actor.system.trackers.stamina.max;
+
+    const newValue = Math.min(max, current + 1);
+    return actor.update({ "system.trackers.stamina.value": newValue });
+  }
+
+  /**
+   * Decrease Stamina by 1 (min 0)
+   * @this {axiomCharacterSheet}
+   */
+  static async #onStaminaDecrease(event) {
+    const actor = this.actor;
+    const current = actor.system.trackers.stamina.value;
+
+    const newValue = Math.max(0, current - 1);
+    return actor.update({ "system.trackers.stamina.value": newValue });
+  }
+
+  /**
+   * Increase skill level
+   * @this {axiomCharacterSheet}
+   */
+  static async #onSkillIncrease(event, target) {
+    const row = target.closest(".skill-row, .expertise-row");
+    if (!row) return;
+    const itemId = row.dataset.itemId;
+    const item = this.actor.items.get(itemId);
+
+    if (!item) return;
+
+    const cur = item.system.level.value ?? 0;
+    const newVal = cur + 1;
+
+    console.log(`Skill + : ${item.name} ${cur} → ${newVal}`);
+
+    await item.update({ "system.level.value": newVal });
+  }
+
+  /**
+   * Decrease skill level
+   */
+  static async #onSkillDecrease(event, target) {
+    const row = target.closest(".skill-row, .expertise-row");
+    if (!row) return;
+    const itemId = row.dataset.itemId;
+    const item = this.actor.items.get(itemId);
+
+    if (!item) return;
+
+    const cur = item.system.level.value ?? 0;
+    const newVal = Math.max(0, cur - 1);
+
+    console.log(`Skill - : ${item.name} ${cur} → ${newVal}`);
+
+    await item.update({ "system.level.value": newVal });
+  }
+
+  /**
+   * Get the Item document associated with an action event.
+   * Mirrors CrucibleBaseActorSheet.#getEventItem.
+   * @param {PointerEvent} event
+   * @param {HTMLElement} target
+   * @returns {Item|null}
+   */
+  #getEventItem(_event, target) {
+    const row = target.closest("[data-item-id]");
+    const itemId = row?.dataset.itemId;
+    if (!itemId) return null;
+    return this.actor.items.get(itemId);
+  }
+
+  /* -------------------------------------------- */
+  /* Listeners (ActorSheetV2 uses _onRender)      */
+  /* -------------------------------------------- */
+
+  /** @override */
+  async _onRender(context, options) {
+    await super._onRender(context, options);
+
+    const root = this.element;
+    const trackers = this.actor.system.trackers;
+
+    const buildTrackerIcons = (trackerKey) => {
+      const container = root.querySelector(
+        `.resource-icons[data-tracker="${trackerKey}"]`
+      );
+      if (!container) return;
+
+      const t = trackers[trackerKey] ?? {};
+      const value = Number(t.value ?? 0);
+      const max = Number(t.max ?? 0);
+
+      // Clear and rebuild icons
+      container.innerHTML = "";
+
+      for (let i = 0; i < max; i++) {
+        const icon = document.createElement("i");
+        icon.classList.add(
+          "fa-solid",
+          trackerKey === "focus" ? "fa-clover" : "fa-bolt-lightning"
+        );
+
+        if (i < value) icon.classList.add("active");
+        else icon.classList.add("inactive");
+
+        container.appendChild(icon);
+      }
+
+      // Block browser context menu on the whole row
+      container.addEventListener("contextmenu", (evt) => evt.preventDefault());
+
+      // Left click: decrease
+      container.addEventListener("click", (evt) => {
+        evt.preventDefault();
+        this._adjustTracker(trackerKey, -1);
+      });
+
+      // Right click: increase
+      container.addEventListener("mousedown", (evt) => {
+        if (evt.button === 2) {
+          evt.preventDefault();
+          this._adjustTracker(trackerKey, +1);
+        }
+      });
+    };
+
+    buildTrackerIcons("focus");
+    buildTrackerIcons("actionPoints");
+  }
+
+  _adjustTracker(trackerKey, delta) {
+    const t = this.actor.system.trackers[trackerKey];
+    if (!t) return;
+
+    const max = Number(t.max ?? 0);
+    const cur = Number(t.value ?? 0);
+
+    // Focus & AP are 0..max
+    const newValue = Math.max(0, Math.min(cur + delta, max));
+
+    return this.actor.update({
+      [`system.trackers.${trackerKey}.value`]: newValue,
+    });
   }
 }

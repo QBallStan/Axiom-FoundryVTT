@@ -22,6 +22,15 @@
     "CHA": "CHA",
     "POW": "POW",
 
+    "Strength": "Strength",
+    "Agility": "Agility",
+    "Fortitude": "Fortitude",
+    "Instinct": "Instinct",
+    "Logic": "Logic",
+    "Resilience": "Resilience",
+    "Charisma": "Charisma",
+    "Power": "Power",
+
     "AttributeTests": "Attribute Tests",
     "PhysicalLimits": "Physical Limits",
     "Skills": "Skills",
@@ -36,6 +45,26 @@
 
     "Description": "Description",
     "Details": "Details",
-    "Effects": "Effects"
+    "Effects": "Effects",
+
+    "Expertise": "Expertise",
+    "Attribute": "Attribute",
+    "SkillLevel": "Skill Level",
+
+    "Armor": "Armor",
+    "Head": "Head",
+    "Chest": "Chest",
+    "Arms": "Arms",
+    "Legs": "Legs"
+  },
+
+  "TYPES": {
+    "Item": {
+      "weapon": "Weapon",
+      "armor": "Armor",
+      "skill": "Skill",
+      "equipment": "Equipment",
+      "ammunition": "Ammunition"
+    }
   }
 }

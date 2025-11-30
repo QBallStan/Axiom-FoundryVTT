@@ -1,9 +1,59 @@
-<section class="sheet-body tab flexcol {{tabs.details.cssClass}}"
-         data-tab="{{tabs.details.id}}"
-         data-group="{{tabs.details.group}}">
+<section
+  class="sheet-body tab flexcol {{tabs.details.cssClass}}"
+  data-tab="{{tabs.details.id}}"
+  data-group="{{tabs.details.group}}"
+>
+  <section
+    class="tab sheet-body flexcol {{tabs.details.cssClass}}"
+    data-tab="{{tabs.details.id}}"
+    data-group="{{tabs.details.group}}"
+  >
+    <h3 class="section-title">Armor Values</h3>
 
-  <div class="armor-details">
-    <p>Armor details form goes here.</p>
-  </div>
+    <div class="armor-grid">
+      <!-- Header row -->
+      <div></div>
+      <!-- empty cell above the label -->
+      <div class="col-header">Head</div>
+      <div class="col-header">Chest</div>
+      <div class="col-header">Arms</div>
+      <div class="col-header">Legs</div>
 
+      <!-- Armor Values Row -->
+      <div class="row-label">Armor Value</div>
+
+      <div class="field-input">
+        <input
+          type="number"
+          name="system.head"
+          value="{{system.head}}"
+          min="0"
+        />
+      </div>
+      <div class="field-input">
+        <input
+          type="number"
+          name="system.chest"
+          value="{{system.chest}}"
+          min="0"
+        />
+      </div>
+      <div class="field-input">
+        <input
+          type="number"
+          name="system.arms"
+          value="{{system.arms}}"
+          min="0"
+        />
+      </div>
+      <div class="field-input">
+        <input
+          type="number"
+          name="system.legs"
+          value="{{system.legs}}"
+          min="0"
+        />
+      </div>
+    </div>
+  </section>
 </section>

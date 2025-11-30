@@ -7,6 +7,29 @@ and this project adheres to **Semantic Versioning (SemVer)**.
 
 ---
 
+# **[0.0.4] – 2025-11-30**
+
+### **Added**
+
+- New **Item Types**: Ammunition and Equipment, including template definitions and basic sheet structures.
+- Full **Inventory tab** created and populated (temporary visual layout for playtesting).
+- Added **Equip button** for Armor items; equipping automatically applies armor values to actor tracker fields.
+- Added **Edit** and **Delete** buttons for all items directly in the actor sheet inventory.
+- Implemented initialization of **all actor core values** (health, stamina, movement, toughness, corruption, focus, action points).
+- Added dynamic **click handlers** for adjustable actor values:
+  - Health and Stamina (using + / – buttons)
+  - Focus Points (left-click decrease, right-click increase)
+  - Action Points (left-click decrease, right-click increase)
+- Added AppV2 action handlers for **skill level adjustment**.
+  
+### **Changed**
+
+- Updated weapon item sheet logic:
+  - **Range block** is now automatically hidden for melee weapons.
+  - Added **Ammunition selector** (dropdown) for applicable ranged weapons.
+
+---
+
 ## **[0.0.3] – 2025-11-29**
 ### Added
 

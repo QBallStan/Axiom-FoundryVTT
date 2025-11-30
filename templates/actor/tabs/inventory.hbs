@@ -3,5 +3,226 @@
   data-tab="{{tabs.sheet.inventory.id}}"
   data-group="{{tabs.sheet.inventory.group}}"
 >
-Coming Soon
+  <!-- ============================================================ -->
+  <!-- WEAPONS: MELEE                                               -->
+  <!-- ============================================================ -->
+
+  <h3>Melee Weapons</h3>
+  <table class="inventory-table weapon-grid melee-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Damage</th>
+        <th>AP</th>
+        <th></th>
+        <th>Dice Pool</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {{#each inventory.melee}}
+      <tr class="item-row melee-row" data-item-id="{{this.id}}">
+        <!-- NAME -->
+        <td class="item-name">{{this.name}}</td>
+
+        <!-- DAMAGE VALUE + L/S -->
+        <td class="item-damage">
+          {{this.system.damage.value}} {{#if (eq this.system.damage.class
+          "lethal")}}L{{else}}S{{/if}}
+        </td>
+
+        <!-- AP -->
+        <td class="item-ap">{{this.system.ap}}</td>
+
+        <td></td>
+
+        <!-- DICE POOL -->
+        <td class="item-dice">
+          {{#if this.dicePool}}{{this.dicePool}}{{else}}—{{/if}}
+        </td>
+
+        <!-- ROLL -->
+        <td class="item-roll">
+          <a data-action="rollItem" title="Roll"
+            ><i class="fas fa-dice-d8"></i
+          ></a>
+        </td>
+
+        <!-- CONTROLS -->
+        <td class="item-controls">
+          <a data-action="itemEdit" title="Edit"
+            ><i class="fas fa-pen-square"></i
+          ></a>
+          <a data-action="itemDelete" title="Delete"
+            ><i class="fas fa-trash"></i
+          ></a>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <!-- ============================================================ -->
+  <!-- WEAPONS: RANGED                                              -->
+  <!-- ============================================================ -->
+
+  <h3>Ranged Weapons</h3>
+  <table class="inventory-table weapon-grid ranged-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Damage</th>
+        <th>AP</th>
+        <th>Ammo</th>
+        <th>Dice Pool</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {{#each inventory.ranged}}
+      <tr class="item-row ranged-row" data-item-id="{{this.id}}">
+        <!-- NAME -->
+        <td class="item-name">{{this.name}}</td>
+
+        <!-- DAMAGE VALUE + L/S -->
+        <td class="item-damage">
+          {{this.system.damage.value}} {{#if (eq this.system.damage.class
+          "lethal")}}L{{else}}S{{/if}}
+        </td>
+
+        <!-- AP -->
+        <td class="item-ap">{{this.system.ap}}</td>
+
+        <!-- AMMO -->
+        <td class="item-ammo">
+          {{#if this.system.ammo}} {{#with (lookup ../inventory.ammo
+          this.system.ammo)}} {{this.name}} {{/with}} {{else}}—{{/if}}
+        </td>
+
+        <!-- DICE POOL -->
+        <td class="item-dice">
+          {{#if this.dicePool}}{{this.dicePool}}{{else}}—{{/if}}
+        </td>
+
+        <!-- ROLL -->
+        <td class="item-roll">
+          <a data-action="rollItem"><i class="fas fa-dice-d8"></i></a>
+        </td>
+
+        <!-- CONTROLS -->
+        <td class="item-controls">
+          <a data-action="itemEdit"><i class="fas fa-pen-square"></i></a>
+          <a data-action="itemDelete"><i class="fas fa-trash"></i></a>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <!-- ============================================================ -->
+  <!-- AMMUNITION                                                    -->
+  <!-- ============================================================ -->
+
+  <h3>Ammunition</h3>
+  <table class="inventory-table ammo-grid ammo-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Quantity</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {{#each inventory.ammo}}
+      <tr class="item-row ammo-row" data-item-id="{{this.id}}">
+        <td class="item-name">{{this.name}}</td>
+        <td class="item-qty">{{this.system.quantity}}</td>
+
+        <td class="item-controls">
+          <a data-action="itemEdit"><i class="fas fa-pen-square"></i></a>
+          <a data-action="itemDelete"><i class="fas fa-trash"></i></a>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <!-- ============================================================ -->
+  <!-- ARMOR                                                         -->
+  <!-- ============================================================ -->
+
+  <h3>Armor</h3>
+  <table class="inventory-table armor-grid armor-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Head</th>
+        <th>Chest</th>
+        <th>Arms</th>
+        <th>Legs</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {{#each inventory.armor}}
+      <tr class="item-row armor-row" data-item-id="{{this.id}}">
+        <td class="item-name">{{this.name}}</td>
+        <td>{{this.system.head}}</td>
+        <td>{{this.system.chest}}</td>
+        <td>{{this.system.arms}}</td>
+        <td>{{this.system.legs}}</td>
+
+        <td class="item-controls">
+          {{#if this.system.isEquipped}}
+          <a data-action="itemEquip" title="Unequip"
+            ><i class="fa-solid fa-helmet-battle"></i
+          ></a>
+          {{else}}
+          <a data-action="itemEquip" title="Equip"
+            ><i class="fa-solid fa-backpack"></i
+          ></a>
+          {{/if}}
+
+          <a data-action="itemEdit"><i class="fas fa-pen-square"></i></a>
+          <a data-action="itemDelete"><i class="fas fa-trash"></i></a>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <!-- ============================================================ -->
+  <!-- EQUIPMENT                                                     -->
+  <!-- ============================================================ -->
+
+  <h3>Equipment</h3>
+  <table class="inventory-table equipment-grid equipment-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Quantity</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {{#each inventory.equipment}}
+      <tr class="item-row equipment-row" data-item-id="{{this.id}}">
+        <td class="item-name">{{this.name}}</td>
+        <td class="item-qty">{{this.system.quantity}}</td>
+
+        <td class="item-controls">
+          <a data-action="itemEdit"><i class="fas fa-pen-square"></i></a>
+          <a data-action="itemDelete"><i class="fas fa-trash"></i></a>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
 </section>

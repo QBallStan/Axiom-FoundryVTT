@@ -1,9 +1,40 @@
-<section class="sheet-body tab flexcol {{tabs.details.cssClass}}"
-         data-tab="{{tabs.details.id}}"
-         data-group="{{tabs.details.group}}">
+<section
+  class="sheet-body tab flexcol {{tabs.details.cssClass}}"
+  data-tab="{{tabs.details.id}}"
+  data-group="{{tabs.details.group}}"
+>
+  <h3 class="section-title">Skill Details</h3>
 
-  <div class="skill-details">
-    <p>Skill details form goes here.</p>
+  <div class="skill-details-grid">
+    <!-- Expertise -->
+    <label class="field-label">{{localize "AXIOM.Expertise"}}</label>
+    <div class="field-input">
+      <input
+        type="checkbox"
+        name="system.isExpertise"
+        {{checked
+        system.isExpertise}}
+      />
+    </div>
+
+    <!-- Attribute -->
+    <label class="field-label">{{localize "AXIOM.Attribute"}}</label>
+    <div class="field-input">
+      <select name="system.attribute">
+        {{selectOptions config.attributes selected=system.attribute
+        localize=false}}
+      </select>
+    </div>
+
+    <!-- Level -->
+    <label class="field-label">{{localize "AXIOM.SkillLevel"}}</label>
+    <div class="field-input">
+      <input
+        type="number"
+        name="system.level.value"
+        value="{{system.level.value}}"
+        min="0"
+      />
+    </div>
   </div>
-
 </section>

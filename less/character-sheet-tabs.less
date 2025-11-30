@@ -1,0 +1,114 @@
+// main: ./axiom.less
+
+.axiom.sheet.character {
+  .inventory-table.weapon-grid tr {
+    display: grid;
+    grid-template-columns: 150px 2fr 1fr 1fr 2fr 20px 1.5fr;
+  }
+  /* ============================================================
+   TABLE HEADER STYLING (shared with skills)
+   ============================================================ */
+
+  .skills-table thead th,
+  .expertise-table thead th,
+  .languages-table thead th,
+  .inventory-table thead th {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  /* ============================================================
+   BASE TABLE CELL ALIGNMENT
+   ============================================================ */
+
+  .skills-table th,
+  .skills-table td,
+  .expertise-table th,
+  .expertise-table td,
+  .inventory-table th,
+  .inventory-table td {
+    text-align: center;
+  }
+
+  /* ============================================================
+   LEFT-ALIGNED NAME COLUMN
+   (Name columns always first)
+   ============================================================ */
+
+  .skills-table th:first-child,
+  .skills-table td.skill-name,
+  .expertise-table th:first-child,
+  .expertise-table td.skill-name,
+  .inventory-table th:first-child,
+  .inventory-table td.item-name {
+    text-align: left;
+    padding-left: 0.3rem;
+  }
+
+  /* ============================================================
+   RIGHT-ALIGNED CONTROLS COLUMN
+   (Controls always last)
+   ============================================================ */
+
+  .skills-table th:last-child,
+  .skills-table td.skill-controls,
+  .expertise-table th:last-child,
+  .expertise-table td.skill-controls,
+  .inventory-table th:last-child,
+  .inventory-table td.item-controls {
+    text-align: right;
+    padding-right: 0.3rem;
+  }
+
+  /* ============================================================
+   SECTION HEADERS (h3)
+   Matching the style from the skills tab
+   ============================================================ */
+
+  .sheet-body h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 1rem 0 0.4rem 0;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid;
+    letter-spacing: 0.5px;
+    width: 100%;
+  }
+
+  /* ============================================================
+   ROW HEIGHT & SPACING (optional but recommended)
+   Keeps rows neat and consistent across inventory sections
+   ============================================================ */
+
+  .inventory-table td,
+  .inventory-table th {
+    padding: 0.2rem 0.3rem;
+  }
+
+  .inventory-table .item-row {
+    height: 28px;
+    line-height: 1.2rem;
+  }
+
+  /* Icons spacing */
+  .inventory-table .item-controls a {
+    margin-left: 0.2rem;
+  }
+
+  .inventory-table .item-roll a {
+    margin-left: 0.1rem;
+    margin-right: 0.1rem;
+  }
+
+  /* ============================================================
+   OPTIONAL: visually separate item sections slightly
+   ------------------------------------------------------------
+   You can comment this out if you don't want spacing
+   ============================================================ */
+
+  .inventory-table {
+    margin-bottom: 1rem;
+  }
+}

@@ -55,16 +55,18 @@
 
       "trackers": {
         "health": {
-          "base": 0,
-          "value": 0,
+          "value": null,
           "max": 0
         },
         "stamina": {
-          "base": 0,
-          "value": 0,
+          "value": null,
           "max": 0
         },
         "focus": {
+          "value": 0,
+          "max": 0
+        },
+        "actionPoints": {
           "value": 0,
           "max": 0
         },
@@ -83,24 +85,30 @@
           "mod": [],
           "value": 0
         },
-        "actionPoints": {
-          "base": 0,
-          "value": 0,
-          "max": 0
+        "armor": {
+          "head": 0,
+          "chest": 0,
+          "arms": 0,
+          "legs": 0
         }
       }
     }
   },
 
   "Item": {
-    "types": ["skill", "armor", "weapon"],
+    "types": ["skill", "armor", "weapon", "equipment", "ammunition"],
 
     "templates": {
       "generalItems": {
+        "quantity": 1,
         "weight": 10,
-        "value": 100,
+        "price": 100,
         "description": ""
       }
+    },
+
+    "equipment": {
+      "templates": ["generalItems"]
     },
 
     "skill": {
@@ -117,11 +125,16 @@
     },
 
     "armor": {
-      "value": 0,
-      "description": ""
+      "templates": ["generalItems"],
+      "head": 0,
+      "chest": 0,
+      "arms": 0,
+      "legs": 0,
+      "isEquipped": false
     },
 
     "weapon": {
+      "templates": ["generalItems"],
       "category": "",
       "skill": "",
       "damage": {
@@ -134,7 +147,12 @@
         "short": "",
         "medium": "",
         "long": ""
-      }
+      },
+      "ammo": ""
+    },
+
+    "ammunition": {
+      "templates": ["generalItems"]
     }
   }
 }

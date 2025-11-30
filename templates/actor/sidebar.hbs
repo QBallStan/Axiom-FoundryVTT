@@ -29,9 +29,8 @@
           <button
             type="button"
             class="tracker-btn"
-            data-action="adjust"
+            data-action="healthDecrease"
             data-target="system.trackers.health.value"
-            data-amount="-1"
           >
             −
           </button>
@@ -47,9 +46,8 @@
           <button
             type="button"
             class="tracker-btn"
-            data-action="adjust"
+            data-action="healthIncrease"
             data-target="system.trackers.health.value"
-            data-amount="+1"
           >
             +
           </button>
@@ -64,9 +62,8 @@
           <button
             type="button"
             class="tracker-btn"
-            data-action="adjust"
+            data-action="staminaDecrease"
             data-target="system.trackers.stamina.value"
-            data-amount="-1"
           >
             −
           </button>
@@ -83,9 +80,8 @@
           <button
             type="button"
             class="tracker-btn"
-            data-action="adjust"
+            data-action="staminaIncrease"
             data-target="system.trackers.stamina.value"
-            data-amount="+1"
           >
             +
           </button>
@@ -93,27 +89,50 @@
       </div>
     </div>
 
+    <!-- STATS GRID (unchanged) -->
     <div class="stats-grid">
       <!-- Row 1: Icons -->
       <i class="fas fa-shield-alt" title="{{localize 'AXIOM.Toughness'}}"></i>
+      <i
+        class="fas fa-user-shield"
+        title="
+{{localize 'AXIOM.Head'}}: {{system.trackers.armor.head}}
+{{localize 'AXIOM.Chest'}}: {{system.trackers.armor.chest}}
+{{localize 'AXIOM.Arms'}}: {{system.trackers.armor.arms}}
+{{localize 'AXIOM.Legs'}}: {{system.trackers.armor.legs}}
+"
+      ></i>
       <i class="fas fa-shoe-prints" title="{{localize 'AXIOM.Movement'}}"></i>
       <i class="fas fa-skull" title="{{localize 'AXIOM.Corruption'}}"></i>
-      <i class="fas fa-bolt" title="{{localize 'AXIOM.FocusPoints'}}"></i>
-      <i
-        class="fas fa-forward-step"
-        title="{{localize 'AXIOM.ActionPoints'}}"
-      ></i>
 
       <!-- Row 2: Values -->
       <span>{{system.trackers.toughness.value}}</span>
+      <span>{{system.trackers.armor.chest}}</span>
       <span>{{system.trackers.movement.value}}</span>
-      <span>{{system.trackers.corruption.value}}</span>
-      <span>{{system.trackers.focus.value}}</span>
-      <span>{{system.trackers.actionPoints.value}}</span>
+      <span
+        >{{system.trackers.corruption.value}}/{{system.trackers.corruption.max}}</span
+      >
     </div>
 
+    <!-- FOCUS & ACTION POINTS -->
+    <div class="sidebar-resource-block">
+      <div class="resource-row">
+        <span class="resource-label">{{localize "AXIOM.FocusPoints"}}</span>
+        <div class="resource-icons focus-icons" data-tracker="focus">
+          <!-- Icons injected by JS -->
+        </div>
+      </div>
+
+      <div class="resource-row">
+        <span class="resource-label">{{localize "AXIOM.ActionPoints"}}</span>
+        <div class="resource-icons action-icons" data-tracker="actionPoints">
+          <!-- Icons injected by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ATTRIBUTES -->
     <div class="attributes-grid">
-      <!-- Row 1 -->
       <div class="attribute">
         <span>{{localize "AXIOM.STR"}}</span>
         <input
@@ -150,7 +169,6 @@
         />
       </div>
 
-      <!-- Row 2 -->
       <div class="attribute">
         <span>{{localize "AXIOM.LOG"}}</span>
         <input
@@ -188,6 +206,7 @@
       </div>
     </div>
   </div>
+
   <nav class="sidebar-tabs tabs">
     {{#each tabs.sidebar}}
     <a
@@ -200,6 +219,7 @@
     </a>
     {{/each}}
   </nav>
+
   <section data-application-part="attribute-tests"></section>
   <section data-application-part="physical-limits"></section>
 </div>

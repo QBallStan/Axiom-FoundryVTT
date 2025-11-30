@@ -62,9 +62,11 @@
   </div>
 
 
-  <!-- RANGE -->
-  <h3 class="section-title">Range</h3>
+  {{#if (eq system.category "ranged")}}
 
+  <h3 class="section-title">Ranged</h3>
+
+  <!-- RANGE -->
   <div class="range-label-row">
     <div class="range-sub-label">Short</div>
     <div class="range-sub-label">Medium</div>
@@ -76,5 +78,23 @@
     <input type="text" name="system.range.medium" value="{{system.range.medium}}">
     <input type="text" name="system.range.long"   value="{{system.range.long}}">
   </div>
+
+  <!-- AMMUNITION SELECTION -->
+  <div class="weapon-row-2col">
+    <div class="field-label">Ammunition</div>
+    <div class="field-input">
+      <select name="system.ammo">
+        <option value="">None</option>
+        {{#each ammoItems}}
+          <option value="{{this._id}}" {{#if (eq ../system.ammo this._id)}}selected{{/if}}>
+            {{this.name}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+
+{{/if}}
+
 
 </section>

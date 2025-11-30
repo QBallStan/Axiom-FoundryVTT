@@ -21,6 +21,8 @@
   .sidebar-portrait img {
     cursor: pointer;
     border-radius: 5px;
+    width: 200px;
+    margin: auto;
   }
 
   .sidebar-name {
@@ -100,12 +102,49 @@
 
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     grid-template-rows: auto auto;
     text-align: center;
     gap: 4px;
     margin: auto;
     padding: 10px;
+  }
+
+  /* Container for the two rows */
+  .sidebar-resource-block {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    border: 1px solid;
+    border-radius: 5px;
+    padding: 5px;
+  }
+
+  /* Each row is label on left, icons on right */
+  .resource-row {
+    display: grid;
+    grid-template-columns: 120px 120px;
+    column-gap: 1rem;
+    margin: auto;
+  }
+
+  /* Label stays compact */
+  .resource-label {
+    font-size: 15px;
+    text-align: center;
+  }
+
+  /* Icons align as a row */
+  .resource-icons {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: center;
+  }
+
+  /* Icon baseline style */
+  .resource-icons i {
+    font-size: 1rem;
+    cursor: pointer;
   }
 
   .attributes-grid {

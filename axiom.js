@@ -5,6 +5,8 @@ import axiomItem from "./modules/objects/axiomItem.js";
 import axiomWeaponItemSheet from "./modules/sheets/itemWeaponSheet.js";
 import axiomArmorItemSheet from "./modules/sheets/itemArmorSheet.js";
 import axiomSkillItemSheet from "./modules/sheets/itemSkillSheet.js";
+import axiomAmmoItemSheet from "./modules/sheets/itemAmmoSheet.js";
+import axiomEquipmentItemSheet from "./modules/sheets/itemEquipmentSheet.js";
 
 Hooks.once("init", async () => {
   console.log("AXIOM | Initializing Axiom//Core System");
@@ -35,19 +37,31 @@ Hooks.once("init", async () => {
   // Register Axiom item sheets
   sheets.registerSheet(Item, "axiom", axiomWeaponItemSheet, {
     types: ["weapon"],
-    label: "AXIOM.Sheets.Weapon",
+    label: "TYPES.item.weapon",
     makeDefault: true,
   });
 
   sheets.registerSheet(Item, "axiom", axiomArmorItemSheet, {
     types: ["armor"],
-    label: "AXIOM.Sheets.Armor",
+    label: "TYPES.item.armor",
     makeDefault: true,
   });
 
   sheets.registerSheet(Item, "axiom", axiomSkillItemSheet, {
     types: ["skill"],
-    label: "AXIOM.Sheets.Skill",
+    label: "TYPES.item.skill",
+    makeDefault: true,
+  });
+
+  sheets.registerSheet(Item, "axiom", axiomAmmoItemSheet, {
+    types: ["ammunition"],
+    label: "TYPES.item.ammunition",
+    makeDefault: true,
+  });
+
+  sheets.registerSheet(Item, "axiom", axiomEquipmentItemSheet, {
+    types: ["equipment"],
+    label: "TYPES.item.equipment",
     makeDefault: true,
   });
 
@@ -84,6 +98,8 @@ function preloadHandlebarsTemplates() {
     "systems/axiom/templates/item/types/skill.hbs",
     "systems/axiom/templates/item/types/weapon.hbs",
     "systems/axiom/templates/item/types/armor.hbs",
+    "systems/axiom/templates/item/types/equipment.hbs",
+    "systems/axiom/templates/item/types/ammo.hbs",
 
     /* -------------------------------------------- */
     /*  CHARACTER SHEET PARTS                       */
@@ -182,5 +198,14 @@ function registerHandlebarsHelpers() {
 
   Handlebars.registerHelper("attrValue", function (actor, attrKey) {
     return actor.system.attributes[attrKey]?.value ?? 0;
+  });
+
+  Handlebars.registerHelper("capitalize", function (str) {
+    if (typeof str !== "string") return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  });
+
+  Handlebars.registerHelper("isFilled", function (value, index) {
+    return value >= index + 1;
   });
 }

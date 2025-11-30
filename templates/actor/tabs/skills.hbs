@@ -3,6 +3,9 @@
   data-tab="{{tabs.sheet.skills.id}}"
   data-group="{{tabs.sheet.skills.group}}"
 >
+  <!-- =========================================================== -->
+  <!-- SKILLS (PARENT SKILLS)                                      -->
+  <!-- =========================================================== -->
   <h3>Skills</h3>
   <table class="skills-table">
     <thead>
@@ -10,128 +13,26 @@
         <th>Name</th>
         <th>Attribute</th>
         <th>Level</th>
-        <th>Dice</th>
-        <th>Roll</th>
-        <th>Controls</th>
+        <th>Dice Pool</th>
+        <th></th>
+        <th></th>
       </tr>
     </thead>
 
     <tbody>
-      {{#each actor.items as |skill|}} {{#unless skill.system.isExpertise}}
-      {{!-- Parent skill row --}}
+      {{!-- LOOP: parent skills --}} {{#each skills as |skill|}} {{#unless
+      skill.system.isExpertise}}
+
+      <!-- Parent Skill Row -->
       <tr class="skill-row" data-item-id="{{skill.id}}">
         <td class="skill-name">{{skill.name}}</td>
 
-        <td class="skill-attribute">{{skill.system.attribute}}</td>
+        <td class="skill-attribute">{{capitalize skill.system.attribute}}</td>
 
         <td class="skill-level">
-          <a class="level-down" data-action="skill-dec">-</a>
+          <a class="level-down" data-action="skillDec">-</a>
           <span>{{skill.system.level.value}}</span>
-          <a class="level-up" data-action="skill-inc">+</a>
-        </td>
-
-        <td class="skill-dice">
-          {{!-- Trait Dice = attribute + level --}} {{math
-          skill.system.level.value "+" (attrValue ../actor
-          skill.system.attribute)}}
-        </td>
-
-        <td class="skill-roll">
-          <a class="skill-roll-button" data-action="roll-skill" title="Roll">
-            <i class="fas fa-dice-d8"></i>
-          </a>
-        </td>
-
-        <td class="skill-controls">
-          <a data-action="add-spec" title="Add Specialization">
-            <i class="fas fa-plus"></i>
-          </a>
-          <a data-action="edit-skill" title="Edit Skill">
-            <i class="fas fa-pen-square"></i>
-          </a>
-          <a data-action="delete-skill" title="Delete Skill">
-            <i class="fas fa-trash"></i>
-          </a>
-        </td>
-      </tr>
-
-      {{!-- Specializations --}} {{#each skill.system.spec as |spec i|}}
-      <tr class="spec-row" data-item-id="{{../id}}" data-spec-id="{{spec.id}}">
-        <td class="spec-name">
-          <input
-            type="text"
-            name="system.spec.{{i}}.name"
-            value="{{spec.name}}"
-          />
-        </td>
-
-        <td class="spec-attribute">{{../system.attribute}}</td>
-
-        <td class="spec-level">
-          <a class="spec-level-down" data-action="spec-dec" data-index="{{i}}"
-            >-</a
-          >
-          <span>{{spec.level.value}}</span>
-          <a class="spec-level-up" data-action="spec-inc" data-index="{{i}}"
-            >+</a
-          >
-        </td>
-
-        <td class="spec-dice">
-          {{math spec.level.value "+" (attrValue ../../actor
-          ../system.attribute)}}
-        </td>
-
-        <td class="spec-roll">
-          <a
-            class="spec-roll-button"
-            data-action="roll-spec"
-            data-index="{{i}}"
-            title="Roll"
-          >
-            <i class="fas fa-dice-d8"></i>
-          </a>
-        </td>
-
-        <td class="spec-controls">
-          <a
-            data-action="delete-spec"
-            data-index="{{i}}"
-            title="Delete Specialization"
-          >
-            <i class="fas fa-trash"></i>
-          </a>
-        </td>
-      </tr>
-      {{/each}} {{/unless}} {{/each}}
-    </tbody>
-  </table>
-
-  <h3>Expertise</h3>
-  <table class="expertise-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Attribute</th>
-        <th>Level</th>
-        <th>Dice</th>
-        <th>Roll</th>
-        <th>Controls</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      {{#each actor.items as |skill|}} {{#if skill.system.isExpertise}} {{!--
-      Parent expertise row --}}
-      <tr class="expertise-row" data-item-id="{{skill.id}}">
-        <td class="skill-name">{{skill.name}}</td>
-
-        <td class="skill-attribute">{{skill.system.attribute}}</td>
-
-        <td class="skill-level">
-          <a class="level-down" data-action="skill-dec">-</a>
-          <span>{{skill.system.level.value}}</span>
-          <a class="level-up" data-action="skill-inc">+</a>
+          <a class="level-up" data-action="skillInc">+</a>
         </td>
 
         <td class="skill-dice">
@@ -149,18 +50,18 @@
           <a data-action="add-spec" title="Add Specialization">
             <i class="fas fa-plus"></i>
           </a>
-          <a data-action="edit-skill" title="Edit Skill">
+          <a data-action="itemEdit" title="Edit Skill">
             <i class="fas fa-pen-square"></i>
           </a>
-          <a data-action="delete-skill" title="Delete Skill">
+          <a data-action="itemDelete" title="Delete Skill">
             <i class="fas fa-trash"></i>
           </a>
         </td>
       </tr>
 
-      {{!-- Expertise specializations --}} {{#each skill.system.spec as |spec
-      i|}}
-      <tr class="spec-row" data-item-id="{{../id}}" data-spec-id="{{spec.id}}">
+      {{!-- Specializations for this skill --}} {{#each skill.system.spec as
+      |spec i|}}
+      <tr class="spec-row" data-item-id="{{../id}}" data-spec-id="{{i}}">
         <td class="spec-name">
           <input
             type="text"
@@ -169,7 +70,7 @@
           />
         </td>
 
-        <td class="spec-attribute">{{../system.attribute}}</td>
+        <td class="spec-attribute">{{capitalize ../system.attribute}}</td>
 
         <td class="spec-level">
           <a class="spec-level-down" data-action="spec-dec" data-index="{{i}}"
@@ -198,19 +99,121 @@
         </td>
 
         <td class="spec-controls">
-          <a
-            data-action="delete-spec"
-            data-index="{{i}}"
-            title="Delete Specialization"
-          >
+          <a data-action="itemDelete" title="Delete Specialization">
             <i class="fas fa-trash"></i>
           </a>
         </td>
       </tr>
-      {{/each}} {{/if}} {{/each}}
+      {{/each}} {{/unless}} {{/each}}
     </tbody>
   </table>
 
+  <!-- =========================================================== -->
+  <!-- EXPERTISE (CHILD SKILLS)                                    -->
+  <!-- =========================================================== -->
+  <h3>Expertise</h3>
+  <table class="expertise-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Attribute</th>
+        <th>Level</th>
+        <th>Dice Pool</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {{#each expertise as |skill|}}
+
+      <tr class="expertise-row" data-item-id="{{skill.id}}">
+        <td class="skill-name">{{skill.name}}</td>
+
+        <td class="skill-attribute">{{capitalize skill.system.attribute}}</td>
+
+        <td class="skill-level">
+          <a class="level-down" data-action="skillDec">-</a>
+          <span>{{skill.system.level.value}}</span>
+          <a class="level-up" data-action="skillInc">+</a>
+        </td>
+
+        <td class="skill-dice">
+          {{math skill.system.level.value "+" (attrValue ../actor
+          skill.system.attribute)}}
+        </td>
+
+        <td class="skill-roll">
+          <a class="skill-roll-button" data-action="roll-skill" title="Roll">
+            <i class="fas fa-dice-d8"></i>
+          </a>
+        </td>
+
+        <td class="skill-controls">
+          <a data-action="add-spec" title="Add Specialization">
+            <i class="fas fa-plus"></i>
+          </a>
+          <a data-action="itemEdit" title="Edit Skill">
+            <i class="fas fa-pen-square"></i>
+          </a>
+          <a data-action="itemDelete" title="Delete Skill">
+            <i class="fas fa-trash"></i>
+          </a>
+        </td>
+      </tr>
+
+      {{!-- Expertise specializations --}} {{#each skill.system.spec as |spec
+      i|}}
+      <tr class="spec-row" data-item-id="{{../id}}" data-spec-id="{{i}}">
+        <td class="spec-name">
+          <input
+            type="text"
+            name="system.spec.{{i}}.name"
+            value="{{spec.name}}"
+          />
+        </td>
+
+        <td class="spec-attribute">{{capitalize ../system.attribute}}</td>
+
+        <td class="spec-level">
+          <a class="spec-level-down" data-action="spec-dec" data-index="{{i}}"
+            >-</a
+          >
+          <span>{{spec.level.value}}</span>
+          <a class="spec-level-up" data-action="spec-inc" data-index="{{i}}"
+            >+</a
+          >
+        </td>
+
+        <td class="spec-dice">
+          {{math spec.level.value "+" (attrValue ../../actor
+          ../system.attribute)}}
+        </td>
+
+        <td class="spec-roll">
+          <a
+            class="spec-roll-button"
+            data-action="roll-spec"
+            data-index="{{i}}"
+            title="Roll"
+          >
+            <i class="fas fa-dice-d8"></i>
+          </a>
+        </td>
+
+        <td class="spec-controls">
+          <a data-action="itemDelete" title="Delete Specialization">
+            <i class="fas fa-trash"></i>
+          </a>
+        </td>
+      </tr>
+      {{/each}} {{/each}}
+    </tbody>
+  </table>
+
+  <!-- =========================================================== -->
+  <!-- LANGUAGES (stub)                                             -->
+  <!-- =========================================================== -->
   <h3>Languages</h3>
   <table class="languages-table">
     <thead>
@@ -220,7 +223,6 @@
         <th>Controls</th>
       </tr>
     </thead>
-
     <tbody>
       <tr>
         <td colspan="3">Language section coming soon…</td>
