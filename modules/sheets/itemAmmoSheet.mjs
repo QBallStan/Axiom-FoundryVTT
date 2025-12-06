@@ -1,9 +1,9 @@
-import axiomBaseItemSheet from "./itemBaseSheet.js";
+import axiomBaseItemSheet from "./itemBaseSheet.mjs";
 
-export default class axiomEquipmentItemSheet extends axiomBaseItemSheet {
+export default class axiomAmmoItemSheet extends axiomBaseItemSheet {
   static DEFAULT_OPTIONS = {
     item: {
-      type: "equipment",
+      type: "ammo",
       isPhysical: true
     }
   };
@@ -12,11 +12,11 @@ export default class axiomEquipmentItemSheet extends axiomBaseItemSheet {
     // Run base initialization
     this._initializeItemSheetClass();
 
-    // Remove Details + Effects PARTS
+    // Remove Details + Effects PARTS entirely
     delete this.PARTS.details;
     delete this.PARTS.effects;
 
-    // Keep only Description tab
+    // Keep only the Description tab
     this.TABS.sheet = this.TABS.sheet.filter(t => t.id === "description");
   }
 }

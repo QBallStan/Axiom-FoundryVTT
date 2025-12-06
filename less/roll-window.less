@@ -1,0 +1,52 @@
+// main: ./axiom.less
+
+/* Two-column form layout */
+.axiom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.axiom-row label {
+  flex: 0 0 40%;
+  font-weight: 600;
+}
+
+.axiom-row select,
+.axiom-row .modifier-controls,
+.axiom-row .dice-pool-display {
+  flex: 1;
+  text-align: right;
+}
+
+/* Modifier controls */
+.modifier-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.modifier-controls button {
+  width: 26px;
+  height: 26px;
+  font-size: 1rem;
+}
+
+.modifier-controls span.modifier-value {
+  display: inline-flex;
+  align-items: center; /* center text vertically */
+  justify-content: center;
+  height: 26px; /* match button height */
+  line-height: 26px; /* ensures perfect centering */
+  min-width: 20px; /* keeps it from shrinking awkwardly */
+  font-size: 1rem;
+}
+
+/* Full-width roll button */
+.roll-button {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1.1rem;
+  margin-top: 0.6rem;
+}

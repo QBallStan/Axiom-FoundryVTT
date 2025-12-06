@@ -55,7 +55,9 @@
     "Head": "Head",
     "Chest": "Chest",
     "Arms": "Arms",
-    "Legs": "Legs"
+    "Legs": "Legs",
+
+    "Roll": "Roll"
   },
 
   "TYPES": {

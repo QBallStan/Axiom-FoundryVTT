@@ -1,12 +1,14 @@
-import { AXIOM } from "./modules/config.js";
-import axiomActor from "./modules/objects/axiomActor.js";
-import axiomCharacterSheet from "./modules/sheets/actorCharacterSheet.js";
-import axiomItem from "./modules/objects/axiomItem.js";
-import axiomWeaponItemSheet from "./modules/sheets/itemWeaponSheet.js";
-import axiomArmorItemSheet from "./modules/sheets/itemArmorSheet.js";
-import axiomSkillItemSheet from "./modules/sheets/itemSkillSheet.js";
-import axiomAmmoItemSheet from "./modules/sheets/itemAmmoSheet.js";
-import axiomEquipmentItemSheet from "./modules/sheets/itemEquipmentSheet.js";
+import { AXIOM } from "./modules/config.mjs";
+import axiomActor from "./modules/objects/axiomActor.mjs";
+import axiomCharacterSheet from "./modules/sheets/actorCharacterSheet.mjs";
+import axiomItem from "./modules/objects/axiomItem.mjs";
+import axiomWeaponItemSheet from "./modules/sheets/itemWeaponSheet.mjs";
+import axiomArmorItemSheet from "./modules/sheets/itemArmorSheet.mjs";
+import axiomSkillItemSheet from "./modules/sheets/itemSkillSheet.mjs";
+import axiomAmmoItemSheet from "./modules/sheets/itemAmmoSheet.mjs";
+import axiomEquipmentItemSheet from "./modules/sheets/itemEquipmentSheet.mjs";
+import AxiomRoll from "./modules/dice/axiom-roll.mjs";
+import { AxiomDieTrait, AxiomDieFate } from "./modules/dice/dice.mjs";
 
 Hooks.once("init", async () => {
   console.log("AXIOM | Initializing Axiom//Core System");
@@ -14,6 +16,11 @@ Hooks.once("init", async () => {
   // Setting up the Global Configuration Object
   CONFIG.AXIOM = AXIOM;
   CONFIG.INIT = true;
+
+  CONFIG.Dice.rolls["AxiomRoll"] = AxiomRoll;
+  CONFIG.Dice.terms["t"] = AxiomDieTrait;
+  CONFIG.Dice.terms["a"] = AxiomDieFate;
+
   CONFIG.Actor.documentClass = axiomActor;
   CONFIG.Item.documentClass = axiomItem;
 
@@ -118,6 +125,11 @@ function preloadHandlebarsTemplates() {
     "systems/axiom/templates/actor/tabs/combat.hbs",
     "systems/axiom/templates/actor/tabs/inventory.hbs",
     "systems/axiom/templates/actor/tabs/details.hbs",
+
+    /* -------------------------------------------- */
+    /*  CHAT TEMPLATES                             */
+    /* -------------------------------------------- */
+    "systems/axiom/templates/chat/axiom-roll.hbs",
   ];
 
   return foundry.applications.handlebars.loadTemplates(templatePaths);

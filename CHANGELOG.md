@@ -7,6 +7,30 @@ and this project adheres to **Semantic Versioning (SemVer)**.
 
 ---
 
+# **[0.0.5] – 2025-12-06**
+
+### **Added**
+
+- Complete implementation of the **Axiom Dice Engine**:
+  - Unified d8 Trait Die and Fate Die probability logic.
+  - Full **Dice So Nice integration**, including custom 3D dice presets.
+
+- New **Roll Window (DialogV2)** for all roll types:
+  - Supports skill checks, item rolls, and attribute tests.
+  - Adjustable **attribute**, **difficulty**, and **modifier** fields.
+  - Live **dice pool computation** with automatic updates.
+  - Clean minimal UI matching Axiom//Core design goals.
+    
+- New **Roll Chat Card**:
+  - Displays net result, success tier, fate icons, and flaw/focus tokens.
+  - Infrastructure prepared for future interactive buttons (rerolls, opposed rolls, spending fate, etc.).
+  
+### **Fixed**
+
+- Fixed **melee weapon damage** calculation to correctly include Strength.
+
+---
+
 # **[0.0.4] – 2025-11-30**
 
 ### **Added**

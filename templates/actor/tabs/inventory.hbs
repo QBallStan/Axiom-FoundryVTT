@@ -29,8 +29,11 @@
 
         <!-- DAMAGE VALUE + L/S -->
         <td class="item-damage">
-          {{this.system.damage.value}} {{#if (eq this.system.damage.class
-          "lethal")}}L{{else}}S{{/if}}
+          {{#if (eq this.system.category "melee")}} {{!-- Melee damage = base +
+          Strength --}} {{math this.system.damage.value "+" (attrValue ../actor
+          "strength")}} {{else}} {{!-- Ranged damage = base --}}
+          {{this.system.damage.value}} {{/if}} {{#if (eq
+          this.system.damage.class "lethal")}}L{{else}}S{{/if}}
         </td>
 
         <!-- AP -->

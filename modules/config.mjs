@@ -18,7 +18,7 @@ AXIOM.weaponCategories = {
 
 AXIOM.damageClasses = {
   lethal: "Lethal",
-  stun: "Stun"
+  stun: "Stun",
 };
 
 AXIOM.damageTypes = {
@@ -33,4 +33,11 @@ AXIOM.damageTypes = {
   psychic: "Psychic",
 };
 
-
+AXIOM.difficulties = {
+  easy: "Easy",
+  average: "Average",
+  hard: "Hard",
+  veryhard: "Very Hard",
+  extreme: "Extreme",
+  impossible: "Impossible",
+};

@@ -2,7 +2,7 @@
     "id": "axiom",
     "title": "Axiom//Core System",
     "description": "The official Axiom//Core system created by PlexiStan",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "authors": [
         {
             "name": "PlexiStan",
@@ -15,7 +15,7 @@
         "maximum": 13
     },
     "esmodules": [
-        "axiom.js"
+        "axiom.mjs"
     ],
     "styles": [
         "axiom.css"

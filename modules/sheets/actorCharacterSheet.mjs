@@ -1,3 +1,5 @@
+import AxiomRollDialog from "../apps/rollDialog.mjs";
+
 const { api, sheets } = foundry.applications;
 
 /**
@@ -34,6 +36,10 @@ export default class axiomCharacterSheet extends api.HandlebarsApplicationMixin(
       staminaDecrease: axiomCharacterSheet.#onStaminaDecrease,
       skillInc: axiomCharacterSheet.#onSkillIncrease,
       skillDec: axiomCharacterSheet.#onSkillDecrease,
+      rollAttributeTest: axiomCharacterSheet.#onAttributeTest,
+      rollSkill: axiomCharacterSheet.#onSkillRoll,
+      rollSpec: axiomCharacterSheet.#onSpecRoll,
+      rollItem: axiomCharacterSheet.#onItemRoll,
     },
   };
 
@@ -402,8 +408,6 @@ export default class axiomCharacterSheet extends api.HandlebarsApplicationMixin(
     const cur = item.system.level.value ?? 0;
     const newVal = cur + 1;
 
-    console.log(`Skill + : ${item.name} ${cur} → ${newVal}`);
-
     await item.update({ "system.level.value": newVal });
   }
 
@@ -421,8 +425,6 @@ export default class axiomCharacterSheet extends api.HandlebarsApplicationMixin(
     const cur = item.system.level.value ?? 0;
     const newVal = Math.max(0, cur - 1);
 
-    console.log(`Skill - : ${item.name} ${cur} → ${newVal}`);
-
     await item.update({ "system.level.value": newVal });
   }
 
@@ -438,6 +440,169 @@ export default class axiomCharacterSheet extends api.HandlebarsApplicationMixin(
     const itemId = row?.dataset.itemId;
     if (!itemId) return null;
     return this.actor.items.get(itemId);
+  }
+
+  /**
+   * Handle an Attribute Test roll (via Roll Dialog).
+   * @this {axiomCharacterSheet}
+   */
+  static async #onAttributeTest(event, target) {
+    const actor = this.actor;
+    const test = target.dataset.test;
+
+    const attrs = actor.system.attributes;
+    const map = {
+      insight: [attrs.logic.value, attrs.instinct.value],
+      perception: [attrs.resolve.value, attrs.instinct.value],
+      memory: [attrs.resolve.value, attrs.logic.value],
+      composure: [attrs.charisma.value, attrs.resolve.value],
+      lifting: [attrs.strength.value, attrs.fortitude.value],
+    };
+
+    if (!map[test]) return;
+    const [a, b] = map[test];
+
+    const dialog = new AxiomRollDialog({
+      actor,
+      type: "attribute-test",
+      label: `Attribute Test: ${test.toUpperCase()}`,
+      primaryValue: a,
+      secondaryValue: b,
+      difficulty: 0,
+      modifier: 0,
+      test,
+      data: { actorId: actor.id, type: "attribute", test },
+    });
+
+    return dialog.render({ force: true });
+  }
+
+  /**
+   * Handle a skill roll from the skill tab (opens Roll Dialog).
+   * @this {axiomCharacterSheet}
+   */
+  static async #onSkillRoll(event, target) {
+    event?.preventDefault();
+    const actor = this.actor;
+
+    const itemId = target.closest("[data-item-id]")?.dataset.itemId;
+    if (!itemId) return;
+
+    const skill = actor.items.get(itemId);
+    if (!skill) return;
+
+    const attributeKey = skill.system.attribute;
+    const attributeValue = actor.system.attributes[attributeKey]?.value || 0;
+    const skillValue = skill.system.level.value || 0;
+
+    const dlg = new AxiomRollDialog({
+      actor,
+      type: "skill",
+      label: `${skill.name} Check`,
+      attributeKey,
+      attributeValue,
+      skillValue,
+      difficulty: 0,
+      modifier: 0,
+      itemId,
+      data: { actorId: actor.id, type: "skill", skillId: itemId },
+    });
+
+    return dlg.render({ force: true });
+  }
+
+  /**
+   * Roll a specialization (same attribute, spec.level instead of skill.level).
+   * Uses the Roll Dialog.
+   * @this {axiomCharacterSheet}
+   */
+  static async #onSpecRoll(event, target) {
+    const actor = this.actor;
+
+    const row = target.closest(".spec-row");
+    if (!row) return;
+
+    const itemId = row.dataset.itemId;
+    const specIndex = target.dataset.index;
+
+    const item = actor.items.get(itemId);
+    if (!item) return;
+
+    const spec = item.system.spec?.[specIndex];
+    if (!spec) return;
+
+    const attributeKey = item.system.attribute;
+    const attributeValue = actor.system.attributes[attributeKey]?.value ?? 0;
+    const skillValue = spec.level?.value ?? 0;
+
+    const labelName = spec.name ?? spec.label ?? item.name;
+
+    const dialog = new AxiomRollDialog({
+      actor,
+      type: "spec",
+      label: `Specialization: ${labelName}`,
+      attributeKey,
+      attributeValue,
+      skillValue,
+      difficulty: 0,
+      modifier: 0,
+      data: {
+        actorId: actor.id,
+        type: "spec",
+        skillId: item.id,
+        specIndex,
+      },
+    });
+
+    return dialog.render({ force: true });
+  }
+
+  /**
+   * Roll an item attack (melee or ranged) using the weapon's skill via Roll Dialog.
+   * @this {axiomCharacterSheet}
+   */
+  static async #onItemRoll(event, target) {
+    const actor = this.actor;
+    const item = this.#getEventItem(event, target);
+    if (!item) return;
+
+    const skillName = item.system.skill;
+    if (!skillName) {
+      ui.notifications.warn(`${item.name} has no linked skill.`);
+      return;
+    }
+
+    const skill = actor.items.find(
+      (i) => i.type === "skill" && i.name === skillName
+    );
+    if (!skill) {
+      ui.notifications.warn(`Skill "${skillName}" not found on actor.`);
+      return;
+    }
+
+    const attributeKey = skill.system.attribute;
+    const attrValue = actor.system.attributes[attributeKey]?.value ?? 0;
+    const skillValue = skill.system.level?.value ?? 0;
+
+    const dialog = new AxiomRollDialog({
+      actor,
+      type: "item",
+      label: `Attack: ${item.name}`,
+      attributeKey,
+      attributeValue: attrValue,
+      skillValue,
+      difficulty: 0,
+      modifier: 0,
+      itemId: item.id,
+      data: {
+        actorId: actor.id,
+        type: "weapon",
+        itemId: item.id,
+        skillId: skill.id,
+      },
+    });
+
+    return dialog.render({ force: true });
   }
 
   /* -------------------------------------------- */

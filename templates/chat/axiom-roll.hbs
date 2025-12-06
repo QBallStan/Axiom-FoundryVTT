@@ -1,0 +1,42 @@
+<div class="axiom-chat-card">
+  <header class="axiom-roll-header">
+    <strong>{{label}}</strong>
+  </header>
+
+  <div class="axiom-roll-summary">
+    {{#if traitDice}}
+    <div class="axiom-roll-row">
+      <span class="axiom-roll-term">Trait Dice:</span>
+      <span class="axiom-roll-value">
+        {{#each traitDice}}
+        <span class="die">{{this}}</span>
+        {{/each}}
+      </span>
+    </div>
+    {{/if}} {{#if fateDie}}
+    <div class="axiom-roll-row">
+      <span class="axiom-roll-term">Fate Die:</span>
+      <span class="axiom-roll-value die">{{fateDie}}</span>
+    </div>
+    {{/if}} {{!-- SUCCESS TIER (centered + capitalized) --}}
+    <div class="axiom-roll-row tier">
+      <span class="axiom-roll-value">{{capitalize tier}}</span>
+    </div>
+
+    {{!-- NET HITS (big) --}}
+    <div class="axiom-roll-net">{{finalNet}}</div>
+
+    {{!-- BOTTOM RESULT: either Focus or Complication --}}
+    <div class="axiom-roll-bottom">
+      {{#if focus}}
+      <div class="axiom-roll-row bottom-focus">
+        <span class="axiom-roll-value">Focus +{{focus}}</span>
+      </div>
+      {{else if flaw}}
+      <div class="axiom-roll-row bottom-flaw">
+        <span class="axiom-roll-value">Complication</span>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>

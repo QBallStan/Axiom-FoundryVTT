@@ -1,0 +1,58 @@
+<div class="axiom-roll-dialog">
+  <section class="axiom-roll-body">
+
+    {{!-- ATTRIBUTE (not for attribute tests) --}}
+    {{#unless isAttributeTest}}
+    <div class="axiom-row">
+      <label>Attribute</label>
+      <select name="attribute">
+        {{#each attributes as |attrLabel attrKey|}}
+          <option value="{{attrKey}}"
+            {{#if (eq ../selectedAttributeKey attrKey)}}selected{{/if}}>
+            {{attrLabel}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+    {{/unless}}
+
+    {{!-- DIFFICULTY --}}
+    <div class="axiom-row">
+      <label>Difficulty</label>
+      <select name="difficulty">
+        {{#each difficultyOptions}}
+          <option value="{{value}}"
+            {{#if (eq ../difficulty value)}}selected{{/if}}>
+            {{label}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    {{!-- MODIFIER --}}
+    <div class="axiom-row">
+      <label>Modifier</label>
+      <div class="modifier-controls">
+        <button type="button" data-action="modMinus">−</button>
+        <span class="modifier-value">{{modifier}}</span>
+        <button type="button" data-action="modPlus">+</button>
+      </div>
+    </div>
+
+    {{!-- DICEPOOL --}}
+    <div class="axiom-row">
+      <label>Dice Pool</label>
+      <div class="dice-pool-display">
+        <span class="pool-total">{{pool}}</span>
+      </div>
+    </div>
+
+  </section>
+
+  <footer class="axiom-roll-footer">
+    <button type="submit" data-action="roll" class="roll-button">
+      {{localize "AXIOM.Roll"}}
+    </button>
+  </footer>
+
+</div>

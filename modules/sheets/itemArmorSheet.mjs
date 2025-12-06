@@ -1,4 +1,4 @@
-import axiomBaseItemSheet from "./itemBaseSheet.js";
+import axiomBaseItemSheet from "./itemBaseSheet.mjs";
 
 export default class axiomArmorItemSheet extends axiomBaseItemSheet {
 
