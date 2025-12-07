@@ -1,15 +1,5 @@
 // systems/axiom/scripts/dice.mjs
 
-// Difficulty modifiers, applied after tallying hits.
-export const AXIOM_DIFFICULTY = {
-  EASY: 1,
-  AVERAGE: 0,
-  HARD: -1,
-  VERY_HARD: -2,
-  EXTREME: -3,
-  IMPOSSIBLE: -4,
-};
-
 /**
  * Trait Die (standard d8)
  * 7–8 → +1 hit
@@ -92,16 +82,16 @@ export function getSuccessTier(finalNet, fateDieResult) {
 
   // Check for failure + flaw
   if (n <= 0 && fateDieResult === "flaw") {
-    return "major failure";
+    return "Major failure";
   }
 
   // Standard failure
-  if (n <= 0) return "failure";
+  if (n <= 0) return "Failure";
 
   // Success tiers
-  if (n === 1) return "success";
-  if (n === 2) return "strong success";
-  return "exceptional success";
+  if (n === 1) return "Success";
+  if (n === 2) return "Strong success";
+  return "Exceptional success";
 }
 
 /**

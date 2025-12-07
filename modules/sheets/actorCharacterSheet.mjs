@@ -451,23 +451,35 @@ export default class axiomCharacterSheet extends api.HandlebarsApplicationMixin(
     const test = target.dataset.test;
 
     const attrs = actor.system.attributes;
+
+    // Keys for each test
     const map = {
-      insight: [attrs.logic.value, attrs.instinct.value],
-      perception: [attrs.resolve.value, attrs.instinct.value],
-      memory: [attrs.resolve.value, attrs.logic.value],
-      composure: [attrs.charisma.value, attrs.resolve.value],
-      lifting: [attrs.strength.value, attrs.fortitude.value],
+      insight: { pk: "logic", sk: "instinct" },
+      perception: { pk: "resolve", sk: "instinct" },
+      memory: { pk: "resolve", sk: "logic" },
+      composure: { pk: "charisma", sk: "resolve" },
+      lifting: { pk: "strength", sk: "fortitude" },
     };
 
     if (!map[test]) return;
-    const [a, b] = map[test];
+
+    const pk = map[test].pk;
+    const sk = map[test].sk;
+
+    const primaryValue = attrs[pk].value;
+    const secondaryValue = attrs[sk].value;
+
+    // Capitalized label for window title
+    const label = test.charAt(0).toUpperCase() + test.slice(1);
 
     const dialog = new AxiomRollDialog({
       actor,
       type: "attribute-test",
-      label: `Attribute Test: ${test.toUpperCase()}`,
-      primaryValue: a,
-      secondaryValue: b,
+      label, // "Insight", "Memory", etc.
+      primaryKey: pk, // "logic"
+      secondaryKey: sk, // "instinct"
+      primaryValue,
+      secondaryValue,
       difficulty: 0,
       modifier: 0,
       test,
@@ -498,7 +510,7 @@ export default class axiomCharacterSheet extends api.HandlebarsApplicationMixin(
     const dlg = new AxiomRollDialog({
       actor,
       type: "skill",
-      label: `${skill.name} Check`,
+      label: `${skill.name}`,
       attributeKey,
       attributeValue,
       skillValue,

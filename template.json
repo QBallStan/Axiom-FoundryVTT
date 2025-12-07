@@ -91,6 +91,15 @@
           "arms": 0,
           "legs": 0
         }
+      },
+      "penalty": {
+        "health": 0,
+        "stamina": 0,
+        "ignore": {
+          "health": 0,
+          "stamina": 0,
+          "all": 0
+        }
       }
     }
   },

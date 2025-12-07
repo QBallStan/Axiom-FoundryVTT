@@ -1,52 +1,145 @@
 // main: ./axiom.less
 
-/* Two-column form layout */
-.axiom-row {
+.axiom-roll-dialog {
+  font-size: 13px;
+}
+
+/* SECTION HEADERS (Base Pool, Modifiers) */
+.axiom-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 2px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-top: 6px;
+}
+
+/* Arrow indicator */
+.axiom-section .section-header::before {
+  content: "▶";
+  margin-right: 6px;
+  transition: transform 0.15s ease;
+  font-size: 12px;
+}
+
+.axiom-section[expanded="true"] .section-header::before {
+  content: "▼";
+}
+
+/* SECTION EXPANDED CONTENT */
+.section-expand {
+  padding-left: 14px;
+  padding-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ROWS INSIDE SECTIONS (breakdown & modifiers) */
+.line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1px 0;
+}
+
+/* LABEL LEFT / VALUE RIGHT */
+.line-label {
+  flex: 1;
+}
+.line-value {
+  margin-left: 10px;
+  text-align: right;
+  min-width: 24px;
+}
+
+/* ADDITIONAL MODIFIER (ALWAYS VISIBLE) */
+.manual-mod.always-visible {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 2px;
+  margin: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.manual-mod .manual-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* spacing between buttons and value */
+}
+
+/* - + buttons */
+.manual-controls button {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border: none;              
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* Common modifiers dropdown */
+.line select {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* Difficulty row */
+.axiom-diff-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.75rem;
+  margin: 8px 0;
+  gap: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.axiom-row label {
-  flex: 0 0 40%;
+.axiom-diff-row label {
   font-weight: 600;
 }
 
-.axiom-row select,
-.axiom-row .modifier-controls,
-.axiom-row .dice-pool-display {
-  flex: 1;
-  text-align: right;
+/* Roll button footer */
+.axiom-roll-footer {
+  margin-top: 12px;
+  text-align: center;
 }
 
-/* Modifier controls */
-.modifier-controls {
+.roll-footer-layout {
   display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
-
-.modifier-controls button {
-  width: 26px;
-  height: 26px;
-  font-size: 1rem;
-}
-
-.modifier-controls span.modifier-value {
-  display: inline-flex;
-  align-items: center; /* center text vertically */
-  justify-content: center;
-  height: 26px; /* match button height */
-  line-height: 26px; /* ensures perfect centering */
-  min-width: 20px; /* keeps it from shrinking awkwardly */
-  font-size: 1rem;
-}
-
-/* Full-width roll button */
-.roll-button {
+  gap: 8px; 
   width: 100%;
-  padding: 0.6rem;
-  font-size: 1.1rem;
-  margin-top: 0.6rem;
+  margin: auto;
 }
+
+.roll-mode-select,
+.axiom-roll-footer button {
+  flex: 1 1 0;         
+  height: 32px;
+  box-sizing: border-box;
+}
+
+/* Collapsible bodies (Base Pool breakdown, Modifiers list) */
+.axiom-section .section-expand {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition:
+    max-height 0.2s ease,
+    opacity 0.2s ease;
+}
+
+/* Optional: small indent */
+.axiom-section .section-expand {
+  padding-left: 12px;
+}
+

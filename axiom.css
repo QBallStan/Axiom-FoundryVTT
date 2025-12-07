@@ -1,3 +1,7 @@
+.chat-message {
+  background: rgba(11, 10, 19, 0.9);
+  color: #efe6d8;
+}
 @font-face {
   font-family: 'Poltawski Nowy';
   font-style: normal;
@@ -446,51 +450,260 @@
 .axiom.sheet.character .inventory-table {
   margin-bottom: 1rem;
 }
-/* Two-column form layout */
-.axiom-row {
+.axiom-roll-dialog {
+  font-size: 13px;
+}
+/* SECTION HEADERS (Base Pool, Modifiers) */
+.axiom-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 2px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 6px;
+}
+/* Arrow indicator */
+.axiom-section .section-header::before {
+  content: "▶";
+  margin-right: 6px;
+  transition: transform 0.15s ease;
+  font-size: 12px;
+}
+.axiom-section[expanded="true"] .section-header::before {
+  content: "▼";
+}
+/* SECTION EXPANDED CONTENT */
+.section-expand {
+  padding-left: 14px;
+  padding-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+/* ROWS INSIDE SECTIONS (breakdown & modifiers) */
+.line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1px 0;
+}
+/* LABEL LEFT / VALUE RIGHT */
+.line-label {
+  flex: 1;
+}
+.line-value {
+  margin-left: 10px;
+  text-align: right;
+  min-width: 24px;
+}
+/* ADDITIONAL MODIFIER (ALWAYS VISIBLE) */
+.manual-mod.always-visible {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 2px;
+  margin: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.manual-mod .manual-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /* spacing between buttons and value */
+}
+/* - + buttons */
+.manual-controls button {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+/* Common modifiers dropdown */
+.line select {
+  width: 100%;
+  margin-top: 4px;
+}
+/* Difficulty row */
+.axiom-diff-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.75rem;
+  margin: 8px 0;
+  gap: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
-.axiom-row label {
-  flex: 0 0 40%;
+.axiom-diff-row label {
   font-weight: 600;
 }
-.axiom-row select,
-.axiom-row .modifier-controls,
-.axiom-row .dice-pool-display {
-  flex: 1;
-  text-align: right;
+/* Roll button footer */
+.axiom-roll-footer {
+  margin-top: 12px;
+  text-align: center;
 }
-/* Modifier controls */
-.modifier-controls {
+.roll-footer-layout {
   display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
-.modifier-controls button {
-  width: 26px;
-  height: 26px;
-  font-size: 1rem;
-}
-.modifier-controls span.modifier-value {
-  display: inline-flex;
-  align-items: center;
-  /* center text vertically */
-  justify-content: center;
-  height: 26px;
-  /* match button height */
-  line-height: 26px;
-  /* ensures perfect centering */
-  min-width: 20px;
-  /* keeps it from shrinking awkwardly */
-  font-size: 1rem;
-}
-/* Full-width roll button */
-.roll-button {
+  gap: 8px;
   width: 100%;
-  padding: 0.6rem;
-  font-size: 1.1rem;
+  margin: auto;
+}
+.roll-mode-select,
+.axiom-roll-footer button {
+  flex: 1 1 0;
+  height: 32px;
+  box-sizing: border-box;
+}
+/* Collapsible bodies (Base Pool breakdown, Modifiers list) */
+.axiom-section .section-expand {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.2s ease, opacity 0.2s ease;
+}
+/* Optional: small indent */
+.axiom-section .section-expand {
+  padding-left: 12px;
+}
+.axiom-chat-card .axiom-roll-header {
+  text-align: center;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  margin: auto;
+  padding: 5px;
+}
+.axiom-chat-card .axiom-collapse-icon i {
+  transition: transform 0.2s ease;
+}
+.axiom-chat-card .axiom-collapse-icon i.rotated {
+  transform: rotate(-180deg);
+}
+.axiom-chat-card .axiom-roll-row.tier .axiom-roll-value {
+  display: block;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.axiom-chat-card .axiom-net-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 18px;
+  font-weight: 700;
+}
+.axiom-chat-card .axiom-edit-toggle,
+.axiom-chat-card .axiom-second-wind {
+  cursor: pointer;
+  opacity: 0.75;
+}
+.axiom-chat-card .axiom-edit-toggle:hover,
+.axiom-chat-card .axiom-second-wind:hover {
+  opacity: 1;
+}
+.axiom-chat-card .axiom-hit-input {
+  width: 36px;
+  height: 24px;
+  margin-right: 4px;
+  text-align: center;
+  font-weight: bold;
+}
+.axiom-chat-card .axiom-net-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+.axiom-chat-card .axiom-inline-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+.axiom-chat-card .axiom-inline-btn:hover {
+  opacity: 1;
+}
+.axiom-chat-card .axiom-roll-details-wrapper {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+.axiom-chat-card .axiom-roll-bottom {
   margin-top: 0.6rem;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.axiom-chat-card .axiom-dice-container {
+  display: flex;
+  gap: 6px;
+  margin: auto;
+  padding: 3px;
+  flex-wrap: wrap;
+}
+.axiom-chat-card .axiom-die {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(45deg);
+  border-radius: 4px;
+  border: 2px solid #555;
+  font-weight: bold;
+  position: relative;
+}
+.axiom-chat-card .axiom-die .face {
+  transform: rotate(-45deg);
+  font-size: 14px;
+  color: #000;
+}
+.axiom-chat-card .axiom-die-separator {
+  font-weight: bold;
+  font-size: 16px;
+}
+.axiom-chat-card .axiom-die.neutral {
+  background-color: #d6d6d6;
+  border-color: #9e9e9e;
+}
+.axiom-chat-card .axiom-die.hit {
+  background-color: #ccebd7;
+  border-color: #42a86b;
+}
+.axiom-chat-card .axiom-die.miss {
+  background-color: #f2cece;
+  border-color: #c03939;
+}
+.axiom-chat-card .axiom-die.flaw {
+  background-color: #f7dfc3;
+  border-color: #d48a34;
+}
+.axiom-chat-card .axiom-die.focus {
+  background-color: #d5e6fa;
+  border-color: #3f90d7;
+}
+.axiom-chat-card .axiom-base-pool,
+.axiom-chat-card .axiom-difficulty {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.axiom-chat-card .axiom-detail-section .label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.axiom-chat-card .axiom-separator {
+  color: black;
+  margin: 5px;
 }

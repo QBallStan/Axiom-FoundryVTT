@@ -26,10 +26,6 @@ export default class axiomActor extends Actor {
     this._applyEquippedArmor(actorData);
   }
 
-  /* -------------------------------------------- */
-  /*  Derived Stats: Placeholder                  */
-  /* -------------------------------------------- */
-
   async _setCharacterValues(data) {
     // Insert calculations for derived stats here later (movement, toughness, etc.)
 
@@ -74,6 +70,19 @@ export default class axiomActor extends Actor {
         Math.min(trackers.stamina.value, trackers.stamina.max)
       );
     }
+
+    /* -------------------------------------------- */
+    /* DAMAGE PENALTIES                             */
+    /* -------------------------------------------- */
+
+    const penalty = data.penalty;
+
+    // Raw penalties are always based on missing tracker points
+    const missingHealth = trackers.health.max - trackers.health.value;
+    const missingStamina = trackers.stamina.max - trackers.stamina.value;
+
+    penalty.health = Math.max(0, missingHealth);
+    penalty.stamina = Math.max(0, missingStamina);
 
     /* TOUGHNESS = 2 + floor(FORT / 2) */
     const toughness = 2 + Math.floor(FORT / 2);

@@ -7,6 +7,32 @@ and this project adheres to **Semantic Versioning (SemVer)**.
 
 ---
 
+**[0.0.6] – 2025-12-07**
+
+### **Added**
+
+- Expanded **Roll Window** functionality:
+  - Sections are now collapsible (Base Pool, Modifiers).
+  - Modifiers can be toggled and selected from a **common dropdown list**.
+  - Added **Action Point selection** (0–3) with validation against the actor’s AP.
+    
+- Improved **Roll Chat Card** with clearer breakdowns: modifiers, difficulty label, flaw/focus markers, and integrated **edit** and **Second Wind** actions.
+- Introduced initial **combat preparation systems**:
+  - System settings for default Melee skill.
+  - Optional **hit location roll** toggle.
+  - Added hit-location table for future automation.
+    
+- Added basic **Initiative Roll** implementation.
+  
+
+### **Changed**
+
+- Roll window UI fully redesigned for responsiveness and clarity.
+- Difficulty system refactored internally for cleaner logic and faster lookup.
+- Refined default pool calculation and modifier handling for better consistency.
+
+---
+
 # **[0.0.5] – 2025-12-06**
 
 ### **Added**

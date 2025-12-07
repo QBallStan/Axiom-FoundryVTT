@@ -1,42 +1,92 @@
 <div class="axiom-chat-card">
-  <header class="axiom-roll-header">
-    <strong>{{label}}</strong>
+  <!-- HEADER (click-to-expand) -->
+  <header class="axiom-roll-header" data-action="toggle-details">
+    <strong>{{label}} Test</strong>
+    <span class="axiom-collapse-icon">
+      <i class="fa-solid fa-caret-down"></i>
+    </span>
   </header>
 
-  <div class="axiom-roll-summary">
-    {{#if traitDice}}
-    <div class="axiom-roll-row">
-      <span class="axiom-roll-term">Trait Dice:</span>
-      <span class="axiom-roll-value">
-        {{#each traitDice}}
-        <span class="die">{{this}}</span>
-        {{/each}}
-      </span>
-    </div>
-    {{/if}} {{#if fateDie}}
-    <div class="axiom-roll-row">
-      <span class="axiom-roll-term">Fate Die:</span>
-      <span class="axiom-roll-value die">{{fateDie}}</span>
-    </div>
-    {{/if}} {{!-- SUCCESS TIER (centered + capitalized) --}}
-    <div class="axiom-roll-row tier">
-      <span class="axiom-roll-value">{{capitalize tier}}</span>
-    </div>
+  <!-- COLLAPSIBLE DETAILS -->
+  <div class="axiom-roll-details-wrapper">
+    <div class="axiom-roll-details">
+      <!-- Dice Results -->
+      <div class="axiom-dice-container"></div>
 
-    {{!-- NET HITS (big) --}}
-    <div class="axiom-roll-net">{{finalNet}}</div>
+      <hr class="axiom-separator" />
 
-    {{!-- BOTTOM RESULT: either Focus or Complication --}}
-    <div class="axiom-roll-bottom">
-      {{#if focus}}
-      <div class="axiom-roll-row bottom-focus">
-        <span class="axiom-roll-value">Focus +{{focus}}</span>
+      <!-- Base Dice Pool -->
+      <div class="axiom-detail-section axiom-base-pool">
+        <div class="label">Base:</div>
+        <div class="value">{{basePoolLabel}}</div>
       </div>
-      {{else if flaw}}
-      <div class="axiom-roll-row bottom-flaw">
-        <span class="axiom-roll-value">Complication</span>
+
+      <!-- Modifiers -->
+      {{#if modifiers}}
+      <hr class="axiom-separator" />
+      <div class="axiom-detail-section axiom-modifiers">
+        <div class="label">Modifiers:</div>
+        <ul>
+          {{#each modifiers}}
+          <li>{{this.label}} ({{this.value}})</li>
+          {{/each}}
+        </ul>
       </div>
       {{/if}}
+
+      <hr class="axiom-separator" />
+
+      <!-- Difficulty -->
+      <div class="axiom-detail-section axiom-difficulty">
+        <div class="label">Difficulty:</div>
+        <div class="value">{{difficultyLabel}}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS TIER -->
+  <div class="axiom-roll-row tier">
+    <span class="axiom-roll-value">{{tier}}</span>
+  </div>
+
+  <!-- FOCUS or FLAW -->
+  {{#if focus}}
+  <div class="axiom-roll-bottom bottom-focus">Focus +{{focus}}</div>
+
+  {{else if flaw}}
+  <div class="axiom-roll-bottom bottom-flaw">Complication</div>
+  {{/if}}
+
+  <!-- NET RESULT + INLINE CONTROLS -->
+  <div class="axiom-net-row">
+    <!-- EDIT -->
+    <div class="col-2">
+      <a class="axiom-edit-toggle" data-action="edit" title="Edit result">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </a>
+    </div>
+
+    <!-- NET HITS (display vs edit) -->
+    <div class="col-8">
+      <!-- Edit mode -->
+      <div class="axiom-hit-edit display-toggle" style="display: none">
+        <input class="axiom-hit-input" type="number" value="{{finalNet}}" />
+        Hits
+      </div>
+
+      <!-- View mode -->
+      <div class="axiom-hit-display display-toggle">{{finalNet}} Hits</div>
+    </div>
+
+    <!-- SECOND WIND -->
+    <div class="col-2">
+      <a
+        class="axiom-second-wind"
+        data-action="second-wind"
+        title="Second Wind"
+      >
+        <i class="fa-solid fa-clover"></i>
+      </a>
     </div>
   </div>
 </div>

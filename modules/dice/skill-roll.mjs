@@ -18,7 +18,6 @@ export async function rollSkillCheck({
   attributeValue,
   skillValue,
   modifier = 0,
-  difficulty = 0, // kept for symmetry, not used here
   data = {},
 }) {
   const attr = Number(attributeValue) || 0;

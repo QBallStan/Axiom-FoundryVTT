@@ -1,5 +1,7 @@
 export const AXIOM = {};
 
+// … your existing sections …
+
 AXIOM.attributes = {
   strength: "Strength",
   agility: "Agility",
@@ -34,10 +36,27 @@ AXIOM.damageTypes = {
 };
 
 AXIOM.difficulties = {
-  easy: "Easy",
-  average: "Average",
-  hard: "Hard",
-  veryhard: "Very Hard",
-  extreme: "Extreme",
-  impossible: "Impossible",
+  easy:       { key: "easy",       label: "Easy",        value:  1 },
+  average:    { key: "average",    label: "Average",     value:  0 },
+  hard:       { key: "hard",       label: "Hard",        value: -1 },
+  veryhard:   { key: "veryhard",   label: "Very Hard",   value: -2 },
+  extreme:    { key: "extreme",    label: "Extreme",     value: -3 },
+  impossible: { key: "impossible", label: "Impossible",  value: -4 },
 };
+
+AXIOM.hitLocations = {
+  d8: [
+    { range: [1],       location: "Left Leg",  armorRegion: "legs" },
+    { range: [2],       location: "Right Leg", armorRegion: "legs" },
+    { range: [3, 4, 5], location: "Torso",     armorRegion: "chest" },
+    { range: [6],       location: "Left Arm",  armorRegion: "arms" },
+    { range: [7],       location: "Right Arm", armorRegion: "arms" },
+    { range: [8],       location: "Head",      armorRegion: "head" }
+  ]
+};
+
+export function rollHitLocation() {
+  const table = AXIOM.hitLocations.d8;
+  const roll = new Roll("1d8").evaluateSync().total;
+  return table.find(e => e.range.includes(roll));
+}

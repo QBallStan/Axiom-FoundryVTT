@@ -1,0 +1,162 @@
+// main: ./axiom.less
+
+.axiom-chat-card {
+  .axiom-roll-header {
+    text-align: center;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    margin: auto;
+    padding: 5px;
+  }
+
+  .axiom-collapse-icon i {
+    transition: transform 0.2s ease;
+  }
+
+  .axiom-collapse-icon i.rotated {
+    transform: rotate(-180deg);
+  }
+
+  .axiom-roll-row.tier .axiom-roll-value {
+    display: block;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .axiom-net-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .axiom-edit-toggle,
+  .axiom-second-wind {
+    cursor: pointer;
+    opacity: 0.75;
+  }
+
+  .axiom-edit-toggle:hover,
+  .axiom-second-wind:hover {
+    opacity: 1;
+  }
+
+  .axiom-hit-input {
+    width: 36px;
+    height: 24px;
+    margin-right: 4px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .axiom-net-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+  }
+
+  .axiom-inline-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .axiom-inline-btn:hover {
+    opacity: 1;
+  }
+
+  .axiom-roll-details-wrapper {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+
+  .axiom-roll-bottom {
+    margin-top: 0.6rem;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .axiom-dice-container {
+    display: flex;
+    gap: 6px;
+    margin: auto;
+    padding: 3px;
+    flex-wrap: wrap;
+  }
+
+  .axiom-die {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transform: rotate(45deg);
+    border-radius: 4px;
+    border: 2px solid #555;
+    font-weight: bold;
+    position: relative;
+  }
+
+  .axiom-die .face {
+    transform: rotate(-45deg);
+    font-size: 14px;
+    color: #000;
+  }
+
+  .axiom-die-separator {
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  .axiom-die.neutral {
+    background-color: #d6d6d6;
+    border-color: #9e9e9e;
+  }
+
+  .axiom-die.hit {
+    background-color: #ccebd7;
+    border-color: #42a86b;
+  }
+
+  .axiom-die.miss {
+    background-color: #f2cece;
+    border-color: #c03939;
+  }
+
+  .axiom-die.flaw {
+    background-color: #f7dfc3;
+    border-color: #d48a34;
+  }
+
+  .axiom-die.focus {
+    background-color: #d5e6fa;
+    border-color: #3f90d7;
+  }
+
+  .axiom-base-pool,
+  .axiom-difficulty {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .axiom-detail-section .label {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .axiom-separator {
+    color: black;
+    margin: 5px;
+  }
+}

@@ -1,4 +1,5 @@
 import { AXIOM } from "./modules/config.mjs";
+import { AxiomSettings } from "./modules/settings.mjs";
 import axiomActor from "./modules/objects/axiomActor.mjs";
 import axiomCharacterSheet from "./modules/sheets/actorCharacterSheet.mjs";
 import axiomItem from "./modules/objects/axiomItem.mjs";
@@ -9,6 +10,8 @@ import axiomAmmoItemSheet from "./modules/sheets/itemAmmoSheet.mjs";
 import axiomEquipmentItemSheet from "./modules/sheets/itemEquipmentSheet.mjs";
 import AxiomRoll from "./modules/dice/axiom-roll.mjs";
 import { AxiomDieTrait, AxiomDieFate } from "./modules/dice/dice.mjs";
+import AxiomChat from "./modules/chat.mjs";
+import AxiomCombat from "./modules/systems/combat.mjs";
 
 Hooks.once("init", async () => {
   console.log("AXIOM | Initializing Axiom//Core System");
@@ -23,6 +26,11 @@ Hooks.once("init", async () => {
 
   CONFIG.Actor.documentClass = axiomActor;
   CONFIG.Item.documentClass = axiomItem;
+
+  CONFIG.Combat.documentClass = AxiomCombat;
+
+  AxiomChat.init();
+  AxiomSettings.registerSystemSettings();
 
   const { DocumentSheetConfig } = foundry.applications.apps;
 
@@ -219,5 +227,10 @@ function registerHandlebarsHelpers() {
 
   Handlebars.registerHelper("isFilled", function (value, index) {
     return value >= index + 1;
+  });
+
+  Handlebars.registerHelper("array", function (...args) {
+    // Handlebars passes an extra "options" object at the end, so remove it
+    return args.slice(0, -1);
   });
 }
