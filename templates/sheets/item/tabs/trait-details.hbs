@@ -1,0 +1,14 @@
+<section class="trait-details item-details">
+  <h2 class="section-title"><i class="fa-solid fa-scale-balanced"></i> {{localize "AXIOM.Trait.Details"}}</h2>
+
+  <div class="details-grid">
+    <label class="detail-card full">
+      <span>{{localize "AXIOM.Trait.Category"}}</span>
+      <select name="system.category">
+        {{#each config.traitCategories as |label key|}}
+          <option value="{{key}}" {{#if (eq ../system.category key)}}selected{{/if}}>{{localize label}}</option>
+        {{/each}}
+      </select>
+    </label>
+  </div>
+</section>

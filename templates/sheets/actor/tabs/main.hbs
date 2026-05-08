@@ -1,0 +1,78 @@
+<section class='tab-section'>
+  <h2 class='section-title'><i class='fa-solid fa-table-cells-large'></i> {{localize "AXIOM.Actor.Main.Attributes"}}</h2>
+  <div class='attribute-table'>
+    <div class='attribute-row attribute-head'><span></span>{{#each mock.attributes}}<strong>{{label}}</strong>{{/each}}</div>
+    <div class='attribute-row'><span>{{localize "AXIOM.Actor.Main.Base"}}</span>{{#each mock.attributes}}<input type='number' name='system.attributes.{{key}}.base' value='{{base}}'>{{/each}}</div>
+    <div class='attribute-row attribute-adv'><span>{{localize "AXIOM.Actor.Main.Adv"}}</span>{{#each mock.attributes}}<input type='number' name='system.attributes.{{key}}.adv' value='{{adv}}'>{{/each}}</div>
+    <div class='attribute-row'><span>{{localize "AXIOM.Actor.Main.Mod"}}</span>{{#each mock.attributes}}<input type='number' name='system.attributes.{{key}}.mod' value='{{mod}}'>{{/each}}</div>
+    <div class='attribute-row attribute-total'><span>{{localize "AXIOM.Actor.Main.Total"}}</span>{{#each mock.attributes}}<strong>{{total}}</strong>{{/each}}</div>
+  </div>
+</section>
+
+<section class='tab-section'>
+  <h2 class='section-title'><i class='fa-solid fa-chart-line'></i> {{localize "AXIOM.Actor.Main.SubAttributes"}}</h2>
+  <div class='stat-grid'>
+    <div class='stat-card'><label>{{localize "AXIOM.Actor.Main.Movement"}}</label><strong>{{mock.subAttributes.movement}}</strong></div>
+    <div class='stat-card'><label>{{localize "AXIOM.Actor.Main.Initiative"}}</label><strong>{{mock.subAttributes.initiative}}</strong></div>
+    <div class='stat-card'><label>{{localize "AXIOM.Actor.Main.Size"}}</label><strong>{{mock.subAttributes.size}}</strong></div>
+    <div class='stat-card'><label>{{localize "AXIOM.Actor.Main.DamageMod"}}</label><strong>{{mock.subAttributes.damageModifier}}</strong></div>
+    <div class='stat-card'><label>{{localize "AXIOM.Actor.Main.Toughness"}}</label><strong>{{mock.subAttributes.toughness}}</strong></div>
+    <div class='stat-card corruption-stat'>
+      <label>{{localize "AXIOM.Actor.Main.Corruption"}}</label>
+      <strong class='ratio-value'>
+        <input type='number' name='system.corruption.current' value='{{mock.subAttributes.corruption.current}}' min='0' />
+        <span>/ {{mock.subAttributes.corruption.threshold}}</span>
+      </strong>
+    </div>
+  </div>
+</section>
+
+<section class='tab-section trait-tab'>
+  <h2 class='section-title'><i class='fa-solid fa-scale-balanced'></i> {{localize "AXIOM.Actor.Main.Traits"}}</h2>
+
+  <div class='trait-column-grid'>
+    <section class='trait-list-section quality'>
+      <h3 class='sub-title good'><i class='fa-solid fa-plus'></i> {{localize "AXIOM.Actor.Main.Qualities"}}</h3>
+      {{#if mainTab.qualities.length}}
+        <div class='trait-list'>
+          {{#each mainTab.qualities}}
+            <article class='trait-row' data-trait-id='{{id}}'>
+              <span class='trait-name' data-action='toggleItemDescription' role='button' tabindex='0' aria-expanded='false'>{{name}}</span>
+              <div class='trait-actions'>
+                <button type='button' data-action='editTrait' title='{{localize "AXIOM.Actor.Main.EditTrait"}}'><i class='fa-solid fa-pen-to-square'></i></button>
+                <button type='button' data-action='deleteTrait' title='{{localize "AXIOM.Actor.Main.DeleteTrait"}}'><i class='fa-solid fa-trash'></i></button>
+              </div>
+              {{#if description}}
+                <div class='item-description-inline trait-description' hidden>{{{description}}}</div>
+              {{/if}}
+            </article>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class='empty-list'>{{localize "AXIOM.Actor.Main.NoQualities"}}</div>
+      {{/if}}
+    </section>
+
+    <section class='trait-list-section flaw'>
+      <h3 class='sub-title bad'><i class='fa-solid fa-minus'></i> {{localize "AXIOM.Actor.Main.Flaws"}}</h3>
+      {{#if mainTab.flaws.length}}
+        <div class='trait-list'>
+          {{#each mainTab.flaws}}
+            <article class='trait-row' data-trait-id='{{id}}'>
+              <span class='trait-name' data-action='toggleItemDescription' role='button' tabindex='0' aria-expanded='false'>{{name}}</span>
+              <div class='trait-actions'>
+                <button type='button' data-action='editTrait' title='{{localize "AXIOM.Actor.Main.EditTrait"}}'><i class='fa-solid fa-pen-to-square'></i></button>
+                <button type='button' data-action='deleteTrait' title='{{localize "AXIOM.Actor.Main.DeleteTrait"}}'><i class='fa-solid fa-trash'></i></button>
+              </div>
+              {{#if description}}
+                <div class='item-description-inline trait-description' hidden>{{{description}}}</div>
+              {{/if}}
+            </article>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class='empty-list'>{{localize "AXIOM.Actor.Main.NoFlaws"}}</div>
+      {{/if}}
+    </section>
+  </div>
+</section>

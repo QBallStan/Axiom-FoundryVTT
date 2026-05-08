@@ -1,0 +1,57 @@
+<header class="sheet-header item-header">
+  <img class="item-image" data-action="editImage" data-edit="img" src="{{item.img}}" alt="{{item.name}}" />
+
+  <div class="item-header-main header-fields">
+    <input
+      class="item-name name-input"
+      name="name"
+      type="text"
+      value="{{item.name}}"
+      placeholder="{{localize 'AXIOM.Item.NamePlaceholder'}}"
+    />
+
+    {{#if displayCommonFields}}
+    <div class="item-header-fields item-common-grid {{#if currency.isFantasy}}fantasy-currency-grid{{/if}}">
+      <div class="item-field field-group item-price-field {{#if currency.isFantasy}}fantasy-price-field{{/if}}">
+        <span>{{localize "AXIOM.Item.Price"}}</span>
+        {{#if currency.isFantasy}}
+          <div class="coin-input-grid">
+            <label>
+              <span>{{localize "AXIOM.Currency.Gold"}}</span>
+              <input type="number" name="system.priceCoins.gold" value="{{currency.itemPriceCoins.gold}}" min="0" step="1" />
+            </label>
+            <label>
+              <span>{{localize "AXIOM.Currency.Silver"}}</span>
+              <input type="number" name="system.priceCoins.silver" value="{{currency.itemPriceCoins.silver}}" min="0" step="1" />
+            </label>
+            <label>
+              <span>{{localize "AXIOM.Currency.Copper"}}</span>
+              <input type="number" name="system.priceCoins.copper" value="{{currency.itemPriceCoins.copper}}" min="0" step="1" />
+            </label>
+          </div>
+        {{else}}
+          <div class="standard-currency-input">
+            <span>{{currency.standardSymbol}}</span>
+            <input type="number" name="system.price" value="{{currency.itemPriceValue}}" min="0" step="1" aria-label="{{currency.standardLabel}}" />
+          </div>
+        {{/if}}
+      </div>
+
+      <label class="item-field field-group">
+        <span>{{localize "AXIOM.Item.Weight"}}</span>
+        <input type="number" name="system.weight" value="{{system.weight}}" min="0" step="0.01" />
+      </label>
+
+      <label class="item-field field-group">
+        <span>{{localize "AXIOM.Item.Quantity"}}</span>
+        <input type="number" name="system.quantity" value="{{system.quantity}}" min="0" step="1" />
+      </label>
+
+      <label class="item-field field-group">
+        <span>{{localize "AXIOM.Item.Availability"}}</span>
+        <input type="number" name="system.availability" value="{{system.availability}}" min="0" step="1" />
+      </label>
+    </div>
+    {{/if}}
+  </div>
+</header>

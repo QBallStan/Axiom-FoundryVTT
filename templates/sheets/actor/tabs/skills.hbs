@@ -1,0 +1,130 @@
+<section class="tab-section skills-tab">
+  <div class="skills-layout">
+    <section class="skill-column">
+      <h2 class="section-title"><i class="fa-solid fa-list-check"></i> {{localize "AXIOM.Actor.Skills.Core"}}</h2>
+
+      <div class="skill-list">
+        {{#each skillTab.core}}
+          <div class="skill-row" data-skill-id="{{id}}">
+            <div class="skill-main">
+              <span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span>
+              <span class="skill-attributes">{{attributesLabel}}</span>
+            </div>
+            <input
+              class="skill-level-input"
+              type="number"
+              value="{{level}}"
+              min="0"
+              max="50"
+              step="1"
+              data-action="updateSkillLevel"
+              aria-label="{{name}} {{localize 'AXIOM.Skill.Level'}}"
+            />
+            <span class="skill-total">{{total}}</span>
+            <div class="skill-actions">
+              <button class="skill-action" type="button" data-action="editSkill" title="{{localize 'AXIOM.Actor.Skills.Edit'}}">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button class="skill-action skill-delete" type="button" data-action="deleteSkill" title="{{localize 'AXIOM.Actor.Skills.Delete'}}">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+              <button class="skill-action skill-roll" type="button" data-action="rollSkill" title="{{localize 'AXIOM.Actor.Skills.Roll'}}">
+                <i class="fa-solid fa-dice-d20"></i>
+              </button>
+            </div>
+            {{#if description}}
+              <div class="item-description-inline skill-description" hidden>{{{description}}}</div>
+            {{/if}}
+          </div>
+        {{else}}
+          <div class="empty-list">{{localize "AXIOM.Actor.Skills.NoCore"}}</div>
+        {{/each}}
+      </div>
+    </section>
+
+    <section class="skill-column">
+      <h2 class="section-title"><i class="fa-solid fa-gauge-high"></i> {{localize "AXIOM.Actor.Skills.AttributeChecks"}}</h2>
+
+      <div class="skill-list attribute-check-list">
+        <div class="skill-row attribute-check-row" data-check-id="custom" data-check-name="">
+          <div class="attribute-check-selects">
+            <select data-action="updateAttributeCheckPreview" aria-label="{{localize 'AXIOM.Skill.AttributeOne'}}">
+              {{#each skillTab.attributeCheck.attributeOneOptions}}
+                <option value="{{key}}" data-value="{{value}}" {{#if selected}}selected{{/if}}>{{localize label}}</option>
+              {{/each}}
+            </select>
+            <select data-action="updateAttributeCheckPreview" aria-label="{{localize 'AXIOM.Skill.AttributeTwo'}}">
+              {{#each skillTab.attributeCheck.attributeTwoOptions}}
+                <option value="{{key}}" data-value="{{value}}" {{#if selected}}selected{{/if}}>{{localize label}}</option>
+              {{/each}}
+            </select>
+          </div>
+          <span class="skill-level-static">+30</span>
+          <span class="skill-total" data-attribute-check-total>{{skillTab.attributeCheck.total}}</span>
+          <div class="skill-actions attribute-check-actions">
+            <button class="skill-action skill-roll" type="button" data-action="rollAttributeCheck" title="{{localize 'AXIOM.Actor.Skills.Roll'}}">
+              <i class="fa-solid fa-dice-d20"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="attribute-check-presets" aria-label="{{localize 'AXIOM.Actor.Skills.Presets.Label'}}">
+        {{#each skillTab.attributeCheckPresets}}
+          <button
+            class="attribute-check-preset"
+            type="button"
+            data-action="setAttributeCheckPreset"
+            data-preset="{{key}}"
+            data-check-name="{{localize label}}"
+            data-attribute-one="{{attributeOne}}"
+            data-attribute-two="{{attributeTwo}}"
+            title="{{localize label}}: {{attributesLabel}}"
+          >
+            <span>{{localize label}}</span>
+          </button>
+        {{/each}}
+      </div>
+
+      <h2 class="section-title expertise-title"><i class="fa-solid fa-star"></i> {{localize "AXIOM.Actor.Skills.Expertise"}}</h2>
+
+      <div class="skill-list">
+        {{#each skillTab.expertise}}
+          <div class="skill-row" data-skill-id="{{id}}">
+            <div class="skill-main">
+              <span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span>
+              <span class="skill-attributes">{{attributesLabel}}</span>
+            </div>
+            <input
+              class="skill-level-input"
+              type="number"
+              value="{{level}}"
+              min="0"
+              max="50"
+              step="1"
+              data-action="updateSkillLevel"
+              aria-label="{{name}} {{localize 'AXIOM.Skill.Level'}}"
+            />
+            <span class="skill-total">{{total}}</span>
+            <div class="skill-actions">
+              <button class="skill-action" type="button" data-action="editSkill" title="{{localize 'AXIOM.Actor.Skills.Edit'}}">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button class="skill-action skill-delete" type="button" data-action="deleteSkill" title="{{localize 'AXIOM.Actor.Skills.Delete'}}">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+              <button class="skill-action skill-roll" type="button" data-action="rollSkill" title="{{localize 'AXIOM.Actor.Skills.Roll'}}">
+                <i class="fa-solid fa-dice-d20"></i>
+              </button>
+            </div>
+            {{#if description}}
+              <div class="item-description-inline skill-description" hidden>{{{description}}}</div>
+            {{/if}}
+          </div>
+        {{else}}
+          <div class="empty-list">{{localize "AXIOM.Actor.Skills.NoExpertise"}}</div>
+        {{/each}}
+      </div>
+    </section>
+  </div>
+</section>

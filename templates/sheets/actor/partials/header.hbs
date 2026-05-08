@@ -1,0 +1,131 @@
+<header class="sheet-header">
+  <div class="sheet-top">
+    <input
+      class="name-input"
+      name="name"
+      type="text"
+      value="{{actor.name}}"
+      placeholder="{{localize 'AXIOM.Actor.NamePlaceholder'}}"
+    />
+  </div>
+
+  <div class="identity-row">
+    <div class="portrait">
+      <img data-action="editImage" data-edit="img" src="{{actor.img}}" />
+    </div>
+
+    <div class="status-grid">
+      <section class="panel wounds-panel">
+        <h3 class="panel-title"><i class="fa-solid fa-heart-pulse"></i> {{localize "AXIOM.Actor.Wounds.Title"}}</h3>
+        <div class="wounds">
+          <div class="wound-grid">
+            <div class="wound-col">
+              <div class="wound-col-label">{{localize "AXIOM.Actor.Wounds.Grazing"}}</div>
+              <div class="wound-col-content">
+                {{#each mock.wounds.grazing}}
+                  <div class="wound-slot">
+                    <button class="wound-toggle {{#if taken}}taken{{/if}}" type="button" data-action="toggleWound" data-wound-severity="grazing" data-wound-key="{{key}}"><span class="wound-mark mark-grazing"></span></button>
+                    <input class="tiny-input" type="number" name="system.wounds.grazing.slots.{{key}}.healing" value="{{healing}}" min="0" max="{{healingMax}}" />
+                    <span class="max">/{{healingMax}}</span>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+
+            <div class="wound-col">
+              <div class="wound-col-label">{{localize "AXIOM.Actor.Wounds.Minor"}} <strong>-5</strong></div>
+              <div class="wound-col-content">
+                {{#each mock.wounds.minor}}
+                  <div class="wound-slot">
+                    <button class="wound-toggle {{#if taken}}taken{{/if}}" type="button" data-action="toggleWound" data-wound-severity="minor" data-wound-key="{{key}}"><span class="wound-mark mark-minor"><span class="mark-inner"></span></span></button>
+                    <input class="tiny-input" type="number" name="system.wounds.minor.slots.{{key}}.healing" value="{{healing}}" min="0" max="{{healingMax}}" />
+                    <span class="max">/{{healingMax}}</span>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+
+            <div class="wound-col">
+              <div class="wound-col-label">{{localize "AXIOM.Actor.Wounds.Major"}} <strong>-10</strong></div>
+              <div class="wound-col-content">
+                {{#each mock.wounds.major}}
+                  <div class="wound-slot">
+                    <button class="wound-toggle {{#if taken}}taken{{/if}}" type="button" data-action="toggleWound" data-wound-severity="major" data-wound-key="{{key}}"><span class="wound-mark mark-major"><span class="mark-inner"></span></span></button>
+                    <input class="tiny-input" type="number" name="system.wounds.major.slots.{{key}}.healing" value="{{healing}}" min="0" max="{{healingMax}}" />
+                    <span class="max">/{{healingMax}}</span>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+
+            <div class="wound-col">
+              <div class="wound-col-label critical">{{localize "AXIOM.Actor.Wounds.Critical"}}</div>
+              <div class="wound-col-content">
+                {{#each mock.wounds.critical}}
+                  <div class="wound-slot">
+                    <button class="wound-toggle {{#if taken}}taken{{/if}}" type="button" data-action="toggleWound" data-wound-severity="critical" data-wound-key="{{key}}"><span class="wound-mark mark-critical"></span></button>
+                    <input class="tiny-input" type="number" name="system.wounds.critical.slots.{{key}}.healing" value="{{healing}}" min="0" max="{{healingMax}}" />
+                    <span class="max">/{{healingMax}}</span>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+          </div>
+          <input
+            class="injury-input"
+            type="text"
+            name="system.wounds.critical.slots.one.injury"
+            value="{{mock.wounds.critical.0.injury}}"
+            placeholder="{{localize 'AXIOM.Actor.Wounds.CriticalPlaceholder'}}"
+          />
+        </div>
+      </section>
+
+      <aside class="trackers">
+        <section class="panel tracker">
+          <h3 class="tracker-title"><i class="fa-solid fa-coin-vertical"></i> {{localize "AXIOM.Actor.Trackers.Fate"}}</h3>
+          <button
+            class="pips tracker-pips"
+            type="button"
+            data-action="adjustTracker"
+            data-tracker="fate"
+            title="{{localize 'AXIOM.Actor.Trackers.ClickHint'}}"
+          >
+            {{#each mock.trackers.fate.pips}}
+              <span class="pip fate-pip {{#if active}}active{{/if}}"><i class="fa-solid fa-coin-vertical"></i></span>
+            {{/each}}
+          </button>
+        </section>
+        <section class="panel tracker">
+          <h3 class="tracker-title"><i class="fa-solid fa-chevron-right"></i> {{localize "AXIOM.Actor.Trackers.Action"}}</h3>
+          <button
+            class="pips tracker-pips"
+            type="button"
+            data-action="adjustTracker"
+            data-tracker="actionPoints"
+            title="{{localize 'AXIOM.Actor.Trackers.ClickHint'}}"
+          >
+            {{#each mock.trackers.actionPoints.pips}}
+              <span class="pip action-pip {{#if active}}active{{/if}}"><i class="fa-solid fa-chevron-right"></i></span>
+            {{/each}}
+          </button>
+        </section>
+        <section class="panel tracker">
+          <h3 class="tracker-title"><i class="fa-solid fa-gauge-high"></i> {{localize "AXIOM.Actor.Trackers.Momentum"}}</h3>
+          <div class="momentum-line">
+            <span>{{mock.trackers.momentum.min}}</span>
+            <input
+              type="range"
+              name="system.trackers.momentum.current"
+              min="{{mock.trackers.momentum.min}}"
+              max="{{mock.trackers.momentum.max}}"
+              value="{{mock.trackers.momentum.current}}"
+            />
+            <span>+{{mock.trackers.momentum.max}}</span>
+          </div>
+          <div class="momentum-value">{{mock.trackers.momentum.current}}</div>
+        </section>
+      </aside>
+    </div>
+  </div>
+</header>

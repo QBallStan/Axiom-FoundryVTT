@@ -1,0 +1,44 @@
+<article class="axiom-chat-card opposed-test-card" data-opposed-id="{{card.id}}">
+  <header class="card-header">
+    <div class="card-title">
+      <strong>{{localize "AXIOM.Combat.OpposedTest"}}</strong>
+      <span>{{localize card.attackTypeLabel}}</span>
+    </div>
+    <div class="card-badge">{{localize "AXIOM.Combat.Pending"}}</div>
+  </header>
+
+  <section class="card-body">
+    <div class="combat-versus-grid">
+      <div class="combat-side attacker">
+        <span>{{localize "AXIOM.Combat.Attacker"}}</span>
+        <strong>{{card.attacker.name}}</strong>
+        <em>{{card.weapon.name}}</em>
+      </div>
+      <div class="combat-vs">VS</div>
+      <div class="combat-side defender">
+        <span>{{localize "AXIOM.Combat.Defender"}}</span>
+        <strong>{{card.defender.name}}</strong>
+        <em>{{localize "AXIOM.Combat.ChooseDefense"}}</em>
+      </div>
+    </div>
+
+    {{#if card.assignedAfterRollNote}}
+      <div class="combat-note">{{localize card.assignedAfterRollNote}}</div>
+    {{/if}}
+
+    <div class="combat-result-grid compact">
+      <div><span>{{localize "AXIOM.RollCard.Roll"}}</span><strong>{{card.attack.rollDisplay}}</strong></div>
+      <div><span>{{localize "AXIOM.RollCard.Target"}}</span><strong>{{card.attack.successTarget}}</strong></div>
+      <div><span>{{localize "AXIOM.RollCard.Hits"}}</span><strong>{{card.attack.hitsDisplay}}</strong></div>
+      <div><span>{{localize "AXIOM.RollCard.Location"}}</span><strong>{{card.attack.hitLocation.labelText}}</strong></div>
+    </div>
+
+    <div class="combat-action-strip">
+      <button type="button" data-action="combatDodge"><i class="fa-solid fa-person-running"></i> {{localize "AXIOM.Combat.Dodge"}}</button>
+      {{#if card.showParry}}
+        <button type="button" data-action="combatParry"><i class="fa-solid fa-shield-halved"></i> {{localize "AXIOM.Combat.Parry"}}</button>
+      {{/if}}
+      <button type="button" data-action="combatUnopposed"><i class="fa-solid fa-bullseye"></i> {{localize "AXIOM.Combat.Unopposed"}}</button>
+    </div>
+  </section>
+</article>

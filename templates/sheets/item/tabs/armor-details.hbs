@@ -1,0 +1,41 @@
+<section class="tab-section details-tab armor-details">
+  <h3 class="section-title compact-title">{{localize "AXIOM.Armor.Values"}}</h3>
+
+  <div class="armor-value-grid">
+    <label class="armor-value-card">
+      <span>{{localize "AXIOM.Armor.Locations.Head"}}</span>
+      <input type="number" name="system.armor.head" value="{{system.armor.head}}" min="0" step="1" />
+    </label>
+
+    <label class="armor-value-card">
+      <span>{{localize "AXIOM.Armor.Locations.Torso"}}</span>
+      <input type="number" name="system.armor.torso" value="{{system.armor.torso}}" min="0" step="1" />
+    </label>
+
+    <label class="armor-value-card">
+      <span>{{localize "AXIOM.Armor.Locations.Arms"}}</span>
+      <input type="number" name="system.armor.arms" value="{{system.armor.arms}}" min="0" step="1" />
+    </label>
+
+    <label class="armor-value-card">
+      <span>{{localize "AXIOM.Armor.Locations.Legs"}}</span>
+      <input type="number" name="system.armor.legs" value="{{system.armor.legs}}" min="0" step="1" />
+    </label>
+  </div>
+
+  <div class="form-grid compact gear-state-grid">
+    <label class="field-group">
+      <span>{{localize "AXIOM.Item.State.Label"}}</span>
+      <select name="system.state">
+        {{selectOptions config.gearStates selected=system.state localize=true}}
+      </select>
+    </label>
+
+    <label class="field-group">
+      <span>{{localize "AXIOM.Item.Broken"}}</span>
+      <select name="system.broken">
+        {{selectOptions config.booleanOptions selected=system.broken localize=true}}
+      </select>
+    </label>
+  </div>
+</section>

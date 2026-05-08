@@ -1,0 +1,169 @@
+<section class="tab-section actor-effects-section">
+  <h3 class="section-title">
+    <i class="fa-solid fa-bolt"></i>
+    {{localize 'AXIOM.Actor.Effects.StatusEffects'}}
+  </h3>
+
+  <section class="status-strip">
+    <div class="status-track">
+      {{#each effectTab.statuses as |status|}}
+        <div class="status-cell {{status.cssClass}}" data-status-id="{{status.id}}" title="{{status.title}}">
+          <div class="status-icon">
+            <img src="{{status.img}}" alt="{{localize status.label}}">
+          </div>
+          <div class="status-stack">
+            <button type="button" data-action="adjustStatus" data-direction="-1" aria-label="{{localize 'AXIOM.Actor.Effects.RemoveStatusStack'}}">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <span class="status-value">{{status.value}}</span>
+            <button type="button" data-action="adjustStatus" data-direction="1" aria-label="{{localize 'AXIOM.Actor.Effects.AddStatusStack'}}">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+          <div class="status-label">{{localize status.label}}</div>
+        </div>
+      {{/each}}
+    </div>
+  </section>
+</section>
+
+<section class="tab-section actor-effects-section">
+  <div class="section-title-row">
+    <h3 class="section-title">
+      <i class="fa-solid fa-sparkles"></i>
+      {{localize 'AXIOM.Actor.Effects.ActiveEffects'}}
+    </h3>
+    <button type="button" class="effect-create-button" data-action="createEffect" title="{{localize 'AXIOM.Actor.Effects.Create'}}" aria-label="{{localize 'AXIOM.Actor.Effects.Create'}}">
+      <i class="fa-solid fa-plus"></i>
+    </button>
+  </div>
+
+  <section class="effects-panel">
+    <div class="effects-header">
+      <span></span>
+      <span>{{localize 'AXIOM.Actor.Effects.Effect'}}</span>
+      <span>{{localize 'AXIOM.Actor.Effects.Source'}}</span>
+      <span>{{localize 'AXIOM.Actor.Effects.Duration'}}</span>
+      <span></span>
+      <span></span>
+    </div>
+
+    {{#if effectTab.activeEffects.length}}
+      {{#each effectTab.activeEffects as |effect|}}
+        <div class="effect-row {{effect.cssClass}}" data-effect-id="{{effect.id}}">
+          <img class="effect-icon" src="{{effect.img}}" alt="{{effect.name}}">
+          <div class="effect-name">
+            <strong>{{effect.name}}</strong>
+            <small>{{localize 'AXIOM.Actor.Effects.Active'}}</small>
+          </div>
+          <span class="effect-source">{{effect.source}}</span>
+          <span class="effect-duration">{{effect.duration}}</span>
+          <label class="effect-toggle" title="{{localize 'AXIOM.Actor.Effects.Disable'}}">
+            <input type="checkbox" data-action="toggleEffect" checked>
+          </label>
+          <div class="effect-actions">
+            <button type="button" data-action="editEffect" title="{{localize 'AXIOM.Actor.Effects.Edit'}}">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button type="button" data-action="deleteEffect" title="{{localize 'AXIOM.Actor.Effects.Delete'}}">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      {{/each}}
+    {{else}}
+      <div class="empty-list">{{localize 'AXIOM.Actor.Effects.NoneActive'}}</div>
+    {{/if}}
+  </section>
+</section>
+
+
+<section class="tab-section actor-effects-section">
+  <h3 class="section-title">
+    <i class="fa-solid fa-circle-question"></i>
+    {{localize 'AXIOM.Actor.Effects.ConditionalEffects'}}
+  </h3>
+
+  <section class="effects-panel conditional-effects-panel">
+    <div class="effects-header">
+      <span></span>
+      <span>{{localize 'AXIOM.Actor.Effects.Effect'}}</span>
+      <span>{{localize 'AXIOM.Actor.Effects.Source'}}</span>
+      <span>{{localize 'AXIOM.Actor.Effects.Duration'}}</span>
+      <span></span>
+      <span></span>
+    </div>
+
+    {{#if effectTab.conditionalEffects.length}}
+      {{#each effectTab.conditionalEffects as |effect|}}
+        <div class="effect-row {{effect.cssClass}}" data-effect-id="{{effect.id}}">
+          <img class="effect-icon" src="{{effect.img}}" alt="{{effect.name}}">
+          <div class="effect-name">
+            <strong>{{effect.name}}</strong>
+            <small>{{localize 'AXIOM.Actor.Effects.Conditional'}}</small>
+          </div>
+          <span class="effect-source">{{effect.source}}</span>
+          <span class="effect-duration">{{effect.duration}}</span>
+          <label class="effect-toggle" title="{{localize 'AXIOM.Actor.Effects.Disable'}}">
+            <input type="checkbox" data-action="toggleEffect" checked>
+          </label>
+          <div class="effect-actions">
+            <button type="button" data-action="editEffect" title="{{localize 'AXIOM.Actor.Effects.Edit'}}">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button type="button" data-action="deleteEffect" title="{{localize 'AXIOM.Actor.Effects.Delete'}}">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      {{/each}}
+    {{else}}
+      <div class="empty-list">{{localize 'AXIOM.Actor.Effects.NoneConditional'}}</div>
+    {{/if}}
+  </section>
+</section>
+
+<section class="tab-section actor-effects-section">
+  <h3 class="section-title">
+    <i class="fa-solid fa-power-off"></i>
+    {{localize 'AXIOM.Actor.Effects.DisabledEffects'}}
+  </h3>
+
+  <section class="effects-panel disabled-effects-panel">
+    <div class="effects-header">
+      <span></span>
+      <span>{{localize 'AXIOM.Actor.Effects.Effect'}}</span>
+      <span>{{localize 'AXIOM.Actor.Effects.Source'}}</span>
+      <span>{{localize 'AXIOM.Actor.Effects.Duration'}}</span>
+      <span></span>
+      <span></span>
+    </div>
+
+    {{#if effectTab.disabledEffects.length}}
+      {{#each effectTab.disabledEffects as |effect|}}
+        <div class="effect-row {{effect.cssClass}}" data-effect-id="{{effect.id}}">
+          <img class="effect-icon" src="{{effect.img}}" alt="{{effect.name}}">
+          <div class="effect-name">
+            <strong>{{effect.name}}</strong>
+            <small>{{localize 'AXIOM.Actor.Effects.Inactive'}}</small>
+          </div>
+          <span class="effect-source">{{effect.source}}</span>
+          <span class="effect-duration">{{effect.duration}}</span>
+          <label class="effect-toggle" title="{{localize 'AXIOM.Actor.Effects.Enable'}}">
+            <input type="checkbox" data-action="toggleEffect">
+          </label>
+          <div class="effect-actions">
+            <button type="button" data-action="editEffect" title="{{localize 'AXIOM.Actor.Effects.Edit'}}">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button type="button" data-action="deleteEffect" title="{{localize 'AXIOM.Actor.Effects.Delete'}}">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      {{/each}}
+    {{else}}
+      <div class="empty-list">{{localize 'AXIOM.Actor.Effects.NoneDisabled'}}</div>
+    {{/if}}
+  </section>
+</section>

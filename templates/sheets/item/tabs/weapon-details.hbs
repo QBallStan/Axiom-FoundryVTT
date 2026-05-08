@@ -1,0 +1,84 @@
+<section class="tab-section details-tab weapon-details">
+  <input type="hidden" name="system.category" value="{{weapon.category}}" />
+
+  <div class="form-grid compact weapon-grid">
+    <label class="field-group">
+      <span>{{localize "AXIOM.Weapon.Skill"}}</span>
+      <input type="text" name="system.skill" value="{{system.skill}}" list="weapon-skills-{{item.id}}" placeholder="{{localize 'AXIOM.Weapon.SkillPlaceholder'}}" autocomplete="off" />
+      <datalist id="weapon-skills-{{item.id}}">
+        {{#each weapon.skills}}
+          <option value="{{this}}"></option>
+        {{/each}}
+      </datalist>
+    </label>
+
+    <label class="field-group">
+      <span>{{localize "AXIOM.Weapon.Damage"}}</span>
+      <input type="number" name="system.damage" value="{{system.damage}}" min="0" step="1" />
+    </label>
+
+    <label class="field-group">
+      <span>{{localize "AXIOM.Weapon.ArmorPenetration"}}</span>
+      <input type="number" name="system.armorPenetration" value="{{system.armorPenetration}}" min="0" step="1" />
+    </label>
+
+    <label class="field-group">
+      <span>{{localize "AXIOM.Weapon.Delivery.Label"}}</span>
+      <select name="system.delivery">
+        {{selectOptions config.damageDelivery selected=system.delivery localize=true}}
+      </select>
+    </label>
+  </div>
+
+  {{#if weapon.isRanged}}
+    <div class="ranged-weapon-block">
+      <div class="form-grid compact ranged-grid">
+        <label class="field-group">
+          <span>{{localize "AXIOM.Weapon.Range"}}</span>
+          <input type="number" name="system.range" value="{{system.range}}" min="0" step="1" />
+        </label>
+
+        <label class="field-group">
+          <span>{{localize "AXIOM.Weapon.Ammo"}}</span>
+          <input type="number" name="system.ammo" value="{{system.ammo}}" min="0" step="1" />
+        </label>
+
+        <label class="field-group">
+          <span>{{localize "AXIOM.Weapon.AmmoContainer"}}</span>
+          <input type="number" name="system.ammoContainer" value="{{system.ammoContainer}}" min="0" step="1" />
+        </label>
+
+        <label class="field-group ranged-ammo-field">
+          <span>{{localize "AXIOM.Weapon.Ammunition"}}</span>
+          <select name="system.ammunition">
+            <option value="">{{localize "AXIOM.Weapon.NoAmmunition"}}</option>
+            {{selectOptions weapon.ammunition selected=system.ammunition}}
+          </select>
+        </label>
+      </div>
+
+      <div class="range-band-grid">
+        <div class="range-band-card">
+          <span>{{localize "AXIOM.Weapon.RangeBands.Short"}}</span>
+          <strong>{{weapon.rangeBands.short}}m</strong>
+          <small>+10</small>
+        </div>
+        <div class="range-band-card">
+          <span>{{localize "AXIOM.Weapon.RangeBands.Medium"}}</span>
+          <strong>{{weapon.rangeBands.medium}}m</strong>
+          <small>+0</small>
+        </div>
+        <div class="range-band-card">
+          <span>{{localize "AXIOM.Weapon.RangeBands.Long"}}</span>
+          <strong>{{weapon.rangeBands.long}}m</strong>
+          <small>-10</small>
+        </div>
+        <div class="range-band-card">
+          <span>{{localize "AXIOM.Weapon.RangeBands.Extreme"}}</span>
+          <strong>{{weapon.rangeBands.extreme}}m</strong>
+          <small>-30</small>
+        </div>
+      </div>
+    </div>
+  {{/if}}
+</section>

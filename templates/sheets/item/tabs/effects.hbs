@@ -1,0 +1,42 @@
+<section class="tab-section effects-tab">
+  <div class="sheet-list effects-list">
+    <div class="list-header">
+      <span>{{localize "AXIOM.Item.Effects.Active"}}</span>
+      <a data-action="createEffect" data-tooltip="{{localize 'AXIOM.Item.Effects.Create'}}">
+        <i class="fa-solid fa-plus"></i>
+      </a>
+    </div>
+
+    {{#each effects.active as |effect|}}
+      <div class="list-row effect-row" data-effect-id="{{effect.id}}">
+        <img src="{{effect.img}}" alt="{{effect.name}}" />
+        <a class="row-name" data-action="editEffect">{{effect.name}}</a>
+        <div class="row-controls">
+          <a data-action="toggleEffect" data-tooltip="{{localize 'AXIOM.Item.Effects.Disable'}}"><i class="fa-regular fa-circle-check"></i></a>
+          <a data-action="deleteEffect" data-tooltip="{{localize 'AXIOM.Item.Effects.Delete'}}"><i class="fa-solid fa-xmark"></i></a>
+        </div>
+      </div>
+    {{else}}
+      <div class="empty-row">{{localize "AXIOM.Item.Effects.NoneActive"}}</div>
+    {{/each}}
+  </div>
+
+  {{#if effects.disabled.length}}
+    <div class="sheet-list effects-list inactive">
+      <div class="list-header">
+        <span>{{localize "AXIOM.Item.Effects.Disabled"}}</span>
+      </div>
+
+      {{#each effects.disabled as |effect|}}
+        <div class="list-row effect-row" data-effect-id="{{effect.id}}">
+          <img src="{{effect.img}}" alt="{{effect.name}}" />
+          <a class="row-name" data-action="editEffect">{{effect.name}}</a>
+          <div class="row-controls">
+            <a data-action="toggleEffect" data-tooltip="{{localize 'AXIOM.Item.Effects.Enable'}}"><i class="fa-regular fa-circle"></i></a>
+            <a data-action="deleteEffect" data-tooltip="{{localize 'AXIOM.Item.Effects.Delete'}}"><i class="fa-solid fa-xmark"></i></a>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  {{/if}}
+</section>

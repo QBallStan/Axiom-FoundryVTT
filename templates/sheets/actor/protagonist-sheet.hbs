@@ -1,0 +1,25 @@
+<section class="axiom-sheet protagonist-sheet {{cssClass}}" autocomplete="off">
+  {{> 'systems/axiom/templates/sheets/actor/partials/header.hbs'}}
+  {{> 'systems/axiom/templates/sheets/actor/partials/tabs.hbs'}}
+
+  <section class='sheet-body'>
+    <div class='tab {{tabClasses.main}}' data-group='sheet' data-tab='main'>
+      {{> 'systems/axiom/templates/sheets/actor/tabs/main.hbs'}}
+    </div>
+    <div class='tab {{tabClasses.skills}}' data-group='sheet' data-tab='skills'>
+      {{> 'systems/axiom/templates/sheets/actor/tabs/skills.hbs'}}
+    </div>
+    <div class='tab {{tabClasses.combat}}' data-group='sheet' data-tab='combat'>
+      {{> 'systems/axiom/templates/sheets/actor/tabs/combat.hbs'}}
+    </div>
+    <div class='tab {{tabClasses.equipment}}' data-group='sheet' data-tab='equipment'>
+      {{> 'systems/axiom/templates/sheets/actor/tabs/equipment.hbs'}}
+    </div>
+    <div class='tab {{tabClasses.effects}}' data-group='sheet' data-tab='effects'>
+      {{> 'systems/axiom/templates/sheets/actor/tabs/effects.hbs'}}
+    </div>
+    <div class='tab {{tabClasses.details}}' data-group='sheet' data-tab='details'>
+      {{> 'systems/axiom/templates/sheets/actor/tabs/details.hbs'}}
+    </div>
+  </section>
+</section>

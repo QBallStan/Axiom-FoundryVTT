@@ -1,0 +1,254 @@
+<article class="axiom-chat-card roll-card" data-actor-id="{{card.actorId}}" data-item-id="{{card.itemId}}" data-roll-id="{{card.rollId}}">
+  <header class="card-header">
+    <div class="card-title">
+      <strong>{{card.title}}</strong>
+      <span>{{card.actorName}}</span>
+    </div>
+    <div class="card-badge">{{localize card.testTypeLabel}}</div>
+  </header>
+
+  <section class="card-body">
+    {{#if card.timeframeOnly}}
+      <div class="timeframe-focus">
+        <span>{{localize card.timeframeLabel}}</span>
+        <strong>{{card.timeframeDisplay}}</strong>
+        <em>{{card.timeframeFormula}} · {{localize "AXIOM.RollCard.TimeframeDie"}} {{card.timeframeDie}}</em>
+      </div>
+    {{else}}
+    <div class="result-focus">
+      <div class="result-side editable-roll-side">
+        <div class="roll-label-row">
+          <span>{{localize "AXIOM.RollCard.Roll"}}</span>
+          <button
+            class="roll-edit-button"
+            type="button"
+            data-action="enableRollEdit"
+            aria-label="{{localize 'AXIOM.RollCard.EditRoll'}}"
+            data-tooltip="{{localize 'AXIOM.RollCard.EditRoll'}}"
+          >
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+        </div>
+        <input
+          class="roll-value-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="3"
+          value="{{card.rollInputValue}}"
+          data-action="editRollValue"
+          aria-label="{{localize 'AXIOM.RollCard.EditRoll'}}"
+          readonly
+        />
+      </div>
+
+      <div class="result-main {{card.outcomeCss}}">
+        <button
+          class="second-wind-button second-wind-reroll"
+          type="button"
+          data-action="secondWindReroll"
+          aria-label="{{localize 'AXIOM.RollCard.SecondWindReroll'}}"
+          data-tooltip="{{localize 'AXIOM.RollCard.SecondWindReroll'}}"
+        >
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+        <button
+          class="second-wind-button second-wind-hit"
+          type="button"
+          data-action="secondWindHit"
+          aria-label="{{localize 'AXIOM.RollCard.SecondWindHit'}}"
+          data-tooltip="{{localize 'AXIOM.RollCard.SecondWindHit'}}"
+        >
+          <i class="fa-solid fa-plus"></i>
+        </button>
+        <span>{{localize "AXIOM.RollCard.Hits"}}</span>
+        <strong class="hits">{{card.hitsDisplay}}</strong>
+        <strong class="outcome">{{localize card.outcomeLabel}}</strong>
+        <em class="outcome-tier">{{localize card.outcomeTierLabel}}</em>
+      </div>
+
+      <div class="result-side">
+        <span>{{localize "AXIOM.RollCard.Target"}}</span>
+        <strong>{{card.successTarget}}</strong>
+      </div>
+    </div>
+
+    <div class="complication-strip {{card.complicationCss}}">
+      <span class="icon">◆</span>
+      <span>{{localize card.complicationText}}</span>
+      {{#if card.showComplicationActions}}
+        <div class="complication-actions">
+          <button
+            class="complication-action negate"
+            type="button"
+            data-action="negateComplication"
+            data-tooltip="{{localize 'AXIOM.RollCard.NegateComplicationHint'}}"
+            aria-label="{{localize 'AXIOM.RollCard.NegateComplication'}}"
+          >
+            <i class="fa-solid fa-shield-halved"></i>
+          </button>
+          <button
+            class="complication-action accept"
+            type="button"
+            data-action="acceptComplication"
+            data-tooltip="{{localize 'AXIOM.RollCard.AcceptComplicationHint'}}"
+            aria-label="{{localize 'AXIOM.RollCard.AcceptComplication'}}"
+          >
+            <i class="fa-solid fa-hand-holding-heart"></i>
+          </button>
+        </div>
+      {{/if}}
+    </div>
+
+    {{#if card.showWeaponSummary}}
+      <div class="quick-grid">
+        <div class="quick-line"><span>{{localize "AXIOM.RollCard.Location"}}</span><strong>{{card.location}}</strong></div>
+        <div class="quick-line"><span>{{localize "AXIOM.RollCard.Damage"}}</span><strong>{{card.damage}}</strong></div>
+      </div>
+    {{/if}}
+
+    {{#if card.showDefenseActions}}
+      <div class="combat-target-strip {{#unless card.hasCombatTarget}}pending{{/unless}}">
+        <span>{{localize "AXIOM.Combat.Targeting"}}</span>
+        <strong>{{card.combatTargetName}}</strong>
+        {{#if card.combatTargetAssignedAfterRoll}}
+          <em>{{localize "AXIOM.Combat.AssignedAfterRollShort"}}</em>
+        {{/if}}
+      </div>
+      <div class="combat-action-strip icon-only">
+        <button type="button" data-action="combatDodge" data-tooltip="{{localize 'AXIOM.Combat.Dodge'}}" aria-label="{{localize 'AXIOM.Combat.Dodge'}}"><i class="fa-solid fa-person-running"></i></button>
+        {{#if card.showParryAction}}
+          <button type="button" data-action="combatParry" data-tooltip="{{localize 'AXIOM.Combat.Parry'}}" aria-label="{{localize 'AXIOM.Combat.Parry'}}"><i class="fa-solid fa-shield-halved"></i></button>
+        {{/if}}
+        <button type="button" data-action="combatUnopposed" data-tooltip="{{localize 'AXIOM.Combat.Unopposed'}}" aria-label="{{localize 'AXIOM.Combat.Unopposed'}}"><i class="fa-solid fa-bullseye"></i></button>
+      </div>
+    {{/if}}
+
+    {{#if card.combatResolved}}
+      <section class="combat-result {{card.combatResult.outcomeCss}}">
+        <header>
+          <span>{{localize "AXIOM.Combat.CombatResult"}}</span>
+          <strong>{{localize card.combatResult.outcomeLabel}}</strong>
+        </header>
+
+        <div class="combat-result-grid">
+          <div><span>{{localize "AXIOM.Combat.Defender"}}</span><strong>{{card.combatResult.defenderName}}</strong></div>
+          <div><span>{{localize "AXIOM.Combat.AttackHitsShort"}}</span><strong>{{card.combatResult.attackHitsDisplay}}</strong></div>
+          {{#if card.combatResult.defense}}
+            <div><span>{{card.combatResult.defense.label}}</span><strong>{{card.combatResult.defense.hitsDisplay}}</strong></div>
+          {{else}}
+            <div><span>{{localize "AXIOM.Combat.Defense"}}</span><strong>{{localize "AXIOM.Combat.None"}}</strong></div>
+          {{/if}}
+          <div><span>{{localize "AXIOM.Combat.NetHits"}}</span><strong>{{card.combatResult.netHitsDisplay}}</strong></div>
+          <div><span>{{localize "AXIOM.RollCard.Location"}}</span><strong>{{card.combatResult.hitLocation.labelText}}</strong></div>
+          <div><span>{{localize "AXIOM.Combat.FinalDamage"}}</span><strong>{{card.combatResult.damage.finalDamage}}</strong></div>
+          <div><span>{{localize "AXIOM.Combat.Wound"}}</span><strong>{{localize card.combatResult.damage.woundSeverityLabel}}</strong></div>
+        </div>
+
+        {{#if card.combatResult.hitsAttack}}
+          <details class="combat-damage-details">
+            <summary>{{localize "AXIOM.Combat.DamageDetails"}}</summary>
+            <div class="combat-result-grid">
+              <div><span>{{localize "AXIOM.Combat.BaseDamage"}}</span><strong>{{card.combatResult.damage.baseDamage}}</strong></div>
+              <div><span>{{localize "AXIOM.Combat.DamageModifier"}}</span><strong>{{card.combatResult.damage.damageModifier}}</strong></div>
+              <div><span>{{localize "AXIOM.Combat.RawDamage"}}</span><strong>{{card.combatResult.damage.rawDamage}}</strong></div>
+              <div><span>{{localize "AXIOM.Combat.Armor"}}</span><strong>{{card.combatResult.damage.armor}}</strong></div>
+              <div><span>{{localize "AXIOM.Combat.ArmorPenetration"}}</span><strong>{{card.combatResult.damage.armorPenetration}}</strong></div>
+              <div><span>{{localize "AXIOM.Combat.EffectiveArmor"}}</span><strong>{{card.combatResult.damage.effectiveArmor}}</strong></div>
+              <div><span>{{localize "AXIOM.Combat.Toughness"}}</span><strong>{{card.combatResult.damage.toughness}}</strong></div>
+            </div>
+          </details>
+        {{/if}}
+
+        {{#if card.showApplyWoundAction}}
+          <button type="button" class="apply-wound-button" data-action="applyCombatWound">
+            <i class="fa-solid fa-kit-medical"></i> {{localize "AXIOM.Combat.ApplyWound"}}
+          </button>
+        {{/if}}
+
+        {{#if card.combatResult.woundApplied}}
+          <div class="wound-applied-note">{{localize "AXIOM.Combat.WoundApplied"}}</div>
+        {{/if}}
+      </section>
+    {{/if}}
+
+    {{#if card.timeframe}}
+      <div class="timeframe-strip">
+        <span>{{localize "AXIOM.RollCard.Timeframe"}}</span>
+        <strong>{{card.timeframeDisplay}}</strong>
+      </div>
+    {{/if}}
+
+    <details class="breakdown" {{#if card.detailsOpen}}open{{/if}}>
+      <summary>{{localize "AXIOM.RollCard.RollDetails"}}</summary>
+      <div class="breakdown-content">
+        <div class="breakdown-row base-pool-row">
+          <span>{{localize "AXIOM.Roll.BasePool"}}</span>
+          <strong>{{card.basePool}}</strong>
+        </div>
+
+        <div class="breakdown-row base-pool-row">
+          <span>{{localize "AXIOM.RollCard.BaseHits"}}</span>
+          <strong>{{card.baseHitsDisplay}}</strong>
+        </div>
+
+        {{#if card.hasFateHitBonus}}
+          <div class="breakdown-row fate-detail-row">
+            <span>{{localize "AXIOM.RollCard.SecondWindHitBonus"}}</span>
+            <strong>{{card.fateHitBonusDisplay}}</strong>
+          </div>
+        {{/if}}
+
+        {{#if card.hasRerollHistory}}
+          <div class="breakdown-row fate-detail-row">
+            <span>{{localize "AXIOM.RollCard.RerollHistory"}}</span>
+            <strong>{{card.rerollHistoryDisplay}}</strong>
+          </div>
+        {{/if}}
+
+        {{#if card.fateSpent}}
+          <div class="breakdown-row fate-detail-row">
+            <span>{{localize "AXIOM.RollCard.FateSpent"}}</span>
+            <strong>{{card.fateSpentDisplay}}</strong>
+          </div>
+        {{/if}}
+
+        <div class="modifier-breakdown-title">{{localize "AXIOM.RollCard.ActiveModifiers"}}</div>
+
+        {{#if card.hasAnyModifierRows}}
+          {{#if card.difficulty}}
+            <div class="breakdown-row modifier-detail-row fixed">
+              <span>{{localize card.difficultyRow.label}}</span>
+              <strong>{{card.difficultyRow.displayValue}}</strong>
+            </div>
+          {{/if}}
+
+          {{#each card.modifierRows as |modifier|}}
+            <div class="breakdown-row modifier-detail-row {{modifier.cssClass}}" data-modifier-id="{{modifier.id}}">
+              <button
+                class="modifier-toggle"
+                type="button"
+                data-action="toggleCardModifier"
+                data-modifier-id="{{modifier.id}}"
+                data-tooltip="{{localize modifier.toggleLabel}}"
+              >
+                <i class="{{modifier.toggleIcon}}"></i>
+              </button>
+              <span {{#if modifier.calledShotEffectText}}data-tooltip="{{modifier.calledShotEffectText}}"{{/if}}>{{modifier.labelText}}</span>
+              <strong>{{modifier.displayValue}}</strong>
+            </div>
+          {{/each}}
+        {{else}}
+          <div class="breakdown-row empty-modifiers">
+            <span>{{localize "AXIOM.RollCard.NoActiveModifiers"}}</span>
+            <strong>0</strong>
+          </div>
+        {{/if}}
+
+        {{#if card.automaticResult}}
+          <div class="breakdown-row"><span>{{localize "AXIOM.RollCard.AutomaticResult"}}</span><strong>{{localize card.automaticResult}}</strong></div>
+        {{/if}}
+      </div>
+    </details>
+    {{/if}}
+  </section>
+</article>

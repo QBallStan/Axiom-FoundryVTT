@@ -1,0 +1,85 @@
+<section class="tab-section equipment-tab">
+  <div class="equipment-summary-grid">
+    <label class="equipment-summary-card equipment-currency-card {{#if currency.isFantasy}}fantasy-currency-card{{/if}}">
+      <span class="summary-label"><i class="fa-solid fa-coins"></i> {{localize "AXIOM.Actor.Equipment.Currency"}}</span>
+      {{#if currency.isFantasy}}
+        <div class="coin-input-grid">
+          <span>
+            <em>{{localize "AXIOM.Currency.Gold"}}</em>
+            <input type="number" name="system.currency.coins.gold" value="{{equipmentTab.summary.currencyCoins.gold}}" min="0" step="1" />
+          </span>
+          <span>
+            <em>{{localize "AXIOM.Currency.Silver"}}</em>
+            <input type="number" name="system.currency.coins.silver" value="{{equipmentTab.summary.currencyCoins.silver}}" min="0" step="1" />
+          </span>
+          <span>
+            <em>{{localize "AXIOM.Currency.Copper"}}</em>
+            <input type="number" name="system.currency.coins.copper" value="{{equipmentTab.summary.currencyCoins.copper}}" min="0" step="1" />
+          </span>
+        </div>
+      {{else}}
+        <div class="standard-currency-input">
+          <span>{{currency.standardSymbol}}</span>
+          <input type="number" name="system.currency.value" value="{{equipmentTab.summary.currency}}" placeholder="0" min="0" step="1" aria-label="{{currency.standardLabel}}" />
+        </div>
+      {{/if}}
+    </label>
+
+    <div class="equipment-summary-card">
+      <span class="summary-label"><i class="fa-solid fa-weight-hanging"></i> {{localize "AXIOM.Actor.Equipment.Encumbrance"}}</span>
+      <strong>{{equipmentTab.summary.totalWeight}}</strong>
+      <span class="summary-unit">{{localize "AXIOM.Actor.Equipment.WeightUnit"}}</span>
+    </div>
+
+    <div class="equipment-summary-card compact">
+      <span class="summary-label"><i class="fa-solid fa-shirt"></i> {{localize "AXIOM.Item.State.Equipped"}}</span>
+      <strong>{{equipmentTab.summary.equippedCount}}</strong>
+    </div>
+
+    <div class="equipment-summary-card compact">
+      <span class="summary-label"><i class="fa-solid fa-hand"></i> {{localize "AXIOM.Item.State.Carried"}}</span>
+      <strong>{{equipmentTab.summary.carriedCount}}</strong>
+    </div>
+
+    <div class="equipment-summary-card compact muted">
+      <span class="summary-label"><i class="fa-solid fa-box-archive"></i> {{localize "AXIOM.Item.State.Stored"}}</span>
+      <strong>{{equipmentTab.summary.storedCount}}</strong>
+    </div>
+  </div>
+
+  <section class="equipment-gear-section combat-gear-section">
+    <h2 class="section-title"><i class="fa-solid fa-backpack"></i> {{localize "AXIOM.Actor.Equipment.Title"}}</h2>
+
+    {{#if equipmentTab.equipment.length}}
+      <div class="equipment-gear-list combat-gear-list">
+        {{#each equipmentTab.equipment}}
+          <article class="equipment-item-row combat-item-row" data-item-id="{{id}}">
+            <img class="combat-item-img" src="{{img}}" alt="{{name}}" />
+            <div class="equipment-item-line combat-item-line">
+              <span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span>
+              <span>{{localize "AXIOM.Item.Quantity"}} <button type="button" class="quantity-control" data-action="adjustItemQuantity" title="{{localize 'AXIOM.Item.QuantityControlHint'}}">{{quantity}}</button></span>
+              <span>{{localize "AXIOM.Item.Weight"}} {{weight}}</span>
+              <span>{{localize "AXIOM.Actor.Equipment.TotalWeight"}} {{totalWeight}}</span>
+              {{#if price}}<span>{{localize "AXIOM.Item.Price"}} {{price}}</span>{{/if}}
+            </div>
+            <div class="combat-item-actions">
+              <button type="button" data-action="rollEquipmentItem" title="{{localize 'AXIOM.Actor.Equipment.RollItem'}}" {{#unless canRoll}}disabled{{/unless}}><i class="fa-solid fa-dice-d20"></i></button>
+              <select class="combat-state-select" data-action="updateEquipmentItemState" title="{{localize 'AXIOM.Item.State.Label'}}">
+                {{#each stateOptions}}
+                  <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+                {{/each}}
+              </select>
+              <button type="button" data-action="editEquipmentItem" title="{{localize 'AXIOM.Actor.Equipment.EditItem'}}"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button type="button" data-action="deleteEquipmentItem" title="{{localize 'AXIOM.Actor.Equipment.DeleteItem'}}"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            {{#if description}}
+              <div class="item-description-inline combat-item-description" hidden>{{{description}}}</div>
+            {{/if}}
+          </article>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="empty-list">{{localize "AXIOM.Actor.Equipment.Empty"}}</div>
+    {{/if}}
+  </section>
+</section>

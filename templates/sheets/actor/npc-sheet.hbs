@@ -1,0 +1,352 @@
+<section class="axiom-sheet npc-sheet {{cssClass}}" autocomplete="off">
+  <header class="sheet-header npc-header">
+    <div class="sheet-top npc-sheet-top">
+      <input class="name-input" name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'AXIOM.Actor.NamePlaceholder'}}" />
+      <button class="npc-config-button" type="button" data-action="toggleNpcConfig" title="{{localize 'AXIOM.Actor.NPC.Config'}}">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+    </div>
+
+    <section class="npc-config-panel" data-npc-config-panel hidden>
+      <h3 class="section-title"><i class="fa-solid fa-sliders"></i> {{localize "AXIOM.Actor.NPC.Config"}}</h3>
+      <div class="npc-config-grid">
+        <label><span>{{localize "AXIOM.Actor.NPC.GrazingSlots"}}</span><input type="number" name="system.wounds.grazing.max" value="{{system.wounds.grazing.max}}" min="0" max="5" step="1" /></label>
+        <label><span>{{localize "AXIOM.Actor.NPC.MinorSlots"}}</span><input type="number" name="system.wounds.minor.max" value="{{system.wounds.minor.max}}" min="0" max="5" step="1" /></label>
+        <label><span>{{localize "AXIOM.Actor.NPC.MajorSlots"}}</span><input type="number" name="system.wounds.major.max" value="{{system.wounds.major.max}}" min="0" max="5" step="1" /></label>
+        <label><span>{{localize "AXIOM.Actor.NPC.CriticalSlots"}}</span><input type="number" name="system.wounds.critical.max" value="{{system.wounds.critical.max}}" min="0" max="5" step="1" /></label>
+        <label><span>{{localize "AXIOM.Actor.NPC.ActionPoints"}}</span><input type="number" name="system.trackers.actionPoints.max" value="{{system.trackers.actionPoints.max}}" min="0" max="6" step="1" /></label>
+        <label><span>{{localize "AXIOM.Actor.Main.Size"}}</span><input type="number" name="system.size" value="{{system.size}}" min="-5" max="8" step="1" /></label>
+      </div>
+    </section>
+
+    <div class="identity-row npc-identity-row">
+      <div class="portrait">
+        <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+      </div>
+
+      <section class="panel wounds-panel">
+        <h3 class="panel-title"><i class="fa-solid fa-heart-pulse"></i> {{localize "AXIOM.Actor.Wounds.Title"}}</h3>
+        <div class="wounds">
+          <div class="wound-grid">
+            <div class="wound-col">
+              <div class="wound-col-label">{{localize "AXIOM.Actor.Wounds.Grazing"}}</div>
+              <div class="wound-col-content">
+                {{#each mock.wounds.grazing}}
+                  <div class="wound-slot">
+                    <button class="wound-toggle {{#if taken}}taken{{/if}}" type="button" data-action="toggleWound" data-wound-severity="grazing" data-wound-key="{{key}}"><span class="wound-mark mark-grazing"></span></button>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+
+            <div class="wound-col">
+              <div class="wound-col-label">{{localize "AXIOM.Actor.Wounds.Minor"}} <strong>-5</strong></div>
+              <div class="wound-col-content">
+                {{#each mock.wounds.minor}}
+                  <div class="wound-slot">
+                    <button class="wound-toggle {{#if taken}}taken{{/if}}" type="button" data-action="toggleWound" data-wound-severity="minor" data-wound-key="{{key}}"><span class="wound-mark mark-minor"><span class="mark-inner"></span></span></button>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+
+            <div class="wound-col">
+              <div class="wound-col-label">{{localize "AXIOM.Actor.Wounds.Major"}} <strong>-10</strong></div>
+              <div class="wound-col-content">
+                {{#each mock.wounds.major}}
+                  <div class="wound-slot">
+                    <button class="wound-toggle {{#if taken}}taken{{/if}}" type="button" data-action="toggleWound" data-wound-severity="major" data-wound-key="{{key}}"><span class="wound-mark mark-major"><span class="mark-inner"></span></span></button>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+
+            <div class="wound-col">
+              <div class="wound-col-label critical">{{localize "AXIOM.Actor.Wounds.Critical"}}</div>
+              <div class="wound-col-content">
+                {{#each mock.wounds.critical}}
+                  <div class="wound-slot">
+                    <button class="wound-toggle {{#if taken}}taken{{/if}}" type="button" data-action="toggleWound" data-wound-severity="critical" data-wound-key="{{key}}"><span class="wound-mark mark-critical"></span></button>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="trackers">
+        <section class="panel tracker">
+          <h3 class="tracker-title"><i class="fa-solid fa-chevron-right"></i> {{localize "AXIOM.Actor.Trackers.Action"}}</h3>
+          <button class="pips tracker-pips" type="button" data-action="adjustTracker" data-tracker="actionPoints" title="{{localize 'AXIOM.Actor.Trackers.ClickHint'}}">
+            {{#each mock.trackers.actionPoints.pips}}
+              <span class="pip action-pip {{#if active}}active{{/if}}"><i class="fa-solid fa-chevron-right"></i></span>
+            {{/each}}
+          </button>
+        </section>
+        <section class="panel tracker">
+          <h3 class="tracker-title"><i class="fa-solid fa-gauge-high"></i> {{localize "AXIOM.Actor.Trackers.Momentum"}}</h3>
+          <div class="momentum-line">
+            <span>{{mock.trackers.momentum.min}}</span>
+            <input type="range" name="system.trackers.momentum.current" min="{{mock.trackers.momentum.min}}" max="{{mock.trackers.momentum.max}}" value="{{mock.trackers.momentum.current}}" />
+            <span>+{{mock.trackers.momentum.max}}</span>
+          </div>
+          <div class="momentum-value">{{mock.trackers.momentum.current}}</div>
+        </section>
+      </aside>
+    </div>
+  </header>
+
+  {{> 'systems/axiom/templates/sheets/actor/partials/tabs.hbs'}}
+
+  <section class="sheet-body">
+    <div class="tab {{tabClasses.main}}" data-group="sheet" data-tab="main">
+      <section class="tab-section npc-main-top-grid">
+        <div>
+          <h2 class="section-title"><i class="fa-solid fa-table-cells-large"></i> {{localize "AXIOM.Actor.Main.Attributes"}}</h2>
+          <div class="attribute-table npc-attribute-table">
+            <div class="attribute-row attribute-head"><span></span>{{#each mock.attributes}}<strong>{{label}}</strong>{{/each}}</div>
+            <div class="attribute-row"><span>{{localize "AXIOM.Actor.Main.Base"}}</span>{{#each mock.attributes}}<input type="number" name="system.attributes.{{key}}.base" value="{{base}}">{{/each}}</div>
+            <div class="attribute-row"><span>{{localize "AXIOM.Actor.Main.Mod"}}</span>{{#each mock.attributes}}<input type="number" name="system.attributes.{{key}}.mod" value="{{mod}}">{{/each}}</div>
+            <div class="attribute-row attribute-total"><span>{{localize "AXIOM.Actor.Main.Total"}}</span>{{#each mock.attributes}}<strong>{{total}}</strong>{{/each}}</div>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="section-title"><i class="fa-solid fa-chart-line"></i> {{localize "AXIOM.Actor.Main.SubAttributes"}}</h2>
+          <div class="stat-grid npc-stat-grid">
+            <div class="stat-card"><label>{{localize "AXIOM.Actor.Main.Movement"}}</label><strong>{{mock.subAttributes.movement}}</strong></div>
+            <div class="stat-card"><label>{{localize "AXIOM.Actor.Main.Initiative"}}</label><strong>{{mock.subAttributes.initiative}}</strong></div>
+            <div class="stat-card"><label>{{localize "AXIOM.Actor.Main.Size"}}</label><strong>{{mock.subAttributes.size}}</strong></div>
+            <div class="stat-card"><label>{{localize "AXIOM.Actor.Main.DamageMod"}}</label><strong>{{mock.subAttributes.damageModifier}}</strong></div>
+            <div class="stat-card"><label>{{localize "AXIOM.Actor.Main.Toughness"}}</label><strong>{{mock.subAttributes.toughness}}</strong></div>
+            <div class="stat-card corruption-stat">
+              <label>{{localize "AXIOM.Actor.Main.Corruption"}}</label>
+              <strong class="ratio-value">
+                <input type="number" name="system.corruption.current" value="{{mock.subAttributes.corruption.current}}" min="0" />
+                <span>/ {{mock.subAttributes.corruption.threshold}}</span>
+              </strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="npc-main-lower-grid">
+        <div class="skill-column">
+          <h2 class="section-title"><i class="fa-solid fa-list-check"></i> {{localize "AXIOM.Actor.Tabs.Skills"}}</h2>
+          <div class="skills-split-grid npc-skills-split-grid">
+            <section class="skill-subsection">
+              <h3 class="skill-subtitle">{{localize "AXIOM.Actor.Skills.Core"}}</h3>
+              <div class="skill-list">
+                {{#each skillTab.core}}
+                  <div class="skill-row" data-skill-id="{{id}}">
+                    <div class="skill-main"><span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span></div>
+                    <input class="skill-level-input" type="number" value="{{level}}" min="0" max="50" step="1" data-action="updateSkillLevel" />
+                    <span class="skill-total">{{total}}</span>
+                    <div class="skill-actions"><button class="skill-action skill-roll" type="button" data-action="rollSkill" title="{{localize 'AXIOM.Actor.Skills.Roll'}}"><i class="fa-solid fa-dice-d20"></i></button><button class="skill-action skill-delete" type="button" data-action="deleteSkill" title="{{localize 'AXIOM.Actor.Skills.Delete'}}"><i class="fa-solid fa-trash"></i></button></div>
+                    {{#if description}}<div class="item-description-inline skill-description" hidden>{{{description}}}</div>{{/if}}
+                  </div>
+                {{else}}
+                  <div class="empty-list">{{localize "AXIOM.Actor.Skills.NoCore"}}</div>
+                {{/each}}
+              </div>
+            </section>
+
+            <section class="skill-subsection">
+              <h3 class="skill-subtitle">{{localize "AXIOM.Actor.Skills.Expertise"}}</h3>
+              <div class="skill-list">
+                {{#each skillTab.expertise}}
+                  <div class="skill-row" data-skill-id="{{id}}">
+                    <div class="skill-main"><span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span></div>
+                    <input class="skill-level-input" type="number" value="{{level}}" min="0" max="50" step="1" data-action="updateSkillLevel" />
+                    <span class="skill-total">{{total}}</span>
+                    <div class="skill-actions"><button class="skill-action skill-roll" type="button" data-action="rollSkill" title="{{localize 'AXIOM.Actor.Skills.Roll'}}"><i class="fa-solid fa-dice-d20"></i></button><button class="skill-action skill-delete" type="button" data-action="deleteSkill" title="{{localize 'AXIOM.Actor.Skills.Delete'}}"><i class="fa-solid fa-trash"></i></button></div>
+                    {{#if description}}<div class="item-description-inline skill-description" hidden>{{{description}}}</div>{{/if}}
+                  </div>
+                {{else}}
+                  <div class="empty-list">{{localize "AXIOM.Actor.Skills.NoExpertise"}}</div>
+                {{/each}}
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div>
+          <section class="skill-column">
+            <h2 class="section-title"><i class="fa-solid fa-gauge-high"></i> {{localize "AXIOM.Actor.Skills.AttributeChecks"}}</h2>
+            <div class="skill-list attribute-check-list">
+              <div class="skill-row attribute-check-row" data-check-id="custom" data-check-name="">
+                <div class="attribute-check-selects">
+                  <select data-action="updateAttributeCheckPreview" aria-label="{{localize 'AXIOM.Skill.AttributeOne'}}">
+                    {{#each skillTab.attributeCheck.attributeOneOptions}}
+                      <option value="{{key}}" data-value="{{value}}" {{#if selected}}selected{{/if}}>{{localize label}}</option>
+                    {{/each}}
+                  </select>
+                  <select data-action="updateAttributeCheckPreview" aria-label="{{localize 'AXIOM.Skill.AttributeTwo'}}">
+                    {{#each skillTab.attributeCheck.attributeTwoOptions}}
+                      <option value="{{key}}" data-value="{{value}}" {{#if selected}}selected{{/if}}>{{localize label}}</option>
+                    {{/each}}
+                  </select>
+                </div>
+                <span class="skill-total" data-attribute-check-total>{{skillTab.attributeCheck.total}}</span>
+                <div class="skill-actions"><button class="skill-action skill-roll" type="button" data-action="rollAttributeCheck" title="{{localize 'AXIOM.Actor.Skills.Roll'}}"><i class="fa-solid fa-dice-d20"></i></button></div>
+              </div>
+            </div>
+            <div class="attribute-check-presets" aria-label="{{localize 'AXIOM.Actor.Skills.Presets.Label'}}">
+              {{#each skillTab.attributeCheckPresets}}
+                <button class="attribute-check-preset" type="button" data-action="setAttributeCheckPreset" data-check-name="{{localize label}}" data-attribute-one="{{attributeOne}}" data-attribute-two="{{attributeTwo}}" title="{{localize label}}: {{attributesLabel}}"><span>{{localize label}}</span></button>
+              {{/each}}
+            </div>
+          </section>
+
+          <section class="trait-list-section npc-traits-section">
+            <h2 class="section-title"><i class="fa-solid fa-scale-balanced"></i> {{localize "AXIOM.Actor.Main.Traits"}}</h2>
+            <div class="trait-list">
+              {{#each mainTab.qualities}}
+                <article class="trait-row" data-trait-id="{{id}}"><span class="trait-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}} <small>{{localize "AXIOM.Actor.Main.Qualities"}}</small></span><div class="trait-actions"><button type="button" data-action="editTrait"><i class="fa-solid fa-pen-to-square"></i></button><button type="button" data-action="deleteTrait"><i class="fa-solid fa-trash"></i></button></div>{{#if description}}<div class="item-description-inline trait-description" hidden>{{{description}}}</div>{{/if}}</article>
+              {{/each}}
+              {{#each mainTab.flaws}}
+                <article class="trait-row" data-trait-id="{{id}}"><span class="trait-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}} <small>{{localize "AXIOM.Actor.Main.Flaws"}}</small></span><div class="trait-actions"><button type="button" data-action="editTrait"><i class="fa-solid fa-pen-to-square"></i></button><button type="button" data-action="deleteTrait"><i class="fa-solid fa-trash"></i></button></div>{{#if description}}<div class="item-description-inline trait-description" hidden>{{{description}}}</div>{{/if}}</article>
+              {{else}}
+                {{#unless mainTab.qualities.length}}<div class="empty-list">{{localize "AXIOM.Actor.Main.NoTraits"}}</div>{{/unless}}
+              {{/each}}
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <div class="tab {{tabClasses.combat}}" data-group="sheet" data-tab="combat">
+      <section class="tab-section combat-tab npc-combat-tab">
+        <section class="combat-gear-section npc-currency-section npc-currency-top">
+          <h2 class="section-title"><i class="fa-solid fa-coins"></i> {{localize "AXIOM.Actor.Equipment.Currency"}}</h2>
+          {{#if currency.isFantasy}}
+            <div class="coin-input-grid npc-coin-input-grid">
+              <span><em>{{localize "AXIOM.Currency.Gold"}}</em><input type="number" name="system.currency.coins.gold" value="{{equipmentTab.summary.currencyCoins.gold}}" min="0" step="1" /></span>
+              <span><em>{{localize "AXIOM.Currency.Silver"}}</em><input type="number" name="system.currency.coins.silver" value="{{equipmentTab.summary.currencyCoins.silver}}" min="0" step="1" /></span>
+              <span><em>{{localize "AXIOM.Currency.Copper"}}</em><input type="number" name="system.currency.coins.copper" value="{{equipmentTab.summary.currencyCoins.copper}}" min="0" step="1" /></span>
+            </div>
+          {{else}}
+            <div class="standard-currency-input"><span>{{currency.standardSymbol}}</span><input type="number" name="system.currency.value" value="{{equipmentTab.summary.currency}}" placeholder="0" min="0" step="1" /></div>
+          {{/if}}
+        </section>
+
+        <div class="combat-armor-summary npc-armor-summary">
+          <div class="armor-line">
+            <span class="armor-label"><i class="fa-solid fa-shield-halved"></i> {{localize "AXIOM.Actor.Combat.EquippedArmor"}}</span>
+            <span class="armor-value"><span>{{localize "AXIOM.Armor.Locations.Head"}}</span><strong>{{combatTab.armorSummary.head}}</strong></span>
+            <span class="armor-value"><span>{{localize "AXIOM.Armor.Locations.Torso"}}</span><strong>{{combatTab.armorSummary.torso}}</strong></span>
+            <span class="armor-value"><span>{{localize "AXIOM.Armor.Locations.Arms"}}</span><strong>{{combatTab.armorSummary.arms}}</strong></span>
+            <span class="armor-value"><span>{{localize "AXIOM.Armor.Locations.Legs"}}</span><strong>{{combatTab.armorSummary.legs}}</strong></span>
+          </div>
+        </div>
+
+        <section class="npc-two-column-grid npc-weapons-grid">
+          <section class="combat-gear-section">
+            <h2 class="section-title"><i class="fa-solid fa-gavel"></i> {{localize "AXIOM.Actor.Combat.MeleeWeapons"}}</h2>
+            {{#if combatTab.meleeWeapons.length}}
+              <div class="combat-gear-list">
+                {{#each combatTab.meleeWeapons}}
+                  <article class="combat-item-row weapon-row melee-row" data-item-id="{{id}}">
+                    <img class="combat-item-img" src="{{img}}" alt="{{name}}" />
+                    <div class="combat-item-line"><span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span><span>{{localize "AXIOM.Weapon.Damage"}} {{damage}}</span><span>{{localize "AXIOM.Weapon.ArmorPenetration"}} {{armorPenetration}}</span><span>{{delivery}}</span></div>
+                    <div class="combat-item-actions"><button type="button" data-action="rollWeaponAttack"><i class="fa-solid fa-dice-d20"></i></button><button type="button" data-action="editCombatItem"><i class="fa-solid fa-pen-to-square"></i></button><button type="button" data-action="deleteCombatItem"><i class="fa-solid fa-trash"></i></button></div>
+                    {{#if description}}<div class="item-description-inline combat-item-description" hidden>{{{description}}}</div>{{/if}}
+                  </article>
+                {{/each}}
+              </div>
+            {{else}}<div class="empty-list">{{localize "AXIOM.Actor.Combat.NoMeleeWeapons"}}</div>{{/if}}
+          </section>
+
+          <section class="combat-gear-section">
+            <h2 class="section-title"><i class="fa-solid fa-crosshairs"></i> {{localize "AXIOM.Actor.Combat.RangedWeapons"}}</h2>
+            {{#if combatTab.rangedWeapons.length}}
+              <div class="combat-gear-list">
+                {{#each combatTab.rangedWeapons}}
+                  <article class="combat-item-row weapon-row ranged-row" data-item-id="{{id}}">
+                    <img class="combat-item-img" src="{{img}}" alt="{{name}}" />
+                    <div class="combat-item-line combat-item-line-ranged"><span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span><span>{{localize "AXIOM.Weapon.Damage"}} {{damage}}</span><span>{{localize "AXIOM.Weapon.ArmorPenetration"}} {{armorPenetration}}</span><span>{{localize "AXIOM.Weapon.Range"}} {{range}}m</span><span class="combat-ammo-counter">{{localize "AXIOM.Weapon.Ammo"}} {{ammoDisplay}}{{#if canReload}} <button type="button" class="quantity-control reload-weapon-button" data-action="reloadWeapon"><i class="fa-solid fa-rotate-right"></i></button>{{/if}}</span></div>
+                    <div class="combat-item-actions"><button type="button" data-action="rollWeaponAttack"><i class="fa-solid fa-dice-d20"></i></button><button type="button" data-action="editCombatItem"><i class="fa-solid fa-pen-to-square"></i></button><button type="button" data-action="deleteCombatItem"><i class="fa-solid fa-trash"></i></button></div>
+                    {{#if description}}<div class="item-description-inline combat-item-description" hidden>{{{description}}}</div>{{/if}}
+                  </article>
+                {{/each}}
+              </div>
+            {{else}}<div class="empty-list">{{localize "AXIOM.Actor.Combat.NoRangedWeapons"}}</div>{{/if}}
+          </section>
+        </section>
+
+        <section class="npc-two-column-grid npc-gear-grid">
+          <section class="combat-gear-section">
+            <h2 class="section-title"><i class="fa-solid fa-shield"></i> {{localize "AXIOM.Actor.Combat.Armor"}}</h2>
+            {{#if combatTab.armor.length}}
+              <div class="combat-gear-list">
+                {{#each combatTab.armor}}
+                  <article class="combat-item-row armor-row" data-item-id="{{id}}">
+                    <img class="combat-item-img" src="{{img}}" alt="{{name}}" />
+                    <div class="combat-item-line"><span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span><span>{{localize "AXIOM.Armor.Locations.Head"}} {{head}}</span><span>{{localize "AXIOM.Armor.Locations.Torso"}} {{torso}}</span><span>{{localize "AXIOM.Armor.Locations.Arms"}} {{arms}}</span><span>{{localize "AXIOM.Armor.Locations.Legs"}} {{legs}}</span></div>
+                    <div class="combat-item-actions"><select class="combat-state-select" data-action="updateCombatItemState">{{#each stateOptions}}<option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select><button type="button" data-action="editCombatItem"><i class="fa-solid fa-pen-to-square"></i></button><button type="button" data-action="deleteCombatItem"><i class="fa-solid fa-trash"></i></button></div>
+                    {{#if description}}<div class="item-description-inline combat-item-description" hidden>{{{description}}}</div>{{/if}}
+                  </article>
+                {{/each}}
+              </div>
+            {{else}}<div class="empty-list">{{localize "AXIOM.Actor.Combat.NoArmor"}}</div>{{/if}}
+          </section>
+
+          <section class="combat-gear-section">
+            <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> {{localize "AXIOM.Actor.Combat.Ammunition"}}</h2>
+            {{#if combatTab.ammunition.length}}
+              <div class="combat-gear-list">
+                {{#each combatTab.ammunition}}
+                  <article class="combat-item-row" data-item-id="{{id}}">
+                    <img class="combat-item-img" src="{{img}}" alt="{{name}}" />
+                    <div class="combat-item-line"><span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span><span>{{localize "AXIOM.Item.Quantity"}} <button type="button" class="quantity-control" data-action="adjustItemQuantity">{{quantity}}</button></span><span>{{localize "AXIOM.Item.Weight"}} {{weight}}</span></div>
+                    <div class="combat-item-actions"><button type="button" data-action="editCombatItem"><i class="fa-solid fa-pen-to-square"></i></button><button type="button" data-action="deleteCombatItem"><i class="fa-solid fa-trash"></i></button></div>
+                    {{#if description}}<div class="item-description-inline combat-item-description" hidden>{{{description}}}</div>{{/if}}
+                  </article>
+                {{/each}}
+              </div>
+            {{else}}<div class="empty-list">{{localize "AXIOM.Actor.Combat.NoAmmunition"}}</div>{{/if}}
+          </section>
+        </section>
+
+        <section class="combat-gear-section npc-equipment-wide">
+          <h2 class="section-title"><i class="fa-solid fa-backpack"></i> {{localize "AXIOM.Actor.Equipment.Title"}}</h2>
+          {{#if equipmentTab.equipment.length}}
+            <div class="combat-gear-list">
+              {{#each equipmentTab.equipment}}
+                <article class="combat-item-row equipment-item-row" data-item-id="{{id}}">
+                  <img class="combat-item-img" src="{{img}}" alt="{{name}}" />
+                  <div class="combat-item-line equipment-item-line"><span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span><span>{{localize "AXIOM.Item.Quantity"}} <button type="button" class="quantity-control" data-action="adjustItemQuantity">{{quantity}}</button></span><span>{{localize "AXIOM.Item.Weight"}} {{weight}}</span></div>
+                  <div class="combat-item-actions"><button type="button" data-action="editEquipmentItem"><i class="fa-solid fa-pen-to-square"></i></button><button type="button" data-action="deleteEquipmentItem"><i class="fa-solid fa-trash"></i></button></div>
+                  {{#if description}}<div class="item-description-inline combat-item-description" hidden>{{{description}}}</div>{{/if}}
+                </article>
+              {{/each}}
+            </div>
+          {{else}}<div class="empty-list">{{localize "AXIOM.Actor.Equipment.Empty"}}</div>{{/if}}
+        </section>
+      </section>
+    </div>
+
+    <div class="tab {{tabClasses.effects}}" data-group="sheet" data-tab="effects">
+      {{> 'systems/axiom/templates/sheets/actor/tabs/effects.hbs'}}
+    </div>
+
+    <div class="tab {{tabClasses.notes}}" data-group="sheet" data-tab="notes">
+      <section class="tab-section notes-tab npc-notes-tab">
+        <h2 class="section-title"><i class="fa-solid fa-note-sticky"></i> {{localize "AXIOM.Actor.Tabs.Notes"}}</h2>
+        <div class="details-field-grid npc-notes-grid">
+          <label class="details-field"><span>{{localize "AXIOM.Actor.NPC.Role"}}</span><input type="text" name="system.details.role" value="{{system.details.role}}" /></label>
+          <label class="details-field"><span>{{localize "AXIOM.Actor.Details.Species"}}</span><input type="text" name="system.details.species" value="{{system.details.species}}" /></label>
+          <label class="details-field"><span>{{localize "AXIOM.Actor.Details.Faction"}}</span><input type="text" name="system.details.faction" value="{{system.details.faction}}" /></label>
+          <label class="details-field"><span>{{localize "AXIOM.Actor.NPC.Disposition"}}</span><input type="text" name="system.details.disposition" value="{{system.details.disposition}}" /></label>
+          <label class="details-field"><span>{{localize "AXIOM.Actor.NPC.Morale"}}</span><input type="text" name="system.details.morale" value="{{system.details.morale}}" /></label>
+          <label class="details-field"><span>{{localize "AXIOM.Actor.NPC.Treasure"}}</span><input type="text" name="system.details.treasure" value="{{system.details.treasure}}" /></label>
+          <div class="details-field wide notes-panel editor-section">
+            <span>{{localize "AXIOM.Actor.NPC.GmNotes"}}</span>
+            {{formInput editorFields.details.notes name="system.details.notes" value=source.system.details.notes enriched=enriched.system.details.notes toggled=true}}
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+</section>

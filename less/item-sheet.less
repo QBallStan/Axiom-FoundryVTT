@@ -1,0 +1,880 @@
+// main: ./axiom.less
+
+/* ----------------------------------------- */
+/*  Axiom//Core Item Sheets                  */
+/* ----------------------------------------- */
+
+.axiom.item-sheet,
+.axiom-item-sheet {
+  --item-bg: #1a1a1c;
+  --item-panel: #232326;
+  --item-panel-dark: #171719;
+  --item-line: #333338;
+  --item-line-soft: #2a2a2f;
+  --item-text: #eaeaea;
+  --item-muted: #aaa;
+  --item-red: #ff2a2a;
+  --item-blue: #4cc9f0;
+  --item-bone: #e0d4b8;
+  --item-shadow-red: rgba(255, 42, 42, 0.35);
+  --item-shadow-bone: rgba(224, 212, 184, 0.25);
+  --item-radius: 8px;
+
+  color: var(--item-text);
+  background: linear-gradient(180deg, #1d1d20 0%, var(--item-bg) 100%);
+  border: 1px solid var(--item-line);
+  border-radius: 12px;
+  overflow: hidden;
+
+  input,
+  select,
+  textarea {
+    color: var(--item-text);
+    font: inherit;
+  }
+
+  input,
+  select,
+  textarea {
+    border: 1px solid var(--item-line);
+    border-radius: 5px;
+    background: var(--item-panel-dark);
+    outline: none;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--item-bone);
+    box-shadow: 0 0 0 1px var(--item-shadow-bone);
+  }
+
+  select {
+    min-height: 28px;
+    padding: 3px 6px;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 180px;
+    padding: 8px;
+    resize: vertical;
+  }
+}
+
+/* ----------------------------------------- */
+/*  Header                                   */
+/* ----------------------------------------- */
+
+.axiom.item-sheet .item-header,
+.axiom-item-sheet .item-header {
+  display: grid;
+  grid-template-columns: 82px 1fr;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 2px solid var(--item-red);
+  background: linear-gradient(90deg, rgba(255, 42, 42, 0.08), transparent 55%);
+}
+
+.axiom.item-sheet .item-image,
+.axiom-item-sheet .item-image {
+  width: 82px;
+  height: 82px;
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  object-fit: cover;
+  cursor: pointer;
+  box-shadow: inset -3px 0 0 var(--item-bone);
+}
+
+.axiom.item-sheet .item-header-main,
+.axiom-item-sheet .item-header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.axiom.item-sheet .item-name,
+.axiom-item-sheet .item-name {
+  width: 100%;
+  height: 34px;
+  border: 0;
+  border-bottom: 1px solid var(--item-line);
+  border-radius: 0;
+  background: transparent;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 0 14px var(--item-shadow-red);
+}
+
+.axiom.item-sheet .item-header-fields,
+.axiom-item-sheet .item-header-fields {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.axiom.item-sheet .item-header-fields.fantasy-currency-grid,
+.axiom-item-sheet .item-header-fields.fantasy-currency-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: start;
+}
+
+.axiom.item-sheet .item-field,
+.axiom-item-sheet .item-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.axiom.item-sheet .item-field label,
+.axiom-item-sheet .item-field label {
+  color: var(--item-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.axiom.item-sheet .item-field input,
+.axiom.item-sheet .item-field select,
+.axiom-item-sheet .item-field input,
+.axiom-item-sheet .item-field select {
+  width: 100%;
+  height: 28px;
+  padding: 2px 6px;
+}
+
+/* Skill sheets only need image + name */
+.axiom.item-sheet.skill .item-header,
+.axiom-item-sheet.skill .item-header,
+.axiom.item-sheet[data-item-type="skill"] .item-header,
+.axiom-item-sheet[data-item-type="skill"] .item-header {
+  grid-template-columns: 72px 1fr;
+}
+
+.axiom.item-sheet.skill .item-image,
+.axiom-item-sheet.skill .item-image,
+.axiom.item-sheet[data-item-type="skill"] .item-image,
+.axiom-item-sheet[data-item-type="skill"] .item-image {
+  width: 72px;
+  height: 72px;
+}
+
+.axiom.item-sheet.skill .item-header-fields,
+.axiom-item-sheet.skill .item-header-fields,
+.axiom.item-sheet[data-item-type="skill"] .item-header-fields,
+.axiom-item-sheet[data-item-type="skill"] .item-header-fields {
+  display: none;
+}
+
+/* ----------------------------------------- */
+/*  Tabs                                     */
+/* ----------------------------------------- */
+
+.axiom.item-sheet .sheet-tabs,
+.axiom-item-sheet .sheet-tabs,
+.axiom.item-sheet .tabs,
+.axiom-item-sheet .tabs {
+  display: flex;
+  justify-content: flex-start;
+  gap: 3px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--item-line);
+  overflow-x: auto;
+}
+
+.axiom.item-sheet .sheet-tabs .item,
+.axiom-item-sheet .sheet-tabs .item,
+.axiom.item-sheet .tabs .item,
+.axiom-item-sheet .tabs .item,
+.axiom.item-sheet .tab-button,
+.axiom-item-sheet .tab-button {
+  flex: 0 0 auto;
+  padding: 8px 12px 6px;
+  border: 1px solid var(--item-line);
+  border-bottom: 0;
+  border-radius: 7px 7px 0 0;
+  background: var(--item-bg);
+  color: var(--item-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.axiom.item-sheet .sheet-tabs .item.active,
+.axiom-item-sheet .sheet-tabs .item.active,
+.axiom.item-sheet .tabs .item.active,
+.axiom-item-sheet .tabs .item.active,
+.axiom.item-sheet .tab-button.active,
+.axiom-item-sheet .tab-button.active {
+  background: var(--item-panel);
+  color: var(--item-bone);
+  box-shadow: inset 0 -2px 0 var(--item-bone), 0 0 12px var(--item-shadow-bone);
+}
+
+/* ----------------------------------------- */
+/*  Body                                     */
+/* ----------------------------------------- */
+
+.axiom.item-sheet .sheet-body,
+.axiom-item-sheet .sheet-body,
+.axiom.item-sheet .item-body,
+.axiom-item-sheet .item-body {
+  padding: 12px 14px 14px;
+}
+
+.axiom.item-sheet .tab,
+.axiom-item-sheet .tab {
+  display: none;
+}
+
+.axiom.item-sheet .tab.active,
+.axiom-item-sheet .tab.active {
+  display: block;
+}
+
+.axiom.item-sheet .section-title,
+.axiom-item-sheet .section-title {
+  margin: 0 0 9px;
+  padding: 7px 10px 5px;
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  box-shadow: inset -3px 0 0 var(--item-bone);
+  color: var(--item-bone);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.axiom.item-sheet .details-grid,
+.axiom-item-sheet .details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.axiom.item-sheet .detail-card,
+.axiom-item-sheet .detail-card {
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  padding: 9px;
+  box-shadow: inset -3px 0 0 var(--item-bone);
+}
+
+.axiom.item-sheet .detail-card.full,
+.axiom-item-sheet .detail-card.full {
+  grid-column: 1 / -1;
+}
+
+.axiom.item-sheet .detail-card label,
+.axiom-item-sheet .detail-card label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--item-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.axiom.item-sheet .detail-card input,
+.axiom.item-sheet .detail-card select,
+.axiom-item-sheet .detail-card input,
+.axiom-item-sheet .detail-card select {
+  width: 100%;
+  height: 30px;
+  padding: 3px 7px;
+}
+
+/* ----------------------------------------- */
+/*  Skill Sheet                              */
+/* ----------------------------------------- */
+
+.axiom.item-sheet .skill-category-toggle,
+.axiom-item-sheet .skill-category-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--item-line);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--item-panel-dark);
+}
+
+.axiom.item-sheet .skill-category-toggle label,
+.axiom-item-sheet .skill-category-toggle label {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 32px;
+  margin: 0;
+  color: var(--item-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.axiom.item-sheet .skill-category-toggle label + label,
+.axiom-item-sheet .skill-category-toggle label + label {
+  border-left: 1px solid var(--item-line);
+}
+
+.axiom.item-sheet .skill-category-toggle input,
+.axiom-item-sheet .skill-category-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.axiom.item-sheet .skill-category-toggle label:has(input:checked),
+.axiom-item-sheet .skill-category-toggle label:has(input:checked) {
+  background: var(--item-panel);
+  color: var(--item-bone);
+  box-shadow: inset 0 -2px 0 var(--item-bone), 0 0 10px var(--item-shadow-bone);
+}
+
+.axiom.item-sheet .linked-attributes,
+.axiom-item-sheet .linked-attributes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* Fallback if :has is not supported in a Foundry Chromium build */
+.axiom.item-sheet .skill-category-toggle .active,
+.axiom-item-sheet .skill-category-toggle .active {
+  background: var(--item-panel);
+  color: var(--item-bone);
+  box-shadow: inset 0 -2px 0 var(--item-bone), 0 0 10px var(--item-shadow-bone);
+}
+
+/* ----------------------------------------- */
+/*  Armor Sheet                              */
+/* ----------------------------------------- */
+
+.axiom.item-sheet .armor-location-grid,
+.axiom-item-sheet .armor-location-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.axiom.item-sheet .armor-location-card,
+.axiom-item-sheet .armor-location-card {
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  padding: 8px;
+  text-align: center;
+  box-shadow: inset 0 -3px 0 var(--item-bone);
+}
+
+.axiom.item-sheet .armor-location-card label,
+.axiom-item-sheet .armor-location-card label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--item-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.axiom.item-sheet .armor-location-card input,
+.axiom-item-sheet .armor-location-card input {
+  width: 100%;
+  height: 38px;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--item-text);
+  text-shadow: 0 0 8px var(--item-shadow-bone);
+}
+
+/* ----------------------------------------- */
+/*  Weapon Sheet                             */
+/* ----------------------------------------- */
+
+.axiom.item-sheet .weapon-range-bands,
+.axiom-item-sheet .weapon-range-bands {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.axiom.item-sheet .range-band,
+.axiom-item-sheet .range-band {
+  border: 1px solid var(--item-line);
+  border-radius: 6px;
+  background: var(--item-panel-dark);
+  padding: 6px;
+  text-align: center;
+}
+
+.axiom.item-sheet .range-band .label,
+.axiom-item-sheet .range-band .label {
+  display: block;
+  color: var(--item-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.axiom.item-sheet .range-band .value,
+.axiom-item-sheet .range-band .value {
+  display: block;
+  margin-top: 2px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--item-bone);
+}
+
+/* ----------------------------------------- */
+/*  Effects Tab                              */
+/* ----------------------------------------- */
+
+.axiom.item-sheet .effects-list,
+.axiom-item-sheet .effects-list {
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  padding: 8px;
+}
+
+.axiom.item-sheet .empty-list,
+.axiom-item-sheet .empty-list {
+  padding: 28px 10px;
+  color: var(--item-muted);
+  text-align: center;
+  font-size: 12px;
+}
+
+/* ----------------------------------------- */
+/*  Responsive                               */
+/* ----------------------------------------- */
+
+@media (max-width: 620px) {
+  .axiom.item-sheet .item-header,
+  .axiom-item-sheet .item-header {
+    grid-template-columns: 64px 1fr;
+  }
+
+  .axiom.item-sheet .item-image,
+  .axiom-item-sheet .item-image {
+    width: 64px;
+    height: 64px;
+  }
+
+  .axiom.item-sheet .item-header-fields,
+  .axiom-item-sheet .item-header-fields,
+  .axiom.item-sheet .details-grid,
+  .axiom-item-sheet .details-grid,
+  .axiom.item-sheet .armor-location-grid,
+  .axiom-item-sheet .armor-location-grid,
+  .axiom.item-sheet .weapon-range-bands,
+  .axiom-item-sheet .weapon-range-bands {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+/* ----------------------------------------- */
+/*  Current Item Template Compatibility       */
+/* ----------------------------------------- */
+
+.axiom.item-sheet .form-grid,
+.axiom-item-sheet .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.axiom.item-sheet .form-grid.compact,
+.axiom-item-sheet .form-grid.compact {
+  gap: 8px;
+}
+
+.axiom.item-sheet .field-group,
+.axiom-item-sheet .field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.axiom.item-sheet .field-group > span,
+.axiom-item-sheet .field-group > span {
+  color: var(--item-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.axiom.item-sheet .field-group input,
+.axiom.item-sheet .field-group select,
+.axiom-item-sheet .field-group input,
+.axiom-item-sheet .field-group select {
+  width: 100%;
+  min-height: 30px;
+  padding: 3px 7px;
+}
+
+.axiom.item-sheet .skill-category-field,
+.axiom-item-sheet .skill-category-field,
+.axiom.item-sheet .ranged-weapon-block,
+.axiom-item-sheet .ranged-weapon-block {
+  margin-top: 12px;
+}
+
+.axiom.item-sheet .segmented-control,
+.axiom-item-sheet .segmented-control {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--item-line);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--item-panel-dark);
+}
+
+.axiom.item-sheet .segmented-control input,
+.axiom-item-sheet .segmented-control input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.axiom.item-sheet .segmented-control label,
+.axiom-item-sheet .segmented-control label {
+  display: grid;
+  place-items: center;
+  min-height: 32px;
+  color: var(--item-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.axiom.item-sheet .segmented-control label + input + label,
+.axiom-item-sheet .segmented-control label + input + label {
+  border-left: 1px solid var(--item-line);
+}
+
+.axiom.item-sheet .segmented-control input:checked + label,
+.axiom-item-sheet .segmented-control input:checked + label {
+  background: var(--item-panel);
+  color: var(--item-bone);
+  box-shadow: inset 0 -2px 0 var(--item-bone), 0 0 10px var(--item-shadow-bone);
+}
+
+.axiom.item-sheet .armor-value-grid,
+.axiom-item-sheet .armor-value-grid,
+.axiom.item-sheet .range-band-grid,
+.axiom-item-sheet .range-band-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.axiom.item-sheet .armor-value-card,
+.axiom-item-sheet .armor-value-card,
+.axiom.item-sheet .range-band-card,
+.axiom-item-sheet .range-band-card {
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  padding: 8px;
+  text-align: center;
+  box-shadow: inset 0 -3px 0 var(--item-bone);
+}
+
+.axiom.item-sheet .armor-value-card span,
+.axiom-item-sheet .armor-value-card span,
+.axiom.item-sheet .range-band-card span,
+.axiom-item-sheet .range-band-card span {
+  display: block;
+  color: var(--item-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.axiom.item-sheet .armor-value-card input,
+.axiom-item-sheet .armor-value-card input {
+  width: 100%;
+  height: 38px;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--item-text);
+  text-shadow: 0 0 8px var(--item-shadow-bone);
+}
+
+.axiom.item-sheet .range-band-grid,
+.axiom-item-sheet .range-band-grid {
+  margin-top: 10px;
+}
+
+.axiom.item-sheet .range-band-card strong,
+.axiom-item-sheet .range-band-card strong {
+  display: block;
+  margin-top: 4px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  color: var(--item-bone);
+}
+
+.axiom.item-sheet .range-band-card small,
+.axiom-item-sheet .range-band-card small {
+  display: block;
+  margin-top: 2px;
+  color: var(--item-blue);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.axiom.item-sheet .sheet-list,
+.axiom-item-sheet .sheet-list {
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  padding: 8px;
+}
+
+.axiom.item-sheet .list-header,
+.axiom-item-sheet .list-header,
+.axiom.item-sheet .list-row,
+.axiom-item-sheet .list-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.axiom.item-sheet .list-header,
+.axiom-item-sheet .list-header {
+  color: var(--item-bone);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.axiom.item-sheet .list-row,
+.axiom-item-sheet .list-row {
+  grid-template-columns: 28px 1fr auto;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--item-line-soft);
+}
+
+.axiom.item-sheet .list-row img,
+.axiom-item-sheet .list-row img {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--item-line);
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.axiom.item-sheet .row-controls,
+.axiom-item-sheet .row-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.axiom.item-sheet .empty-row,
+.axiom-item-sheet .empty-row {
+  padding: 18px 10px;
+  color: var(--item-muted);
+  text-align: center;
+  font-size: 12px;
+}
+
+.application.sheet.axiom.item.item-sheet .window-content {
+  padding: 0;
+  background: var(--item-bg, #1a1a1c);
+}
+
+/* ----------------------------------------- */
+/*  Equipment Sheet                          */
+/* ----------------------------------------- */
+
+.axiom.item-sheet .equipment-roll-note,
+.axiom-item-sheet .equipment-roll-note {
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  border: 1px solid var(--item-line-soft);
+  border-radius: var(--item-radius);
+  background: var(--item-panel-dark);
+  color: var(--item-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+/* ----------------------------------------- */
+/*  Trait Sheet                              */
+/* ----------------------------------------- */
+
+.axiom.item-sheet .detail-card > span,
+.axiom-item-sheet .detail-card > span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--item-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ----------------------------------------- */
+/*  Currency Fields                          */
+/* ----------------------------------------- */
+
+.axiom.item-sheet .item-price-field,
+.axiom-item-sheet .item-price-field {
+  min-width: 0;
+}
+
+.axiom.item-sheet .item-price-field.fantasy-price-field,
+.axiom-item-sheet .item-price-field.fantasy-price-field {
+  grid-column: span 2;
+}
+
+.axiom.item-sheet .fantasy-currency-grid .item-field,
+.axiom-item-sheet .fantasy-currency-grid .item-field {
+  min-width: 0;
+}
+
+.axiom.item-sheet .fantasy-currency-grid .item-field input,
+.axiom-item-sheet .fantasy-currency-grid .item-field input {
+  min-width: 0;
+}
+
+.axiom.item-sheet .standard-currency-input,
+.axiom-item-sheet .standard-currency-input {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 4px;
+
+  > span {
+    color: var(--item-bone);
+    font-family: "Roboto Mono", monospace;
+    font-weight: 800;
+  }
+}
+
+.axiom.item-sheet .coin-input-grid,
+.axiom-item-sheet .coin-input-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+
+  label {
+    display: grid;
+    gap: 2px;
+  }
+
+  label > span {
+    color: var(--item-muted);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  input {
+    min-width: 0;
+    padding-inline: 5px;
+  }
+}
+
+@media (max-width: 500px) {
+  .axiom.item-sheet .item-header-fields.fantasy-currency-grid,
+  .axiom-item-sheet .item-header-fields.fantasy-currency-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .axiom.item-sheet .item-price-field.fantasy-price-field,
+  .axiom-item-sheet .item-price-field.fantasy-price-field {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ----------------------------------------- */
+/*  Rich Text Editors                        */
+/* ----------------------------------------- */
+
+.axiom.item-sheet,
+.axiom-item-sheet {
+  .editor-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .editor-section .form-group,
+  .editor-section .form-fields {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    margin: 0;
+  }
+
+  .editor-section .editor,
+  .editor-section prose-mirror,
+  .editor-section .prosemirror,
+  .editor-section .editor-content {
+    width: 100%;
+    min-height: 220px;
+    background: var(--item-panel-dark);
+    border: 1px solid var(--item-line);
+    border-radius: 5px;
+    color: var(--item-text);
+    line-height: 1.45;
+  }
+
+  .editor-section .editor-content {
+    padding: 8px;
+    overflow: auto;
+  }
+
+  .editor-section .editor-menu,
+  .editor-section menu {
+    border-color: var(--item-line);
+    background: var(--item-panel);
+    color: var(--item-text);
+  }
+
+  .editor-section button,
+  .editor-section .editor-edit {
+    color: var(--item-text);
+  }
+}

@@ -1,0 +1,33 @@
+<section class="tab-section details-tab skill-details">
+  <div class="form-grid compact skill-grid">
+    <label class="field-group skill-level-field">
+      <span>{{localize "AXIOM.Skill.Level"}}</span>
+      <input type="number" name="system.level" value="{{system.level}}" min="0" max="50" step="1" />
+    </label>
+
+    <label class="field-group">
+      <span>{{localize "AXIOM.Skill.AttributeOne"}}</span>
+      <select name="system.attributeOne">
+        {{selectOptions config.attributes selected=system.attributeOne localize=true}}
+      </select>
+    </label>
+
+    <label class="field-group">
+      <span>{{localize "AXIOM.Skill.AttributeTwo"}}</span>
+      <select name="system.attributeTwo">
+        {{selectOptions config.attributes selected=system.attributeTwo localize=true}}
+      </select>
+    </label>
+  </div>
+
+  <div class="field-group skill-category-field">
+    <span>{{localize "AXIOM.Skill.Category"}}</span>
+    <div class="segmented-control">
+      <input id="{{item.id}}-category-core" type="radio" name="system.category" value="core" {{checked skillCategory.core}} />
+      <label for="{{item.id}}-category-core">{{localize "AXIOM.Skill.Categories.Core"}}</label>
+
+      <input id="{{item.id}}-category-expertise" type="radio" name="system.category" value="expertise" {{checked skillCategory.expertise}} />
+      <label for="{{item.id}}-category-expertise">{{localize "AXIOM.Skill.Categories.Expertise"}}</label>
+    </div>
+  </div>
+</section>

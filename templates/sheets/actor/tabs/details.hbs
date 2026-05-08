@@ -1,0 +1,96 @@
+<section class="tab-section details-tab">
+  <div class="details-summary-grid">
+    <label class="details-summary-card">
+      <span class="summary-label"><i class="fa-solid fa-star"></i> {{localize "AXIOM.Actor.Details.XP.Current"}}</span>
+      <input type="number" name="system.details.xp.current" value="{{system.details.xp.current}}" min="0" step="1" />
+    </label>
+
+    <label class="details-summary-card">
+      <span class="summary-label"><i class="fa-solid fa-scroll"></i> {{localize "AXIOM.Actor.Details.XP.Spent"}}</span>
+      <input type="number" name="system.details.xp.spent" value="{{system.details.xp.spent}}" min="0" step="1" />
+    </label>
+
+    <label class="details-summary-card">
+      <span class="summary-label"><i class="fa-solid fa-circle-plus"></i> {{localize "AXIOM.Actor.Details.XP.Total"}}</span>
+      <input type="number" value="{{detailsTab.xp.total}}" readonly disabled />
+    </label>
+  </div>
+
+  <section class="details-panel">
+    <h2 class="section-title"><i class="fa-solid fa-id-card"></i> {{localize "AXIOM.Actor.Details.Identity"}}</h2>
+    <div class="details-field-grid identity-details-grid">
+      <label class="details-field">
+        <span>{{localize "AXIOM.Actor.Details.FirstName"}}</span>
+        <input type="text" name="system.details.firstName" value="{{system.details.firstName}}" />
+      </label>
+      <label class="details-field">
+        <span>{{localize "AXIOM.Actor.Details.LastName"}}</span>
+        <input type="text" name="system.details.lastName" value="{{system.details.lastName}}" />
+      </label>
+      <label class="details-field">
+        <span>{{localize "AXIOM.Actor.Details.Species"}}</span>
+        <input type="text" name="system.details.species" value="{{system.details.species}}" />
+      </label>
+      <label class="details-field">
+        <span>{{localize "AXIOM.Actor.Details.Culture"}}</span>
+        <input type="text" name="system.details.culture" value="{{system.details.culture}}" />
+      </label>
+      <label class="details-field">
+        <span>{{localize "AXIOM.Actor.Details.Profession"}}</span>
+        <input type="text" name="system.details.profession" value="{{system.details.profession}}" />
+      </label>
+      <label class="details-field">
+        <span>{{localize "AXIOM.Actor.Details.Origin"}}</span>
+        <input type="text" name="system.details.origin" value="{{system.details.origin}}" />
+      </label>
+      <label class="details-field wide">
+        <span>{{localize "AXIOM.Actor.Details.Faction"}}</span>
+        <input type="text" name="system.details.faction" value="{{system.details.faction}}" />
+      </label>
+    </div>
+  </section>
+
+  <section class="details-panel">
+    <h2 class="section-title"><i class="fa-solid fa-user"></i> {{localize "AXIOM.Actor.Details.Appearance"}}</h2>
+    <div class="details-field-grid appearance-details-grid">
+      <label class="details-field">
+        <span>{{localize "AXIOM.Actor.Details.Age"}}</span>
+        <input type="text" name="system.details.age" value="{{system.details.age}}" />
+      </label>
+      <label class="details-field">
+        <span>{{localize "AXIOM.Actor.Details.Height"}}</span>
+        <input type="text" name="system.details.height" value="{{system.details.height}}" />
+      </label>
+      <label class="details-field">
+        <span>{{localize "AXIOM.Actor.Details.Weight"}}</span>
+        <input type="text" name="system.details.weight" value="{{system.details.weight}}" />
+      </label>
+      <label class="details-field">
+        <span>{{localize "AXIOM.Actor.Details.EyeColor"}}</span>
+        <input type="text" name="system.details.eyeColor" value="{{system.details.eyeColor}}" />
+      </label>
+      <label class="details-field">
+        <span>{{localize "AXIOM.Actor.Details.HairColor"}}</span>
+        <input type="text" name="system.details.hairColor" value="{{system.details.hairColor}}" />
+      </label>
+      <label class="details-field">
+        <span>{{localize "AXIOM.Actor.Details.SkinTone"}}</span>
+        <input type="text" name="system.details.skinTone" value="{{system.details.skinTone}}" />
+      </label>
+      <label class="details-field wide">
+        <span>{{localize "AXIOM.Actor.Details.DistinguishingMarks"}}</span>
+        <input type="text" name="system.details.distinguishingMarks" value="{{system.details.distinguishingMarks}}" />
+      </label>
+    </div>
+  </section>
+
+  <section class="details-panel biography-panel editor-section">
+    <h2 class="section-title"><i class="fa-solid fa-book-open"></i> {{localize "AXIOM.Actor.Details.Biography"}}</h2>
+    {{formInput editorFields.details.biography name="system.details.biography" value=source.system.details.biography enriched=enriched.system.details.biography toggled=true}}
+  </section>
+
+  <section class="details-panel notes-panel editor-section">
+    <h2 class="section-title"><i class="fa-solid fa-pen-to-square"></i> {{localize "AXIOM.Actor.Details.Notes"}}</h2>
+    {{formInput editorFields.details.notes name="system.details.notes" value=source.system.details.notes enriched=enriched.system.details.notes toggled=true}}
+  </section>
+</section>

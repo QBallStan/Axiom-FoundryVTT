@@ -1,0 +1,34 @@
+<section class="axiom axiom-sheet axiom-item-sheet item-sheet {{item.type}} {{cssClass}}" data-item-type="{{item.type}}" autocomplete="off">
+  {{> "systems/axiom/templates/sheets/item/partials/header.hbs"}}
+  {{> "systems/axiom/templates/sheets/item/partials/tabs.hbs"}}
+
+  <section class="sheet-body">
+    <div class="tab {{tabClasses.description}}" data-group="sheet" data-tab="description">
+      {{> "systems/axiom/templates/sheets/item/tabs/description.hbs"}}
+    </div>
+    {{#if hasDetailsTab}}
+      <div class="tab {{tabClasses.details}}" data-group="sheet" data-tab="details">
+        {{#if isSkill}}
+          {{> "systems/axiom/templates/sheets/item/tabs/skill-details.hbs"}}
+        {{/if}}
+        {{#if isArmor}}
+          {{> "systems/axiom/templates/sheets/item/tabs/armor-details.hbs"}}
+        {{/if}}
+        {{#if isWeapon}}
+          {{> "systems/axiom/templates/sheets/item/tabs/weapon-details.hbs"}}
+        {{/if}}
+        {{#if isEquipment}}
+          {{> "systems/axiom/templates/sheets/item/tabs/equipment-details.hbs"}}
+        {{/if}}
+        {{#if isTrait}}
+          {{> "systems/axiom/templates/sheets/item/tabs/trait-details.hbs"}}
+        {{/if}}
+      </div>
+    {{/if}}
+    {{#if hasEffectsTab}}
+      <div class="tab {{tabClasses.effects}}" data-group="sheet" data-tab="effects">
+        {{> "systems/axiom/templates/sheets/item/tabs/effects.hbs"}}
+      </div>
+    {{/if}}
+  </section>
+</section>

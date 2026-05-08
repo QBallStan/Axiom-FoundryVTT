@@ -1,0 +1,5466 @@
+@font-face {
+  font-family: 'Marcellus';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/marcellus/v14/wEO_EBrOk8hQLDvIAF8FUQ.ttf) format('truetype');
+}
+.application.sheet.axiom.actor.protagonist,
+.application.sheet.axiom.actor.npc {
+  --axiom-bg: #101012;
+  --axiom-panel: #1b1b1f;
+  --axiom-panel-2: #24242a;
+  --axiom-border: #3a3a42;
+  --axiom-text: #e8e4dc;
+  --axiom-muted: #a7a198;
+  --axiom-accent: #c73a32;
+  --axiom-gold: #d8c69a;
+  --axiom-blue: #5fb7d7;
+  font-family: "Marcellus", serif;
+  color: var(--axiom-text);
+  /* ===== WOUNDS ===== */
+  /* ===== TRACKERS ===== */
+  /* ===== TABS ===== */
+  /* ===== ATTRIBUTES ===== */
+  /* ===== STATS ===== */
+  /* ===== TRAITS ===== */
+  /* ===== GENERIC ===== */
+}
+.application.sheet.axiom.actor.protagonist .window-content,
+.application.sheet.axiom.actor.npc .window-content {
+  padding: 12px;
+  background: var(--axiom-bg);
+  overflow-y: auto;
+}
+.application.sheet.axiom.actor.protagonist .axiom-sheet.protagonist-sheet,
+.application.sheet.axiom.actor.npc .axiom-sheet.protagonist-sheet {
+  background: radial-gradient(circle at top, rgba(199, 58, 50, 0.12), transparent 32rem), var(--axiom-bg);
+}
+.application.sheet.axiom.actor.protagonist input,
+.application.sheet.axiom.actor.npc input,
+.application.sheet.axiom.actor.protagonist textarea,
+.application.sheet.axiom.actor.npc textarea,
+.application.sheet.axiom.actor.protagonist select,
+.application.sheet.axiom.actor.npc select {
+  background: #121216;
+  border: 1px solid var(--axiom-border);
+  color: var(--axiom-text);
+  border-radius: 4px;
+  padding: 2px 5px;
+}
+.application.sheet.axiom.actor.protagonist input:focus,
+.application.sheet.axiom.actor.npc input:focus,
+.application.sheet.axiom.actor.protagonist textarea:focus,
+.application.sheet.axiom.actor.npc textarea:focus,
+.application.sheet.axiom.actor.protagonist select:focus,
+.application.sheet.axiom.actor.npc select:focus {
+  outline: none;
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+.application.sheet.axiom.actor.protagonist .sheet-header,
+.application.sheet.axiom.actor.npc .sheet-header {
+  margin-bottom: 10px;
+  border-bottom: 2px solid var(--axiom-accent);
+}
+.application.sheet.axiom.actor.protagonist .sheet-top,
+.application.sheet.axiom.actor.npc .sheet-top {
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--axiom-accent);
+}
+.application.sheet.axiom.actor.protagonist .name-input,
+.application.sheet.axiom.actor.npc .name-input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--axiom-text);
+}
+.application.sheet.axiom.actor.protagonist .identity-row,
+.application.sheet.axiom.actor.npc .identity-row {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 10px;
+  align-items: stretch;
+  margin-bottom: 10px;
+}
+.application.sheet.axiom.actor.protagonist .portrait,
+.application.sheet.axiom.actor.npc .portrait {
+  aspect-ratio: 2 / 3;
+  max-width: 138px;
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.application.sheet.axiom.actor.protagonist .portrait img,
+.application.sheet.axiom.actor.npc .portrait img {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  object-fit: cover;
+  border: 0;
+}
+.application.sheet.axiom.actor.protagonist .status-grid,
+.application.sheet.axiom.actor.npc .status-grid {
+  display: grid;
+  grid-template-columns: 1fr 142px;
+  gap: 10px;
+}
+.application.sheet.axiom.actor.protagonist .panel,
+.application.sheet.axiom.actor.npc .panel {
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+  padding: 8px;
+  box-shadow: inset -3px 0 0 var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .panel-title,
+.application.sheet.axiom.actor.npc .panel-title,
+.application.sheet.axiom.actor.protagonist .tracker-title,
+.application.sheet.axiom.actor.npc .tracker-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .wounds-panel,
+.application.sheet.axiom.actor.npc .wounds-panel {
+  display: flex;
+  flex-direction: column;
+}
+.application.sheet.axiom.actor.protagonist .wounds,
+.application.sheet.axiom.actor.npc .wounds {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.application.sheet.axiom.actor.protagonist .wound-grid,
+.application.sheet.axiom.actor.npc .wound-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  flex: 1;
+}
+.application.sheet.axiom.actor.protagonist .wound-col,
+.application.sheet.axiom.actor.npc .wound-col {
+  display: flex;
+  flex-direction: column;
+}
+.application.sheet.axiom.actor.protagonist .wound-col-label,
+.application.sheet.axiom.actor.npc .wound-col-label {
+  flex: 0 0 auto;
+  margin: 5px 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--axiom-muted);
+}
+.application.sheet.axiom.actor.protagonist .wound-col-label strong,
+.application.sheet.axiom.actor.npc .wound-col-label strong {
+  color: var(--axiom-blue);
+}
+.application.sheet.axiom.actor.protagonist .wound-col-label.critical,
+.application.sheet.axiom.actor.npc .wound-col-label.critical {
+  color: var(--axiom-accent);
+}
+.application.sheet.axiom.actor.protagonist .wound-col-content,
+.application.sheet.axiom.actor.npc .wound-col-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.application.sheet.axiom.actor.protagonist .wound-slot,
+.application.sheet.axiom.actor.npc .wound-slot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.application.sheet.axiom.actor.protagonist .wound-slot .tiny-input,
+.application.sheet.axiom.actor.npc .wound-slot .tiny-input {
+  width: 30px;
+  height: 22px;
+  text-align: center;
+  font-size: 12px;
+  font-family: "Roboto Mono", monospace;
+  padding: 0;
+}
+.application.sheet.axiom.actor.protagonist .wound-slot .max,
+.application.sheet.axiom.actor.npc .wound-slot .max {
+  font-family: "Roboto Mono", monospace;
+  font-size: 11px;
+  color: var(--axiom-muted);
+}
+.application.sheet.axiom.actor.protagonist .wound-toggle,
+.application.sheet.axiom.actor.npc .wound-toggle {
+  width: 23px;
+  height: 23px;
+  flex: 0 0 23px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.application.sheet.axiom.actor.protagonist .wound-toggle.taken .wound-mark::after,
+.application.sheet.axiom.actor.npc .wound-toggle.taken .wound-mark::after {
+  background: var(--axiom-blue);
+}
+.application.sheet.axiom.actor.protagonist .wound-toggle.taken .wound-mark.mark-major::after,
+.application.sheet.axiom.actor.npc .wound-toggle.taken .wound-mark.mark-major::after {
+  background: var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .wound-toggle.taken .wound-mark.mark-critical::after,
+.application.sheet.axiom.actor.npc .wound-toggle.taken .wound-mark.mark-critical::after {
+  background: var(--axiom-accent);
+}
+.application.sheet.axiom.actor.protagonist .wound-toggle.taken .wound-mark,
+.application.sheet.axiom.actor.npc .wound-toggle.taken .wound-mark {
+  box-shadow: 0 0 8px rgba(95, 183, 215, 0.6);
+}
+.application.sheet.axiom.actor.protagonist .wound-toggle.taken .wound-mark.mark-major,
+.application.sheet.axiom.actor.npc .wound-toggle.taken .wound-mark.mark-major {
+  box-shadow: 0 0 8px rgba(216, 198, 154, 0.6);
+}
+.application.sheet.axiom.actor.protagonist .wound-toggle.taken .wound-mark.mark-critical,
+.application.sheet.axiom.actor.npc .wound-toggle.taken .wound-mark.mark-critical {
+  box-shadow: 0 0 10px rgba(199, 58, 50, 0.75);
+}
+.application.sheet.axiom.actor.protagonist .wound-mark,
+.application.sheet.axiom.actor.npc .wound-mark {
+  position: relative;
+  width: 23px;
+  height: 23px;
+  flex: 0 0 23px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--axiom-blue);
+  border: 0;
+}
+.application.sheet.axiom.actor.protagonist .wound-mark::after,
+.application.sheet.axiom.actor.npc .wound-mark::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background: #121216;
+}
+.application.sheet.axiom.actor.protagonist .wound-mark.taken::after,
+.application.sheet.axiom.actor.npc .wound-mark.taken::after,
+.application.sheet.axiom.actor.protagonist .wound-mark.ticked::after,
+.application.sheet.axiom.actor.npc .wound-mark.ticked::after {
+  background: var(--axiom-blue);
+}
+.application.sheet.axiom.actor.protagonist .wound-mark.mark-grazing,
+.application.sheet.axiom.actor.npc .wound-mark.mark-grazing {
+  border-radius: 50%;
+}
+.application.sheet.axiom.actor.protagonist .wound-mark.mark-grazing::after,
+.application.sheet.axiom.actor.npc .wound-mark.mark-grazing::after {
+  border-radius: 50%;
+}
+.application.sheet.axiom.actor.protagonist .wound-mark.mark-minor,
+.application.sheet.axiom.actor.npc .wound-mark.mark-minor,
+.application.sheet.axiom.actor.protagonist .wound-mark.mark-minor::after,
+.application.sheet.axiom.actor.npc .wound-mark.mark-minor::after {
+  clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+}
+.application.sheet.axiom.actor.protagonist .wound-mark.mark-major,
+.application.sheet.axiom.actor.npc .wound-mark.mark-major {
+  background: var(--axiom-gold);
+  clip-path: polygon(50% 0, 98% 35%, 80% 100%, 20% 100%, 2% 35%);
+}
+.application.sheet.axiom.actor.protagonist .wound-mark.mark-major::after,
+.application.sheet.axiom.actor.npc .wound-mark.mark-major::after {
+  clip-path: polygon(50% 0, 98% 35%, 80% 100%, 20% 100%, 2% 35%);
+}
+.application.sheet.axiom.actor.protagonist .wound-mark.mark-major.taken::after,
+.application.sheet.axiom.actor.npc .wound-mark.mark-major.taken::after,
+.application.sheet.axiom.actor.protagonist .wound-mark.mark-major.ticked::after,
+.application.sheet.axiom.actor.npc .wound-mark.mark-major.ticked::after {
+  background: var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .wound-mark.mark-critical,
+.application.sheet.axiom.actor.npc .wound-mark.mark-critical {
+  background: var(--axiom-accent);
+  border-radius: 2px;
+}
+.application.sheet.axiom.actor.protagonist .wound-mark.mark-critical::after,
+.application.sheet.axiom.actor.npc .wound-mark.mark-critical::after {
+  border-radius: 1px;
+}
+.application.sheet.axiom.actor.protagonist .wound-mark.mark-critical.taken::after,
+.application.sheet.axiom.actor.npc .wound-mark.mark-critical.taken::after,
+.application.sheet.axiom.actor.protagonist .wound-mark.mark-critical.ticked::after,
+.application.sheet.axiom.actor.npc .wound-mark.mark-critical.ticked::after {
+  background: var(--axiom-accent);
+}
+.application.sheet.axiom.actor.protagonist .injury-input,
+.application.sheet.axiom.actor.npc .injury-input {
+  width: 100%;
+  margin-top: auto;
+  font-size: 12px;
+}
+.application.sheet.axiom.actor.protagonist .trackers,
+.application.sheet.axiom.actor.npc .trackers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.application.sheet.axiom.actor.protagonist .pips,
+.application.sheet.axiom.actor.npc .pips {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+.application.sheet.axiom.actor.protagonist .pips .pip,
+.application.sheet.axiom.actor.npc .pips .pip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  opacity: 0.28;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.application.sheet.axiom.actor.protagonist .pips .pip.active,
+.application.sheet.axiom.actor.npc .pips .pip.active {
+  opacity: 1;
+}
+.application.sheet.axiom.actor.protagonist .pips .pip i,
+.application.sheet.axiom.actor.npc .pips .pip i {
+  color: var(--axiom-gold);
+  line-height: 1;
+}
+.application.sheet.axiom.actor.protagonist .pips .fate-pip i,
+.application.sheet.axiom.actor.npc .pips .fate-pip i {
+  color: var(--axiom-accent);
+  font-size: 15px;
+  text-shadow: 0 0 4px rgba(199, 58, 50, 0.28);
+}
+.application.sheet.axiom.actor.protagonist .pips .action-pip i,
+.application.sheet.axiom.actor.npc .pips .action-pip i {
+  color: var(--axiom-accent);
+  font-size: 16px;
+  text-shadow: 0 0 4px rgba(199, 58, 50, 0.28);
+}
+.application.sheet.axiom.actor.protagonist .tracker-pips,
+.application.sheet.axiom.actor.npc .tracker-pips {
+  width: 100%;
+  margin: 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.application.sheet.axiom.actor.protagonist .tracker-pips:hover .pip.active,
+.application.sheet.axiom.actor.npc .tracker-pips:hover .pip.active {
+  transform: translateY(-1px);
+}
+.application.sheet.axiom.actor.protagonist .tracker-pips:hover .fate-pip.active i,
+.application.sheet.axiom.actor.npc .tracker-pips:hover .fate-pip.active i {
+  text-shadow: 0 0 7px rgba(199, 58, 50, 0.7);
+}
+.application.sheet.axiom.actor.protagonist .tracker-pips:hover .action-pip.active i,
+.application.sheet.axiom.actor.npc .tracker-pips:hover .action-pip.active i {
+  text-shadow: 0 0 7px rgba(199, 58, 50, 0.7);
+}
+.application.sheet.axiom.actor.protagonist .momentum-line,
+.application.sheet.axiom.actor.npc .momentum-line {
+  display: grid;
+  grid-template-columns: 20px 1fr 20px;
+  gap: 5px;
+  align-items: center;
+  font-size: 11px;
+  color: var(--axiom-muted);
+}
+.application.sheet.axiom.actor.protagonist .momentum-line input,
+.application.sheet.axiom.actor.npc .momentum-line input {
+  width: 100%;
+  accent-color: var(--axiom-accent);
+}
+.application.sheet.axiom.actor.protagonist .momentum-value,
+.application.sheet.axiom.actor.npc .momentum-value {
+  text-align: center;
+  font-family: "Roboto Mono", monospace;
+  font-weight: 700;
+}
+.application.sheet.axiom.actor.protagonist nav.sheet-tabs,
+.application.sheet.axiom.actor.npc nav.sheet-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--axiom-border);
+}
+.application.sheet.axiom.actor.protagonist nav.sheet-tabs .item,
+.application.sheet.axiom.actor.npc nav.sheet-tabs .item {
+  padding: 0px 10px;
+  border: 1px solid var(--axiom-border);
+  border-bottom: 0;
+  border-radius: 5px 5px 0 0;
+  background: #151519;
+  color: var(--axiom-muted);
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 700;
+}
+.application.sheet.axiom.actor.protagonist nav.sheet-tabs .item.active,
+.application.sheet.axiom.actor.npc nav.sheet-tabs .item.active {
+  background: var(--axiom-panel-2);
+  color: var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist nav.tabs,
+.application.sheet.axiom.actor.npc nav.tabs {
+  border-top: 0;
+  justify-content: flex-start;
+}
+.application.sheet.axiom.actor.protagonist .attribute-table,
+.application.sheet.axiom.actor.npc .attribute-table {
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.application.sheet.axiom.actor.protagonist .attribute-row,
+.application.sheet.axiom.actor.npc .attribute-row {
+  display: grid;
+  grid-template-columns: 54px repeat(8, 1fr);
+  border-bottom: 1px solid var(--axiom-border);
+}
+.application.sheet.axiom.actor.protagonist .attribute-row > span,
+.application.sheet.axiom.actor.npc .attribute-row > span,
+.application.sheet.axiom.actor.protagonist .attribute-row > strong,
+.application.sheet.axiom.actor.npc .attribute-row > strong,
+.application.sheet.axiom.actor.protagonist .attribute-row > input,
+.application.sheet.axiom.actor.npc .attribute-row > input {
+  padding: 5px;
+  text-align: center;
+  border-right: 1px solid var(--axiom-border);
+  font-family: "Roboto Mono", monospace;
+}
+.application.sheet.axiom.actor.protagonist .attribute-row > span,
+.application.sheet.axiom.actor.npc .attribute-row > span {
+  background: #151519;
+  color: var(--axiom-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.application.sheet.axiom.actor.protagonist .stat-grid,
+.application.sheet.axiom.actor.npc .stat-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+.application.sheet.axiom.actor.protagonist .stat-card,
+.application.sheet.axiom.actor.npc .stat-card {
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+.application.sheet.axiom.actor.protagonist .stat-card label,
+.application.sheet.axiom.actor.npc .stat-card label {
+  font-size: 11px;
+  color: var(--axiom-muted);
+}
+.application.sheet.axiom.actor.protagonist .stat-card strong,
+.application.sheet.axiom.actor.npc .stat-card strong {
+  font-size: 22px;
+  font-family: "Roboto Mono", monospace;
+}
+.application.sheet.axiom.actor.protagonist .two-col,
+.application.sheet.axiom.actor.npc .two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.application.sheet.axiom.actor.protagonist .list-pill,
+.application.sheet.axiom.actor.npc .list-pill {
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  padding: 5px;
+  border-radius: 4px;
+}
+.application.sheet.axiom.actor.protagonist .list-row,
+.application.sheet.axiom.actor.npc .list-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  margin-bottom: 4px;
+}
+.application.sheet.axiom.actor.protagonist .placeholder-panel,
+.application.sheet.axiom.actor.npc .placeholder-panel {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--axiom-muted);
+}
+.application.sheet.axiom.actor.protagonist .notes-area,
+.application.sheet.axiom.actor.npc .notes-area {
+  width: 100%;
+  min-height: 260px;
+}
+.application.sheet.axiom.actor.protagonist .sheet-body .tab,
+.application.sheet.axiom.actor.npc .sheet-body .tab {
+  display: none;
+}
+.application.sheet.axiom.actor.protagonist .sheet-body .tab.active,
+.application.sheet.axiom.actor.npc .sheet-body .tab.active {
+  display: block;
+}
+.application.sheet.axiom.actor.protagonist .tab-section,
+.application.sheet.axiom.actor.npc .tab-section {
+  margin-bottom: 12px;
+}
+.application.sheet.axiom.actor.protagonist .section-title,
+.application.sheet.axiom.actor.npc .section-title {
+  margin: 0 0 8px;
+  padding: 5px 10px;
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  color: var(--axiom-gold);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: inset -3px 0 0 var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .section-title i,
+.application.sheet.axiom.actor.npc .section-title i {
+  margin-right: 5px;
+}
+.application.sheet.axiom.actor.protagonist .section-title-row,
+.application.sheet.axiom.actor.npc .section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 5px 10px;
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  box-shadow: inset -3px 0 0 var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .section-title-row .section-title,
+.application.sheet.axiom.actor.npc .section-title-row .section-title {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.application.sheet.axiom.actor.protagonist .effect-create-button,
+.application.sheet.axiom.actor.npc .effect-create-button {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--axiom-gold);
+  line-height: 1;
+  cursor: pointer;
+  font-size: 8px;
+}
+.application.sheet.axiom.actor.protagonist .effect-create-button:hover,
+.application.sheet.axiom.actor.npc .effect-create-button:hover {
+  border-color: var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .attribute-table,
+.application.sheet.axiom.actor.npc .attribute-table {
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.application.sheet.axiom.actor.protagonist .attribute-row,
+.application.sheet.axiom.actor.npc .attribute-row {
+  display: grid;
+  grid-template-columns: 54px repeat(8, minmax(0, 1fr));
+  border-bottom: 1px solid var(--axiom-border);
+}
+.application.sheet.axiom.actor.protagonist .attribute-row:last-child,
+.application.sheet.axiom.actor.npc .attribute-row:last-child {
+  border-bottom: 0;
+}
+.application.sheet.axiom.actor.protagonist .attribute-row > span,
+.application.sheet.axiom.actor.npc .attribute-row > span,
+.application.sheet.axiom.actor.protagonist .attribute-row > strong,
+.application.sheet.axiom.actor.npc .attribute-row > strong,
+.application.sheet.axiom.actor.protagonist .attribute-row > input,
+.application.sheet.axiom.actor.npc .attribute-row > input {
+  min-width: 0;
+  padding: 5px 4px;
+  text-align: center;
+  border: 0;
+  border-right: 1px solid var(--axiom-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--axiom-text);
+  font-family: "Roboto Mono", monospace;
+}
+.application.sheet.axiom.actor.protagonist .attribute-row > span:last-child,
+.application.sheet.axiom.actor.npc .attribute-row > span:last-child,
+.application.sheet.axiom.actor.protagonist .attribute-row > strong:last-child,
+.application.sheet.axiom.actor.npc .attribute-row > strong:last-child,
+.application.sheet.axiom.actor.protagonist .attribute-row > input:last-child,
+.application.sheet.axiom.actor.npc .attribute-row > input:last-child {
+  border-right: 0;
+}
+.application.sheet.axiom.actor.protagonist .attribute-row > span,
+.application.sheet.axiom.actor.npc .attribute-row > span {
+  background: #151519;
+  color: var(--axiom-muted);
+  font-family: inherit;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.application.sheet.axiom.actor.protagonist .attribute-row input,
+.application.sheet.axiom.actor.npc .attribute-row input {
+  height: 28px;
+}
+.application.sheet.axiom.actor.protagonist .attribute-adv,
+.application.sheet.axiom.actor.npc .attribute-adv {
+  background: rgba(216, 198, 154, 0.05);
+}
+.application.sheet.axiom.actor.protagonist .attribute-adv > span,
+.application.sheet.axiom.actor.npc .attribute-adv > span {
+  color: var(--axiom-muted);
+}
+.application.sheet.axiom.actor.protagonist .attribute-total > span,
+.application.sheet.axiom.actor.npc .attribute-total > span {
+  color: var(--axiom-gold);
+  font-weight: bold;
+}
+.application.sheet.axiom.actor.protagonist .attribute-head,
+.application.sheet.axiom.actor.npc .attribute-head,
+.application.sheet.axiom.actor.protagonist .attribute-total,
+.application.sheet.axiom.actor.npc .attribute-total {
+  background: #151519;
+}
+.application.sheet.axiom.actor.protagonist .attribute-head strong,
+.application.sheet.axiom.actor.npc .attribute-head strong,
+.application.sheet.axiom.actor.protagonist .attribute-total strong,
+.application.sheet.axiom.actor.npc .attribute-total strong {
+  color: var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .stat-grid,
+.application.sheet.axiom.actor.npc .stat-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+.application.sheet.axiom.actor.protagonist .stat-card,
+.application.sheet.axiom.actor.npc .stat-card {
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+.application.sheet.axiom.actor.protagonist .stat-card label,
+.application.sheet.axiom.actor.npc .stat-card label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  color: var(--axiom-muted);
+  text-transform: uppercase;
+}
+.application.sheet.axiom.actor.protagonist .stat-card strong,
+.application.sheet.axiom.actor.npc .stat-card strong {
+  font-size: 22px;
+  font-family: "Roboto Mono", monospace;
+  color: var(--axiom-text);
+}
+.application.sheet.axiom.actor.protagonist .two-col,
+.application.sheet.axiom.actor.npc .two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.application.sheet.axiom.actor.protagonist .sub-title,
+.application.sheet.axiom.actor.npc .sub-title {
+  margin: 0 0 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+.application.sheet.axiom.actor.protagonist .sub-title.good,
+.application.sheet.axiom.actor.npc .sub-title.good {
+  color: var(--axiom-blue);
+}
+.application.sheet.axiom.actor.protagonist .sub-title.bad,
+.application.sheet.axiom.actor.npc .sub-title.bad {
+  color: var(--axiom-accent);
+}
+.application.sheet.axiom.actor.protagonist .list-pill,
+.application.sheet.axiom.actor.npc .list-pill {
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  padding: 5px 7px;
+  margin-bottom: 5px;
+  color: var(--axiom-text);
+}
+.application.sheet.axiom.actor.protagonist .momentum-line,
+.application.sheet.axiom.actor.npc .momentum-line {
+  display: grid;
+  grid-template-columns: 20px 1fr 20px;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--axiom-muted);
+}
+.application.sheet.axiom.actor.protagonist .momentum-line input[type="range"],
+.application.sheet.axiom.actor.npc .momentum-line input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #151519;
+  cursor: pointer;
+}
+.application.sheet.axiom.actor.protagonist .momentum-line input[type="range"]::-webkit-slider-runnable-track,
+.application.sheet.axiom.actor.npc .momentum-line input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+}
+.application.sheet.axiom.actor.protagonist .momentum-line input[type="range"]::-webkit-slider-thumb,
+.application.sheet.axiom.actor.npc .momentum-line input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  margin-top: -4.5px;
+  border: 0;
+  border-radius: 50%;
+  background: #ff2a2a;
+  box-shadow: 0 0 6px rgba(255, 42, 42, 0.75);
+}
+.application.sheet.axiom.actor.protagonist .momentum-line input[type="range"]::-moz-range-track,
+.application.sheet.axiom.actor.npc .momentum-line input[type="range"]::-moz-range-track {
+  height: 4px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(to right, #ff2a2a 0%, #ff2a2a 50%, #151519 50%, #151519 100%);
+}
+.application.sheet.axiom.actor.protagonist .momentum-line input[type="range"]::-moz-range-thumb,
+.application.sheet.axiom.actor.npc .momentum-line input[type="range"]::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border: 0;
+  border-radius: 50%;
+  background: #ff2a2a;
+  box-shadow: 0 0 6px rgba(255, 42, 42, 0.75);
+}
+/* ===== ACTOR SKILLS ===== */
+.application.sheet.axiom.actor.protagonist .skills-layout,
+.application.sheet.axiom.actor.npc .skills-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+.application.sheet.axiom.actor.protagonist .skill-column,
+.application.sheet.axiom.actor.npc .skill-column {
+  min-width: 0;
+}
+.application.sheet.axiom.actor.protagonist .skill-list,
+.application.sheet.axiom.actor.npc .skill-list {
+  display: grid;
+  gap: 0;
+}
+.application.sheet.axiom.actor.protagonist .attribute-check-presets,
+.application.sheet.axiom.actor.npc .attribute-check-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+}
+.application.sheet.axiom.actor.protagonist .attribute-check-preset,
+.application.sheet.axiom.actor.npc .attribute-check-preset {
+  min-height: 24px;
+  margin: 0;
+  padding: 2px 7px;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 999px;
+  color: var(--axiom-muted);
+  font-size: 10px;
+  line-height: 1;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.application.sheet.axiom.actor.protagonist .attribute-check-preset:hover,
+.application.sheet.axiom.actor.npc .attribute-check-preset:hover {
+  color: var(--axiom-gold);
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.3);
+}
+.application.sheet.axiom.actor.protagonist .skill-row,
+.application.sheet.axiom.actor.npc .skill-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px 42px 82px;
+  gap: 6px;
+  align-items: center;
+  min-height: 32px;
+  padding: 3px 2px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid var(--axiom-border);
+  border-radius: 0;
+}
+.application.sheet.axiom.actor.protagonist .skill-main,
+.application.sheet.axiom.actor.npc .skill-main {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.application.sheet.axiom.actor.protagonist .skill-name,
+.application.sheet.axiom.actor.npc .skill-name,
+.application.sheet.axiom.actor.protagonist .skill-attributes,
+.application.sheet.axiom.actor.npc .skill-attributes {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.application.sheet.axiom.actor.protagonist .skill-name,
+.application.sheet.axiom.actor.npc .skill-name {
+  min-width: 0;
+  color: var(--axiom-text);
+  font-size: 13px;
+}
+.application.sheet.axiom.actor.protagonist .skill-attributes,
+.application.sheet.axiom.actor.npc .skill-attributes {
+  flex: 0 1 auto;
+  margin-left: auto;
+  padding: 1px 5px;
+  color: var(--axiom-muted);
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 999px;
+  font-size: 10px;
+}
+.application.sheet.axiom.actor.protagonist .skill-level-input,
+.application.sheet.axiom.actor.npc .skill-level-input,
+.application.sheet.axiom.actor.protagonist .skill-level-static,
+.application.sheet.axiom.actor.npc .skill-level-static,
+.application.sheet.axiom.actor.protagonist .skill-total,
+.application.sheet.axiom.actor.npc .skill-total {
+  height: 26px;
+  text-align: center;
+  font-family: "Roboto Mono", monospace;
+  font-size: 13px;
+}
+.application.sheet.axiom.actor.protagonist .skill-level-input,
+.application.sheet.axiom.actor.npc .skill-level-input {
+  width: 100%;
+  padding: 0 3px;
+}
+.application.sheet.axiom.actor.protagonist .skill-level-static,
+.application.sheet.axiom.actor.npc .skill-level-static,
+.application.sheet.axiom.actor.protagonist .skill-total,
+.application.sheet.axiom.actor.npc .skill-total {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  background: #151519;
+}
+.application.sheet.axiom.actor.protagonist .skill-total,
+.application.sheet.axiom.actor.npc .skill-total {
+  color: var(--axiom-gold);
+  font-weight: 700;
+}
+.application.sheet.axiom.actor.protagonist .skill-actions,
+.application.sheet.axiom.actor.npc .skill-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.application.sheet.axiom.actor.protagonist .skill-action,
+.application.sheet.axiom.actor.npc .skill-action {
+  width: 24px;
+  height: 26px;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-gold);
+  cursor: pointer;
+}
+.application.sheet.axiom.actor.protagonist .skill-action:hover,
+.application.sheet.axiom.actor.npc .skill-action:hover {
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+.application.sheet.axiom.actor.protagonist .skill-delete,
+.application.sheet.axiom.actor.npc .skill-delete {
+  color: var(--axiom-muted);
+}
+.application.sheet.axiom.actor.protagonist .skill-delete:hover,
+.application.sheet.axiom.actor.npc .skill-delete:hover {
+  color: var(--axiom-accent);
+  border-color: var(--axiom-accent);
+  box-shadow: 0 0 5px rgba(199, 58, 50, 0.35);
+}
+.application.sheet.axiom.actor.protagonist .skill-roll,
+.application.sheet.axiom.actor.npc .skill-roll {
+  color: var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .attribute-check-row,
+.application.sheet.axiom.actor.npc .attribute-check-row {
+  grid-template-columns: minmax(0, 1fr) 48px 42px 82px;
+}
+.application.sheet.axiom.actor.protagonist .attribute-check-selects,
+.application.sheet.axiom.actor.npc .attribute-check-selects {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  min-width: 0;
+}
+.application.sheet.axiom.actor.protagonist .attribute-check-selects select,
+.application.sheet.axiom.actor.npc .attribute-check-selects select {
+  width: 100%;
+  height: 26px;
+  min-width: 0;
+  padding: 0 4px;
+  font-size: 12px;
+}
+.application.sheet.axiom.actor.protagonist .attribute-check-actions .skill-action,
+.application.sheet.axiom.actor.npc .attribute-check-actions .skill-action {
+  margin-left: auto;
+}
+.application.sheet.axiom.actor.protagonist .expertise-title,
+.application.sheet.axiom.actor.npc .expertise-title {
+  margin-top: 12px;
+}
+.application.sheet.axiom.actor.protagonist .empty-list,
+.application.sheet.axiom.actor.npc .empty-list {
+  padding: 10px;
+  color: var(--axiom-muted);
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  font-style: italic;
+}
+@media (max-width: 760px) {
+  .application.sheet.axiom.actor.protagonist .skills-layout,
+  .application.sheet.axiom.actor.npc .skills-layout {
+    grid-template-columns: 1fr;
+  }
+}
+/* ===== ACTOR EFFECTS ===== */
+.application.sheet.axiom.actor.protagonist .actor-effects-section,
+.application.sheet.axiom.actor.npc .actor-effects-section {
+  min-width: 0;
+}
+.application.sheet.axiom.actor.protagonist .status-strip,
+.application.sheet.axiom.actor.npc .status-strip {
+  padding: 8px;
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+  box-shadow: inset 0 -3px 0 var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .status-track,
+.application.sheet.axiom.actor.npc .status-track {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 5px;
+}
+.application.sheet.axiom.actor.protagonist .status-cell,
+.application.sheet.axiom.actor.npc .status-cell {
+  min-width: 0;
+  text-align: center;
+}
+.application.sheet.axiom.actor.protagonist .status-icon,
+.application.sheet.axiom.actor.npc .status-icon {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px 5px 0 0;
+  color: var(--axiom-muted);
+  font-size: 20px;
+}
+.application.sheet.axiom.actor.protagonist .status-icon img,
+.application.sheet.axiom.actor.npc .status-icon img {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  object-fit: contain;
+  opacity: 0.62;
+  filter: grayscale(1);
+}
+.application.sheet.axiom.actor.protagonist .status-cell.active .status-icon img,
+.application.sheet.axiom.actor.npc .status-cell.active .status-icon img {
+  opacity: 1;
+  filter: none;
+}
+.application.sheet.axiom.actor.protagonist .status-cell.active.damage .status-icon,
+.application.sheet.axiom.actor.npc .status-cell.active.damage .status-icon {
+  color: var(--axiom-accent);
+  border-color: rgba(199, 58, 50, 0.6);
+  box-shadow: inset 0 0 12px rgba(199, 58, 50, 0.15);
+}
+.application.sheet.axiom.actor.protagonist .status-cell.active.control .status-icon,
+.application.sheet.axiom.actor.npc .status-cell.active.control .status-icon {
+  color: var(--axiom-blue);
+  border-color: rgba(95, 183, 215, 0.55);
+  box-shadow: inset 0 0 12px rgba(95, 183, 215, 0.12);
+}
+.application.sheet.axiom.actor.protagonist .status-cell.active.position .status-icon,
+.application.sheet.axiom.actor.npc .status-cell.active.position .status-icon,
+.application.sheet.axiom.actor.protagonist .status-cell.active.other .status-icon,
+.application.sheet.axiom.actor.npc .status-cell.active.other .status-icon {
+  color: var(--axiom-gold);
+  border-color: rgba(216, 198, 154, 0.55);
+  box-shadow: inset 0 0 12px rgba(216, 198, 154, 0.12);
+}
+.application.sheet.axiom.actor.protagonist .status-stack,
+.application.sheet.axiom.actor.npc .status-stack {
+  height: 28px;
+  display: grid;
+  grid-template-columns: 22px 1fr 22px;
+  align-items: center;
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-top: 0;
+  border-radius: 0 0 5px 5px;
+}
+.application.sheet.axiom.actor.protagonist .status-stack button,
+.application.sheet.axiom.actor.npc .status-stack button {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--axiom-muted);
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1;
+}
+.application.sheet.axiom.actor.protagonist .status-stack button:hover,
+.application.sheet.axiom.actor.npc .status-stack button:hover {
+  color: var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .status-value,
+.application.sheet.axiom.actor.npc .status-value {
+  overflow: hidden;
+  color: var(--axiom-text);
+  font-family: "Roboto Mono", monospace;
+  font-size: 15px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.application.sheet.axiom.actor.protagonist .status-cell:not(.active) .status-value,
+.application.sheet.axiom.actor.npc .status-cell:not(.active) .status-value {
+  color: var(--axiom-muted);
+}
+.application.sheet.axiom.actor.protagonist .status-label,
+.application.sheet.axiom.actor.npc .status-label {
+  margin-top: 3px;
+  color: var(--axiom-muted);
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.application.sheet.axiom.actor.protagonist .effects-panel,
+.application.sheet.axiom.actor.npc .effects-panel {
+  overflow: hidden;
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+  box-shadow: inset 0 -3px 0 var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .effects-header,
+.application.sheet.axiom.actor.npc .effects-header,
+.application.sheet.axiom.actor.protagonist .effect-row,
+.application.sheet.axiom.actor.npc .effect-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 90px 90px 24px 58px;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--axiom-border);
+}
+.application.sheet.axiom.actor.protagonist .effects-header,
+.application.sheet.axiom.actor.npc .effects-header {
+  background: #151519;
+  color: var(--axiom-gold);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.application.sheet.axiom.actor.protagonist .effect-row,
+.application.sheet.axiom.actor.npc .effect-row {
+  background: var(--axiom-panel-2);
+}
+.application.sheet.axiom.actor.protagonist .effect-row:last-child,
+.application.sheet.axiom.actor.npc .effect-row:last-child {
+  border-bottom: 0;
+}
+.application.sheet.axiom.actor.protagonist .effect-toggle,
+.application.sheet.axiom.actor.npc .effect-toggle,
+.application.sheet.axiom.actor.protagonist .effect-toggle:hover,
+.application.sheet.axiom.actor.npc .effect-toggle:hover,
+.application.sheet.axiom.actor.protagonist .effect-toggle:focus,
+.application.sheet.axiom.actor.npc .effect-toggle:focus,
+.application.sheet.axiom.actor.protagonist .effect-toggle:focus-within,
+.application.sheet.axiom.actor.npc .effect-toggle:focus-within {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 0;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: 0;
+}
+.application.sheet.axiom.actor.protagonist .effect-toggle::before,
+.application.sheet.axiom.actor.npc .effect-toggle::before,
+.application.sheet.axiom.actor.protagonist .effect-toggle::after,
+.application.sheet.axiom.actor.npc .effect-toggle::after {
+  display: none !important;
+  content: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.application.sheet.axiom.actor.protagonist .effect-toggle input,
+.application.sheet.axiom.actor.npc .effect-toggle input {
+  margin: 0;
+  cursor: pointer;
+}
+.application.sheet.axiom.actor.protagonist .effect-icon,
+.application.sheet.axiom.actor.npc .effect-icon {
+  width: 26px;
+  height: 26px;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  object-fit: cover;
+}
+.application.sheet.axiom.actor.protagonist .effect-name,
+.application.sheet.axiom.actor.npc .effect-name {
+  min-width: 0;
+}
+.application.sheet.axiom.actor.protagonist .effect-name strong,
+.application.sheet.axiom.actor.npc .effect-name strong,
+.application.sheet.axiom.actor.protagonist .effect-name small,
+.application.sheet.axiom.actor.npc .effect-name small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.application.sheet.axiom.actor.protagonist .effect-name strong,
+.application.sheet.axiom.actor.npc .effect-name strong {
+  color: var(--axiom-text);
+  font-size: 13px;
+}
+.application.sheet.axiom.actor.protagonist .effect-name small,
+.application.sheet.axiom.actor.npc .effect-name small,
+.application.sheet.axiom.actor.protagonist .effect-source,
+.application.sheet.axiom.actor.npc .effect-source,
+.application.sheet.axiom.actor.protagonist .effect-duration,
+.application.sheet.axiom.actor.npc .effect-duration {
+  color: var(--axiom-muted);
+  font-size: 11px;
+}
+.application.sheet.axiom.actor.protagonist .effect-source,
+.application.sheet.axiom.actor.npc .effect-source,
+.application.sheet.axiom.actor.protagonist .effect-duration,
+.application.sheet.axiom.actor.npc .effect-duration {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.application.sheet.axiom.actor.protagonist .effect-actions,
+.application.sheet.axiom.actor.npc .effect-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.application.sheet.axiom.actor.protagonist .effect-actions button,
+.application.sheet.axiom.actor.npc .effect-actions button {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--axiom-muted);
+  cursor: pointer;
+}
+.application.sheet.axiom.actor.protagonist .effect-actions button:hover,
+.application.sheet.axiom.actor.npc .effect-actions button:hover {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .effect-row.inactive,
+.application.sheet.axiom.actor.npc .effect-row.inactive {
+  opacity: 0.68;
+}
+.application.sheet.axiom.actor.protagonist .conditional-effects-panel,
+.application.sheet.axiom.actor.npc .conditional-effects-panel {
+  box-shadow: inset 0 -3px 0 var(--axiom-blue);
+}
+.application.sheet.axiom.actor.protagonist .effect-row.conditional .effect-name small,
+.application.sheet.axiom.actor.npc .effect-row.conditional .effect-name small {
+  color: var(--axiom-blue);
+}
+.application.sheet.axiom.actor.protagonist .disabled-effects-panel,
+.application.sheet.axiom.actor.npc .disabled-effects-panel {
+  box-shadow: inset 0 -3px 0 rgba(167, 161, 152, 0.55);
+}
+.application.sheet.axiom.actor.protagonist .disabled-effects-panel .effects-header,
+.application.sheet.axiom.actor.npc .disabled-effects-panel .effects-header {
+  color: var(--axiom-muted);
+}
+.application.sheet.axiom.actor.protagonist .effects-panel .empty-list,
+.application.sheet.axiom.actor.npc .effects-panel .empty-list {
+  border: 0;
+  border-radius: 0;
+  background: var(--axiom-panel-2);
+}
+@media (max-width: 760px) {
+  .application.sheet.axiom.actor.protagonist .status-track,
+  .application.sheet.axiom.actor.npc .status-track {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+/* ===== ACTOR COMBAT ===== */
+.application.sheet.axiom.actor.protagonist .combat-tab,
+.application.sheet.axiom.actor.npc .combat-tab {
+  display: grid;
+  gap: 10px;
+}
+.application.sheet.axiom.actor.protagonist .combat-armor-summary,
+.application.sheet.axiom.actor.npc .combat-armor-summary {
+  padding: 8px 12px;
+  background: linear-gradient(90deg, rgba(216, 198, 154, 0.1), var(--axiom-panel-2));
+  border: 1px solid var(--axiom-border);
+  border-right: 3px solid var(--axiom-gold);
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+.application.sheet.axiom.actor.protagonist .armor-line,
+.application.sheet.axiom.actor.npc .armor-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--axiom-muted);
+  font-size: 12px;
+}
+.application.sheet.axiom.actor.protagonist .armor-label,
+.application.sheet.axiom.actor.npc .armor-label {
+  color: var(--axiom-gold);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-right: 2px;
+}
+.application.sheet.axiom.actor.protagonist .armor-label i,
+.application.sheet.axiom.actor.npc .armor-label i {
+  margin-right: 5px;
+}
+.application.sheet.axiom.actor.protagonist .armor-value,
+.application.sheet.axiom.actor.npc .armor-value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 2px 7px;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.application.sheet.axiom.actor.protagonist .armor-value span,
+.application.sheet.axiom.actor.npc .armor-value span {
+  color: var(--axiom-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.application.sheet.axiom.actor.protagonist .armor-value strong,
+.application.sheet.axiom.actor.npc .armor-value strong {
+  color: var(--axiom-text);
+  font-family: "Roboto Mono", monospace;
+  font-size: 14px;
+  text-shadow: 0 0 6px rgba(216, 198, 154, 0.35);
+}
+.application.sheet.axiom.actor.protagonist .combat-gear-section,
+.application.sheet.axiom.actor.npc .combat-gear-section {
+  min-width: 0;
+}
+.application.sheet.axiom.actor.protagonist .combat-gear-list,
+.application.sheet.axiom.actor.npc .combat-gear-list {
+  display: grid;
+  gap: 0;
+}
+.application.sheet.axiom.actor.protagonist .combat-item-row,
+.application.sheet.axiom.actor.npc .combat-item-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) max-content;
+  gap: 2px;
+  align-items: center;
+  min-height: 32px;
+  padding: 3px 2px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid var(--axiom-border);
+  border-radius: 0;
+}
+.application.sheet.axiom.actor.protagonist .combat-item-img,
+.application.sheet.axiom.actor.npc .combat-item-img {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  background: #151519;
+}
+.application.sheet.axiom.actor.protagonist .combat-item-line,
+.application.sheet.axiom.actor.npc .combat-item-line {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.application.sheet.axiom.actor.protagonist .combat-item-line span:not(.skill-name),
+.application.sheet.axiom.actor.npc .combat-item-line span:not(.skill-name) {
+  flex: 0 0 auto;
+  padding: 1px 5px;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+.application.sheet.axiom.actor.protagonist .combat-item-line em,
+.application.sheet.axiom.actor.npc .combat-item-line em {
+  color: var(--axiom-gold);
+  font-style: normal;
+}
+.application.sheet.axiom.actor.protagonist .combat-item-line .quantity-control,
+.application.sheet.axiom.actor.npc .combat-item-line .quantity-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 16px;
+  margin: -1px -2px -1px 2px;
+  padding: 0 4px;
+  background: rgba(216, 198, 154, 0.12);
+  border: 1px solid rgba(216, 198, 154, 0.45);
+  border-radius: 3px;
+  color: var(--axiom-gold);
+  cursor: pointer;
+  font: inherit;
+  line-height: 1;
+}
+.application.sheet.axiom.actor.protagonist .combat-item-line .quantity-control:hover,
+.application.sheet.axiom.actor.npc .combat-item-line .quantity-control:hover {
+  background: rgba(216, 198, 154, 0.22);
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+.application.sheet.axiom.actor.protagonist .combat-item-line-ranged,
+.application.sheet.axiom.actor.npc .combat-item-line-ranged {
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.application.sheet.axiom.actor.protagonist .combat-item-actions,
+.application.sheet.axiom.actor.npc .combat-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.application.sheet.axiom.actor.protagonist .combat-state-select,
+.application.sheet.axiom.actor.npc .combat-state-select {
+  width: 82px;
+  height: 26px;
+  margin: 0;
+  padding: 0 4px;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-muted);
+  cursor: pointer;
+  font-size: 11px;
+}
+.application.sheet.axiom.actor.protagonist .combat-state-select:hover,
+.application.sheet.axiom.actor.npc .combat-state-select:hover {
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+.application.sheet.axiom.actor.protagonist .combat-state-select option,
+.application.sheet.axiom.actor.npc .combat-state-select option {
+  color: var(--axiom-text);
+  background: #151519;
+}
+.application.sheet.axiom.actor.protagonist .combat-item-actions button,
+.application.sheet.axiom.actor.npc .combat-item-actions button {
+  width: 24px;
+  height: 26px;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-gold);
+  cursor: pointer;
+}
+.application.sheet.axiom.actor.protagonist .combat-item-actions button:hover,
+.application.sheet.axiom.actor.npc .combat-item-actions button:hover {
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+.application.sheet.axiom.actor.protagonist .combat-item-actions button[data-action="deleteCombatItem"],
+.application.sheet.axiom.actor.npc .combat-item-actions button[data-action="deleteCombatItem"] {
+  color: var(--axiom-muted);
+}
+.application.sheet.axiom.actor.protagonist .combat-item-actions button[data-action="deleteCombatItem"]:hover,
+.application.sheet.axiom.actor.npc .combat-item-actions button[data-action="deleteCombatItem"]:hover {
+  color: var(--axiom-accent);
+  border-color: var(--axiom-accent);
+  box-shadow: 0 0 5px rgba(199, 58, 50, 0.35);
+}
+@media (max-width: 720px) {
+  .application.sheet.axiom.actor.protagonist .armor-line,
+  .application.sheet.axiom.actor.npc .armor-line {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .application.sheet.axiom.actor.protagonist .armor-label,
+  .application.sheet.axiom.actor.npc .armor-label {
+    width: 100%;
+  }
+  .application.sheet.axiom.actor.protagonist .combat-item-row,
+  .application.sheet.axiom.actor.npc .combat-item-row {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+  .application.sheet.axiom.actor.protagonist .combat-item-actions,
+  .application.sheet.axiom.actor.npc .combat-item-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}
+/* ===== ACTOR EQUIPMENT ===== */
+.application.sheet.axiom.actor.protagonist .equipment-tab,
+.application.sheet.axiom.actor.npc .equipment-tab {
+  display: grid;
+  gap: 10px;
+}
+.application.sheet.axiom.actor.protagonist .equipment-summary-grid,
+.application.sheet.axiom.actor.npc .equipment-summary-grid {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.4fr) minmax(130px, 1fr) repeat(3, minmax(82px, 0.7fr));
+  gap: 6px;
+}
+.application.sheet.axiom.actor.protagonist .equipment-summary-card,
+.application.sheet.axiom.actor.npc .equipment-summary-card {
+  min-width: 0;
+  min-height: 58px;
+  padding: 7px 9px;
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  background: linear-gradient(180deg, var(--axiom-panel), var(--axiom-panel-2));
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  box-shadow: inset 0 -2px 0 rgba(216, 198, 154, 0.45);
+}
+.application.sheet.axiom.actor.protagonist .equipment-summary-card .summary-label,
+.application.sheet.axiom.actor.npc .equipment-summary-card .summary-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--axiom-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.application.sheet.axiom.actor.protagonist .equipment-summary-card strong,
+.application.sheet.axiom.actor.npc .equipment-summary-card strong {
+  color: var(--axiom-text);
+  font-family: "Roboto Mono", monospace;
+  font-size: 18px;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(216, 198, 154, 0.28);
+}
+.application.sheet.axiom.actor.protagonist .equipment-summary-card .summary-unit,
+.application.sheet.axiom.actor.npc .equipment-summary-card .summary-unit {
+  color: var(--axiom-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+.application.sheet.axiom.actor.protagonist .equipment-summary-card.compact,
+.application.sheet.axiom.actor.npc .equipment-summary-card.compact {
+  text-align: center;
+}
+.application.sheet.axiom.actor.protagonist .equipment-summary-card.compact .summary-label,
+.application.sheet.axiom.actor.npc .equipment-summary-card.compact .summary-label {
+  justify-content: center;
+}
+.application.sheet.axiom.actor.protagonist .equipment-summary-card.muted,
+.application.sheet.axiom.actor.npc .equipment-summary-card.muted {
+  box-shadow: inset 0 -2px 0 rgba(170, 170, 170, 0.25);
+}
+.application.sheet.axiom.actor.protagonist .equipment-currency-card input,
+.application.sheet.axiom.actor.npc .equipment-currency-card input {
+  width: 100%;
+  height: 25px;
+  margin: 0;
+  padding: 2px 6px;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-text);
+  font-family: "Roboto Mono", monospace;
+  font-size: 15px;
+}
+.application.sheet.axiom.actor.protagonist .equipment-item-row,
+.application.sheet.axiom.actor.npc .equipment-item-row {
+  grid-template-columns: 28px minmax(0, 1fr) max-content;
+}
+.application.sheet.axiom.actor.protagonist .equipment-item-line,
+.application.sheet.axiom.actor.npc .equipment-item-line {
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.application.sheet.axiom.actor.protagonist .combat-item-actions button[data-action="deleteEquipmentItem"],
+.application.sheet.axiom.actor.npc .combat-item-actions button[data-action="deleteEquipmentItem"] {
+  color: var(--axiom-muted);
+}
+.application.sheet.axiom.actor.protagonist .combat-item-actions button[data-action="deleteEquipmentItem"]:hover,
+.application.sheet.axiom.actor.npc .combat-item-actions button[data-action="deleteEquipmentItem"]:hover {
+  color: var(--axiom-accent);
+  border-color: var(--axiom-accent);
+  box-shadow: 0 0 5px rgba(199, 58, 50, 0.35);
+}
+@media (max-width: 760px) {
+  .application.sheet.axiom.actor.protagonist .equipment-summary-grid,
+  .application.sheet.axiom.actor.npc .equipment-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 720px) {
+  .application.sheet.axiom.actor.protagonist .equipment-item-row,
+  .application.sheet.axiom.actor.npc .equipment-item-row {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+}
+/* ----------------------------------------- */
+/*  Traits on Main Tab                       */
+/* ----------------------------------------- */
+.application.sheet.axiom.actor.protagonist .trait-column-grid,
+.application.sheet.axiom.actor.npc .trait-column-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-items: start;
+}
+.application.sheet.axiom.actor.protagonist .trait-list-section,
+.application.sheet.axiom.actor.npc .trait-list-section {
+  min-width: 0;
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+  background: var(--axiom-panel);
+  padding: 8px;
+}
+.application.sheet.axiom.actor.protagonist .trait-list,
+.application.sheet.axiom.actor.npc .trait-list {
+  display: grid;
+  gap: 0;
+}
+.application.sheet.axiom.actor.protagonist .trait-row,
+.application.sheet.axiom.actor.npc .trait-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 3px 2px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid var(--axiom-border);
+  border-radius: 0;
+}
+.application.sheet.axiom.actor.protagonist .trait-img,
+.application.sheet.axiom.actor.npc .trait-img {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  background: #151519;
+}
+.application.sheet.axiom.actor.protagonist .trait-name,
+.application.sheet.axiom.actor.npc .trait-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--axiom-text);
+  font-size: 13px;
+}
+.application.sheet.axiom.actor.protagonist .trait-actions,
+.application.sheet.axiom.actor.npc .trait-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.application.sheet.axiom.actor.protagonist .trait-actions button,
+.application.sheet.axiom.actor.npc .trait-actions button {
+  width: 24px;
+  height: 26px;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-gold);
+  cursor: pointer;
+}
+.application.sheet.axiom.actor.protagonist .trait-actions button:hover,
+.application.sheet.axiom.actor.npc .trait-actions button:hover {
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+.application.sheet.axiom.actor.protagonist .trait-actions button[data-action="deleteTrait"],
+.application.sheet.axiom.actor.npc .trait-actions button[data-action="deleteTrait"] {
+  color: var(--axiom-muted);
+}
+.application.sheet.axiom.actor.protagonist .trait-actions button[data-action="deleteTrait"]:hover,
+.application.sheet.axiom.actor.npc .trait-actions button[data-action="deleteTrait"]:hover {
+  color: var(--axiom-accent);
+  border-color: var(--axiom-accent);
+  box-shadow: 0 0 5px rgba(199, 58, 50, 0.35);
+}
+@media (max-width: 720px) {
+  .application.sheet.axiom.actor.protagonist .trait-column-grid,
+  .application.sheet.axiom.actor.npc .trait-column-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* ----------------------------------------- */
+/*  Character Details Tab                    */
+/* ----------------------------------------- */
+.application.sheet.axiom.actor.protagonist .details-tab,
+.application.sheet.axiom.actor.npc .details-tab {
+  display: grid;
+  gap: 10px;
+}
+.application.sheet.axiom.actor.protagonist .details-summary-grid,
+.application.sheet.axiom.actor.npc .details-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.application.sheet.axiom.actor.protagonist .details-summary-card,
+.application.sheet.axiom.actor.npc .details-summary-card {
+  min-width: 0;
+  min-height: 58px;
+  padding: 7px 9px;
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  background: linear-gradient(180deg, var(--axiom-panel), var(--axiom-panel-2));
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  box-shadow: inset 0 -2px 0 rgba(216, 198, 154, 0.45);
+}
+.application.sheet.axiom.actor.protagonist .details-summary-card .summary-label,
+.application.sheet.axiom.actor.npc .details-summary-card .summary-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--axiom-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.application.sheet.axiom.actor.protagonist .details-summary-card input,
+.application.sheet.axiom.actor.npc .details-summary-card input {
+  width: 100%;
+  height: 26px;
+  margin: 0;
+  padding: 2px 6px;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-text);
+  font-family: "Roboto Mono", monospace;
+  font-size: 16px;
+  font-weight: 700;
+}
+.application.sheet.axiom.actor.protagonist .details-panel,
+.application.sheet.axiom.actor.npc .details-panel {
+  min-width: 0;
+  padding: 8px;
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+}
+.application.sheet.axiom.actor.protagonist .details-field-grid,
+.application.sheet.axiom.actor.npc .details-field-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.application.sheet.axiom.actor.protagonist .details-field,
+.application.sheet.axiom.actor.npc .details-field {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+.application.sheet.axiom.actor.protagonist .details-field.wide,
+.application.sheet.axiom.actor.npc .details-field.wide {
+  grid-column: span 3;
+}
+.application.sheet.axiom.actor.protagonist .details-field span,
+.application.sheet.axiom.actor.npc .details-field span {
+  color: var(--axiom-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.application.sheet.axiom.actor.protagonist .details-field input,
+.application.sheet.axiom.actor.npc .details-field input {
+  width: 100%;
+  height: 28px;
+  margin: 0;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-text);
+}
+.application.sheet.axiom.actor.protagonist .biography-area,
+.application.sheet.axiom.actor.npc .biography-area,
+.application.sheet.axiom.actor.protagonist .notes-area,
+.application.sheet.axiom.actor.npc .notes-area {
+  width: 100%;
+  min-height: 240px;
+  resize: vertical;
+  background: #151519;
+  line-height: 1.45;
+}
+.application.sheet.axiom.actor.protagonist .notes-area,
+.application.sheet.axiom.actor.npc .notes-area {
+  min-height: 140px;
+}
+@media (max-width: 760px) {
+  .application.sheet.axiom.actor.protagonist .details-summary-grid,
+  .application.sheet.axiom.actor.npc .details-summary-grid,
+  .application.sheet.axiom.actor.protagonist .details-field-grid,
+  .application.sheet.axiom.actor.npc .details-field-grid {
+    grid-template-columns: 1fr;
+  }
+  .application.sheet.axiom.actor.protagonist .details-field.wide,
+  .application.sheet.axiom.actor.npc .details-field.wide {
+    grid-column: auto;
+  }
+}
+/* ----------------------------------------- */
+/*  Inline Item Descriptions                 */
+/* ----------------------------------------- */
+.application.sheet.axiom.actor.protagonist .item-description-inline,
+.application.sheet.axiom.actor.npc .item-description-inline {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  padding: 8px 9px;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  color: var(--axiom-text);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.application.sheet.axiom.actor.protagonist .item-description-inline p,
+.application.sheet.axiom.actor.npc .item-description-inline p {
+  margin: 0 0 0.5em;
+}
+.application.sheet.axiom.actor.protagonist .item-description-inline p:last-child,
+.application.sheet.axiom.actor.npc .item-description-inline p:last-child {
+  margin-bottom: 0;
+}
+.application.sheet.axiom.actor.protagonist .trait-row,
+.application.sheet.axiom.actor.npc .trait-row {
+  grid-template-columns: minmax(0, 1fr) max-content;
+}
+.application.sheet.axiom.actor.protagonist .trait-description,
+.application.sheet.axiom.actor.npc .trait-description {
+  grid-column: 1 / -1;
+}
+/* ===== ACTOR CURRENCY MODES ===== */
+.application.sheet.axiom.actor.protagonist .equipment-currency-card .standard-currency-input,
+.application.sheet.axiom.actor.npc .equipment-currency-card .standard-currency-input {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+}
+.application.sheet.axiom.actor.protagonist .equipment-currency-card .standard-currency-input > span,
+.application.sheet.axiom.actor.npc .equipment-currency-card .standard-currency-input > span {
+  color: var(--axiom-gold);
+  font-family: "Roboto Mono", monospace;
+  font-weight: 800;
+}
+.application.sheet.axiom.actor.protagonist .equipment-currency-card .coin-input-grid,
+.application.sheet.axiom.actor.npc .equipment-currency-card .coin-input-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+.application.sheet.axiom.actor.protagonist .equipment-currency-card .coin-input-grid span,
+.application.sheet.axiom.actor.npc .equipment-currency-card .coin-input-grid span {
+  display: grid;
+  gap: 2px;
+}
+.application.sheet.axiom.actor.protagonist .equipment-currency-card .coin-input-grid em,
+.application.sheet.axiom.actor.npc .equipment-currency-card .coin-input-grid em {
+  color: var(--axiom-muted);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.application.sheet.axiom.actor.protagonist .equipment-currency-card .coin-input-grid input,
+.application.sheet.axiom.actor.npc .equipment-currency-card .coin-input-grid input {
+  height: 23px;
+  font-size: 13px;
+}
+.application.sheet.axiom.actor.protagonist input[type="checkbox"],
+.application.sheet.axiom.actor.npc input[type="checkbox"] {
+  background: none;
+  border: none;
+}
+.application.sheet.axiom.actor.protagonist .effect-toggle input[type="checkbox"]:not(:checked),
+.application.sheet.axiom.actor.npc .effect-toggle input[type="checkbox"]:not(:checked) {
+  color: #151519;
+}
+/* ----------------------------------------- */
+/*  NPC Sheet                                */
+/* ----------------------------------------- */
+.application.sheet.axiom.actor.npc .npc-sheet-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 30px;
+  gap: 6px;
+  align-items: center;
+}
+.application.sheet.axiom.actor.npc .npc-config-button {
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  color: var(--axiom-muted);
+  cursor: pointer;
+}
+.application.sheet.axiom.actor.npc .npc-config-button:hover {
+  color: var(--axiom-gold);
+  border-color: var(--axiom-gold);
+}
+.application.sheet.axiom.actor.npc .npc-config-panel {
+  margin-bottom: 10px;
+  padding: 8px;
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+}
+.application.sheet.axiom.actor.npc .npc-config-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+.application.sheet.axiom.actor.npc .npc-config-grid label {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.application.sheet.axiom.actor.npc .npc-config-grid span {
+  color: var(--axiom-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.application.sheet.axiom.actor.npc .npc-config-grid input {
+  height: 25px;
+  text-align: center;
+  font-family: "Roboto Mono", monospace;
+}
+.application.sheet.axiom.actor.npc .npc-identity-row {
+  grid-template-columns: 96px minmax(0, 1fr) 136px;
+  gap: 8px;
+  justify-content: stretch;
+}
+.application.sheet.axiom.actor.npc .portrait {
+  width: 96px;
+}
+.application.sheet.axiom.actor.npc .wounds-panel {
+  min-width: 0;
+}
+.application.sheet.axiom.actor.npc .wound-grid {
+  gap: 5px;
+}
+.application.sheet.axiom.actor.npc .wound-col-content {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(3, 24px);
+  grid-auto-columns: 24px;
+  align-content: center;
+  justify-content: start;
+  gap: 4px;
+}
+.application.sheet.axiom.actor.npc .wound-slot {
+  margin-bottom: 0;
+}
+.application.sheet.axiom.actor.npc .trackers {
+  min-width: 0;
+}
+.application.sheet.axiom.actor.npc .tracker {
+  min-height: 67px;
+}
+.application.sheet.axiom.actor.npc .npc-main-top-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 224px;
+  gap: 10px;
+  align-items: start;
+}
+.application.sheet.axiom.actor.npc .npc-attribute-table .attribute-row {
+  grid-template-columns: 44px repeat(8, minmax(32px, 1fr));
+}
+.application.sheet.axiom.actor.npc .npc-attribute-table .attribute-row > span,
+.application.sheet.axiom.actor.npc .npc-attribute-table .attribute-row > strong,
+.application.sheet.axiom.actor.npc .npc-attribute-table .attribute-row > input {
+  min-height: 26px;
+  padding: 3px 2px;
+  font-size: 11px;
+}
+.application.sheet.axiom.actor.npc .npc-stat-grid {
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.application.sheet.axiom.actor.npc .npc-stat-grid .stat-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: center;
+  min-height: 35px;
+  padding: 3px 6px;
+  text-align: left;
+}
+.application.sheet.axiom.actor.npc .npc-stat-grid .stat-card label {
+  margin: 0;
+  font-size: 9px;
+}
+.application.sheet.axiom.actor.npc .npc-stat-grid .stat-card strong {
+  font-size: 14px;
+}
+.application.sheet.axiom.actor.npc .npc-main-lower-grid,
+.application.sheet.axiom.actor.npc .npc-two-column-grid,
+.application.sheet.axiom.actor.npc .npc-skills-split-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+.application.sheet.axiom.actor.npc .npc-main-lower-grid {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+}
+.application.sheet.axiom.actor.npc .skill-subtitle {
+  margin: 0 0 5px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--axiom-border);
+  color: var(--axiom-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.application.sheet.axiom.actor.npc .skill-row {
+  grid-template-columns: minmax(0, 1fr) 42px 38px 28px;
+}
+.application.sheet.axiom.actor.npc .attribute-check-row {
+  grid-template-columns: minmax(0, 1fr) 42px 28px;
+}
+.application.sheet.axiom.actor.npc .skill-attributes {
+  display: none;
+}
+.application.sheet.axiom.actor.npc .skill-action,
+.application.sheet.axiom.actor.npc .combat-item-actions button,
+.application.sheet.axiom.actor.npc .trait-actions button {
+  width: 24px;
+}
+.application.sheet.axiom.actor.npc .combat-tab {
+  display: grid;
+  gap: 10px;
+}
+.application.sheet.axiom.actor.npc .npc-currency-top {
+  padding: 8px;
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+}
+.application.sheet.axiom.actor.npc .npc-coin-input-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.application.sheet.axiom.actor.npc .npc-coin-input-grid span {
+  display: grid;
+  gap: 3px;
+}
+.application.sheet.axiom.actor.npc .npc-coin-input-grid em {
+  color: var(--axiom-muted);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.application.sheet.axiom.actor.npc .npc-coin-input-grid input,
+.application.sheet.axiom.actor.npc .npc-currency-section .standard-currency-input input {
+  height: 24px;
+  text-align: center;
+  font-family: "Roboto Mono", monospace;
+}
+.application.sheet.axiom.actor.npc .npc-currency-section .standard-currency-input {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+}
+.application.sheet.axiom.actor.npc .npc-currency-section .standard-currency-input > span {
+  color: var(--axiom-gold);
+  font-family: "Roboto Mono", monospace;
+  font-weight: 800;
+}
+.application.sheet.axiom.actor.npc .npc-equipment-wide {
+  min-width: 0;
+}
+.application.sheet.axiom.actor.npc .npc-notes-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.application.sheet.axiom.actor.npc .npc-traits-section {
+  padding: 8px;
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+}
+.application.sheet.axiom.actor.npc .npc-traits-section .trait-row {
+  grid-template-columns: minmax(0, 1fr) max-content;
+}
+.application.sheet.axiom.actor.npc .npc-traits-section .trait-name small {
+  margin-left: 5px;
+  color: var(--axiom-muted);
+  font-size: 10px;
+}
+.application.sheet.axiom.actor.npc .item-description-inline {
+  grid-column: 1 / -1;
+}
+.application.sheet.axiom.actor.npc .status-track {
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+}
+@media (max-width: 760px) {
+  .application.sheet.axiom.actor.npc .npc-config-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .application.sheet.axiom.actor.npc .npc-identity-row,
+  .application.sheet.axiom.actor.npc .npc-main-top-grid,
+  .application.sheet.axiom.actor.npc .npc-main-lower-grid,
+  .application.sheet.axiom.actor.npc .npc-two-column-grid,
+  .application.sheet.axiom.actor.npc .npc-skills-split-grid,
+  .application.sheet.axiom.actor.npc .npc-notes-grid {
+    grid-template-columns: 1fr;
+  }
+  .application.sheet.axiom.actor.npc .portrait {
+    width: 100%;
+    max-height: 180px;
+    aspect-ratio: 16 / 9;
+  }
+  .application.sheet.axiom.actor.npc .status-track {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+/* ===== AXIOM EFFECT BUILDER ===== */
+.application.dialog.axiom.effect-builder-dialog .axiom-effect-builder,
+.axiom.effect-builder-dialog .axiom-effect-builder {
+  display: grid;
+  gap: 10px;
+}
+.application.dialog.axiom.effect-builder-dialog .effect-builder-grid,
+.axiom.effect-builder-dialog .effect-builder-grid {
+  display: grid;
+  gap: 8px;
+}
+.application.dialog.axiom.effect-builder-dialog .effect-builder-grid.two-columns,
+.axiom.effect-builder-dialog .effect-builder-grid.two-columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.application.dialog.axiom.effect-builder-dialog .form-group,
+.axiom.effect-builder-dialog .form-group {
+  display: grid;
+  gap: 4px;
+}
+.application.dialog.axiom.effect-builder-dialog label,
+.axiom.effect-builder-dialog label,
+.application.dialog.axiom.effect-builder-dialog .effect-key-preview span,
+.axiom.effect-builder-dialog .effect-key-preview span {
+  color: var(--axiom-gold);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.application.dialog.axiom.effect-builder-dialog input,
+.axiom.effect-builder-dialog input,
+.application.dialog.axiom.effect-builder-dialog select,
+.axiom.effect-builder-dialog select {
+  width: 100%;
+  min-height: 28px;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-text);
+}
+.application.dialog.axiom.effect-builder-dialog .effect-builder-checkboxes,
+.axiom.effect-builder-dialog .effect-builder-checkboxes {
+  display: grid;
+  gap: 6px;
+}
+.application.dialog.axiom.effect-builder-dialog .effect-builder-checkbox,
+.axiom.effect-builder-dialog .effect-builder-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--axiom-muted);
+  font-size: 12px;
+}
+.application.dialog.axiom.effect-builder-dialog .effect-builder-checkbox input,
+.axiom.effect-builder-dialog .effect-builder-checkbox input {
+  width: auto;
+  min-height: 0;
+}
+.application.dialog.axiom.effect-builder-dialog .effect-builder-hint,
+.axiom.effect-builder-dialog .effect-builder-hint {
+  margin: -4px 0 0;
+  color: var(--axiom-muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+.application.dialog.axiom.effect-builder-dialog .effect-key-preview,
+.axiom.effect-builder-dialog .effect-key-preview {
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+}
+.application.dialog.axiom.effect-builder-dialog .effect-key-preview code,
+.axiom.effect-builder-dialog .effect-key-preview code {
+  overflow: hidden;
+  color: var(--axiom-muted);
+  font-family: "Roboto Mono", monospace;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* ===== ACTIVE EFFECT CONFIG PATCH ===== */
+.axiom-conditional-effect-field .checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.axiom-conditional-effect-field .hint {
+  margin: 0.25rem 0 0;
+  color: var(--axiom-muted, #a7a198);
+  font-size: 11px;
+  line-height: 1.35;
+}
+/* ----------------------------------------- */
+/*  Rich Text Editors                        */
+/* ----------------------------------------- */
+.application.sheet.axiom.actor.protagonist .editor-section,
+.application.sheet.axiom.actor.npc .editor-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.application.sheet.axiom.actor.protagonist .editor-section .form-group,
+.application.sheet.axiom.actor.npc .editor-section .form-group,
+.application.sheet.axiom.actor.protagonist .editor-section .form-fields,
+.application.sheet.axiom.actor.npc .editor-section .form-fields {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+}
+.application.sheet.axiom.actor.protagonist .editor-section .editor,
+.application.sheet.axiom.actor.npc .editor-section .editor,
+.application.sheet.axiom.actor.protagonist .editor-section prose-mirror,
+.application.sheet.axiom.actor.npc .editor-section prose-mirror,
+.application.sheet.axiom.actor.protagonist .editor-section .prosemirror,
+.application.sheet.axiom.actor.npc .editor-section .prosemirror,
+.application.sheet.axiom.actor.protagonist .editor-section .editor-content,
+.application.sheet.axiom.actor.npc .editor-section .editor-content {
+  width: 100%;
+  min-height: 240px;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-text);
+  line-height: 1.45;
+}
+.application.sheet.axiom.actor.protagonist .notes-panel .editor,
+.application.sheet.axiom.actor.npc .notes-panel .editor,
+.application.sheet.axiom.actor.protagonist .notes-panel prose-mirror,
+.application.sheet.axiom.actor.npc .notes-panel prose-mirror,
+.application.sheet.axiom.actor.protagonist .notes-panel .prosemirror,
+.application.sheet.axiom.actor.npc .notes-panel .prosemirror,
+.application.sheet.axiom.actor.protagonist .notes-panel .editor-content,
+.application.sheet.axiom.actor.npc .notes-panel .editor-content {
+  min-height: 140px;
+}
+.application.sheet.axiom.actor.protagonist .editor-section .editor-content,
+.application.sheet.axiom.actor.npc .editor-section .editor-content {
+  padding: 8px;
+  overflow: auto;
+}
+.application.sheet.axiom.actor.protagonist .editor-section .editor-menu,
+.application.sheet.axiom.actor.npc .editor-section .editor-menu,
+.application.sheet.axiom.actor.protagonist .editor-section menu,
+.application.sheet.axiom.actor.npc .editor-section menu {
+  border-color: var(--axiom-border);
+  background: var(--axiom-panel);
+  color: var(--axiom-text);
+}
+.application.sheet.axiom.actor.protagonist .editor-section button,
+.application.sheet.axiom.actor.npc .editor-section button,
+.application.sheet.axiom.actor.protagonist .editor-section .editor-edit,
+.application.sheet.axiom.actor.npc .editor-section .editor-edit {
+  color: var(--axiom-text);
+}
+/* ----------------------------------------- */
+/*  Axiom//Core Item Sheets                  */
+/* ----------------------------------------- */
+.axiom.item-sheet,
+.axiom-item-sheet {
+  --item-bg: #1a1a1c;
+  --item-panel: #232326;
+  --item-panel-dark: #171719;
+  --item-line: #333338;
+  --item-line-soft: #2a2a2f;
+  --item-text: #eaeaea;
+  --item-muted: #aaa;
+  --item-red: #ff2a2a;
+  --item-blue: #4cc9f0;
+  --item-bone: #e0d4b8;
+  --item-shadow-red: rgba(255, 42, 42, 0.35);
+  --item-shadow-bone: rgba(224, 212, 184, 0.25);
+  --item-radius: 8px;
+  color: var(--item-text);
+  background: linear-gradient(180deg, #1d1d20 0%, var(--item-bg) 100%);
+  border: 1px solid var(--item-line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.axiom.item-sheet input,
+.axiom-item-sheet input,
+.axiom.item-sheet select,
+.axiom-item-sheet select,
+.axiom.item-sheet textarea,
+.axiom-item-sheet textarea {
+  color: var(--item-text);
+  font: inherit;
+}
+.axiom.item-sheet input,
+.axiom-item-sheet input,
+.axiom.item-sheet select,
+.axiom-item-sheet select,
+.axiom.item-sheet textarea,
+.axiom-item-sheet textarea {
+  border: 1px solid var(--item-line);
+  border-radius: 5px;
+  background: var(--item-panel-dark);
+  outline: none;
+}
+.axiom.item-sheet input:focus,
+.axiom-item-sheet input:focus,
+.axiom.item-sheet select:focus,
+.axiom-item-sheet select:focus,
+.axiom.item-sheet textarea:focus,
+.axiom-item-sheet textarea:focus {
+  border-color: var(--item-bone);
+  box-shadow: 0 0 0 1px var(--item-shadow-bone);
+}
+.axiom.item-sheet select,
+.axiom-item-sheet select {
+  min-height: 28px;
+  padding: 3px 6px;
+}
+.axiom.item-sheet textarea,
+.axiom-item-sheet textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: 8px;
+  resize: vertical;
+}
+/* ----------------------------------------- */
+/*  Header                                   */
+/* ----------------------------------------- */
+.axiom.item-sheet .item-header,
+.axiom-item-sheet .item-header {
+  display: grid;
+  grid-template-columns: 82px 1fr;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 2px solid var(--item-red);
+  background: linear-gradient(90deg, rgba(255, 42, 42, 0.08), transparent 55%);
+}
+.axiom.item-sheet .item-image,
+.axiom-item-sheet .item-image {
+  width: 82px;
+  height: 82px;
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  object-fit: cover;
+  cursor: pointer;
+  box-shadow: inset -3px 0 0 var(--item-bone);
+}
+.axiom.item-sheet .item-header-main,
+.axiom-item-sheet .item-header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.axiom.item-sheet .item-name,
+.axiom-item-sheet .item-name {
+  width: 100%;
+  height: 34px;
+  border: 0;
+  border-bottom: 1px solid var(--item-line);
+  border-radius: 0;
+  background: transparent;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 0 14px var(--item-shadow-red);
+}
+.axiom.item-sheet .item-header-fields,
+.axiom-item-sheet .item-header-fields {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.axiom.item-sheet .item-header-fields.fantasy-currency-grid,
+.axiom-item-sheet .item-header-fields.fantasy-currency-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: start;
+}
+.axiom.item-sheet .item-field,
+.axiom-item-sheet .item-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.axiom.item-sheet .item-field label,
+.axiom-item-sheet .item-field label {
+  color: var(--item-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.axiom.item-sheet .item-field input,
+.axiom.item-sheet .item-field select,
+.axiom-item-sheet .item-field input,
+.axiom-item-sheet .item-field select {
+  width: 100%;
+  height: 28px;
+  padding: 2px 6px;
+}
+/* Skill sheets only need image + name */
+.axiom.item-sheet.skill .item-header,
+.axiom-item-sheet.skill .item-header,
+.axiom.item-sheet[data-item-type="skill"] .item-header,
+.axiom-item-sheet[data-item-type="skill"] .item-header {
+  grid-template-columns: 72px 1fr;
+}
+.axiom.item-sheet.skill .item-image,
+.axiom-item-sheet.skill .item-image,
+.axiom.item-sheet[data-item-type="skill"] .item-image,
+.axiom-item-sheet[data-item-type="skill"] .item-image {
+  width: 72px;
+  height: 72px;
+}
+.axiom.item-sheet.skill .item-header-fields,
+.axiom-item-sheet.skill .item-header-fields,
+.axiom.item-sheet[data-item-type="skill"] .item-header-fields,
+.axiom-item-sheet[data-item-type="skill"] .item-header-fields {
+  display: none;
+}
+/* ----------------------------------------- */
+/*  Tabs                                     */
+/* ----------------------------------------- */
+.axiom.item-sheet .sheet-tabs,
+.axiom-item-sheet .sheet-tabs,
+.axiom.item-sheet .tabs,
+.axiom-item-sheet .tabs {
+  display: flex;
+  justify-content: flex-start;
+  gap: 3px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--item-line);
+  overflow-x: auto;
+}
+.axiom.item-sheet .sheet-tabs .item,
+.axiom-item-sheet .sheet-tabs .item,
+.axiom.item-sheet .tabs .item,
+.axiom-item-sheet .tabs .item,
+.axiom.item-sheet .tab-button,
+.axiom-item-sheet .tab-button {
+  flex: 0 0 auto;
+  padding: 8px 12px 6px;
+  border: 1px solid var(--item-line);
+  border-bottom: 0;
+  border-radius: 7px 7px 0 0;
+  background: var(--item-bg);
+  color: var(--item-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.axiom.item-sheet .sheet-tabs .item.active,
+.axiom-item-sheet .sheet-tabs .item.active,
+.axiom.item-sheet .tabs .item.active,
+.axiom-item-sheet .tabs .item.active,
+.axiom.item-sheet .tab-button.active,
+.axiom-item-sheet .tab-button.active {
+  background: var(--item-panel);
+  color: var(--item-bone);
+  box-shadow: inset 0 -2px 0 var(--item-bone), 0 0 12px var(--item-shadow-bone);
+}
+/* ----------------------------------------- */
+/*  Body                                     */
+/* ----------------------------------------- */
+.axiom.item-sheet .sheet-body,
+.axiom-item-sheet .sheet-body,
+.axiom.item-sheet .item-body,
+.axiom-item-sheet .item-body {
+  padding: 12px 14px 14px;
+}
+.axiom.item-sheet .tab,
+.axiom-item-sheet .tab {
+  display: none;
+}
+.axiom.item-sheet .tab.active,
+.axiom-item-sheet .tab.active {
+  display: block;
+}
+.axiom.item-sheet .section-title,
+.axiom-item-sheet .section-title {
+  margin: 0 0 9px;
+  padding: 7px 10px 5px;
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  box-shadow: inset -3px 0 0 var(--item-bone);
+  color: var(--item-bone);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.axiom.item-sheet .details-grid,
+.axiom-item-sheet .details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.axiom.item-sheet .detail-card,
+.axiom-item-sheet .detail-card {
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  padding: 9px;
+  box-shadow: inset -3px 0 0 var(--item-bone);
+}
+.axiom.item-sheet .detail-card.full,
+.axiom-item-sheet .detail-card.full {
+  grid-column: 1 / -1;
+}
+.axiom.item-sheet .detail-card label,
+.axiom-item-sheet .detail-card label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--item-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.axiom.item-sheet .detail-card input,
+.axiom.item-sheet .detail-card select,
+.axiom-item-sheet .detail-card input,
+.axiom-item-sheet .detail-card select {
+  width: 100%;
+  height: 30px;
+  padding: 3px 7px;
+}
+/* ----------------------------------------- */
+/*  Skill Sheet                              */
+/* ----------------------------------------- */
+.axiom.item-sheet .skill-category-toggle,
+.axiom-item-sheet .skill-category-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--item-line);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--item-panel-dark);
+}
+.axiom.item-sheet .skill-category-toggle label,
+.axiom-item-sheet .skill-category-toggle label {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 32px;
+  margin: 0;
+  color: var(--item-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.axiom.item-sheet .skill-category-toggle label + label,
+.axiom-item-sheet .skill-category-toggle label + label {
+  border-left: 1px solid var(--item-line);
+}
+.axiom.item-sheet .skill-category-toggle input,
+.axiom-item-sheet .skill-category-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.axiom.item-sheet .skill-category-toggle label:has(input:checked),
+.axiom-item-sheet .skill-category-toggle label:has(input:checked) {
+  background: var(--item-panel);
+  color: var(--item-bone);
+  box-shadow: inset 0 -2px 0 var(--item-bone), 0 0 10px var(--item-shadow-bone);
+}
+.axiom.item-sheet .linked-attributes,
+.axiom-item-sheet .linked-attributes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+/* Fallback if :has is not supported in a Foundry Chromium build */
+.axiom.item-sheet .skill-category-toggle .active,
+.axiom-item-sheet .skill-category-toggle .active {
+  background: var(--item-panel);
+  color: var(--item-bone);
+  box-shadow: inset 0 -2px 0 var(--item-bone), 0 0 10px var(--item-shadow-bone);
+}
+/* ----------------------------------------- */
+/*  Armor Sheet                              */
+/* ----------------------------------------- */
+.axiom.item-sheet .armor-location-grid,
+.axiom-item-sheet .armor-location-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.axiom.item-sheet .armor-location-card,
+.axiom-item-sheet .armor-location-card {
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  padding: 8px;
+  text-align: center;
+  box-shadow: inset 0 -3px 0 var(--item-bone);
+}
+.axiom.item-sheet .armor-location-card label,
+.axiom-item-sheet .armor-location-card label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--item-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.axiom.item-sheet .armor-location-card input,
+.axiom-item-sheet .armor-location-card input {
+  width: 100%;
+  height: 38px;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--item-text);
+  text-shadow: 0 0 8px var(--item-shadow-bone);
+}
+/* ----------------------------------------- */
+/*  Weapon Sheet                             */
+/* ----------------------------------------- */
+.axiom.item-sheet .weapon-range-bands,
+.axiom-item-sheet .weapon-range-bands {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.axiom.item-sheet .range-band,
+.axiom-item-sheet .range-band {
+  border: 1px solid var(--item-line);
+  border-radius: 6px;
+  background: var(--item-panel-dark);
+  padding: 6px;
+  text-align: center;
+}
+.axiom.item-sheet .range-band .label,
+.axiom-item-sheet .range-band .label {
+  display: block;
+  color: var(--item-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.axiom.item-sheet .range-band .value,
+.axiom-item-sheet .range-band .value {
+  display: block;
+  margin-top: 2px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--item-bone);
+}
+/* ----------------------------------------- */
+/*  Effects Tab                              */
+/* ----------------------------------------- */
+.axiom.item-sheet .effects-list,
+.axiom-item-sheet .effects-list {
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  padding: 8px;
+}
+.axiom.item-sheet .empty-list,
+.axiom-item-sheet .empty-list {
+  padding: 28px 10px;
+  color: var(--item-muted);
+  text-align: center;
+  font-size: 12px;
+}
+/* ----------------------------------------- */
+/*  Responsive                               */
+/* ----------------------------------------- */
+@media (max-width: 620px) {
+  .axiom.item-sheet .item-header,
+  .axiom-item-sheet .item-header {
+    grid-template-columns: 64px 1fr;
+  }
+  .axiom.item-sheet .item-image,
+  .axiom-item-sheet .item-image {
+    width: 64px;
+    height: 64px;
+  }
+  .axiom.item-sheet .item-header-fields,
+  .axiom-item-sheet .item-header-fields,
+  .axiom.item-sheet .details-grid,
+  .axiom-item-sheet .details-grid,
+  .axiom.item-sheet .armor-location-grid,
+  .axiom-item-sheet .armor-location-grid,
+  .axiom.item-sheet .weapon-range-bands,
+  .axiom-item-sheet .weapon-range-bands {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+/* ----------------------------------------- */
+/*  Current Item Template Compatibility       */
+/* ----------------------------------------- */
+.axiom.item-sheet .form-grid,
+.axiom-item-sheet .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.axiom.item-sheet .form-grid.compact,
+.axiom-item-sheet .form-grid.compact {
+  gap: 8px;
+}
+.axiom.item-sheet .field-group,
+.axiom-item-sheet .field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.axiom.item-sheet .field-group > span,
+.axiom-item-sheet .field-group > span {
+  color: var(--item-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.axiom.item-sheet .field-group input,
+.axiom.item-sheet .field-group select,
+.axiom-item-sheet .field-group input,
+.axiom-item-sheet .field-group select {
+  width: 100%;
+  min-height: 30px;
+  padding: 3px 7px;
+}
+.axiom.item-sheet .skill-category-field,
+.axiom-item-sheet .skill-category-field,
+.axiom.item-sheet .ranged-weapon-block,
+.axiom-item-sheet .ranged-weapon-block {
+  margin-top: 12px;
+}
+.axiom.item-sheet .segmented-control,
+.axiom-item-sheet .segmented-control {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--item-line);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--item-panel-dark);
+}
+.axiom.item-sheet .segmented-control input,
+.axiom-item-sheet .segmented-control input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.axiom.item-sheet .segmented-control label,
+.axiom-item-sheet .segmented-control label {
+  display: grid;
+  place-items: center;
+  min-height: 32px;
+  color: var(--item-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.axiom.item-sheet .segmented-control label + input + label,
+.axiom-item-sheet .segmented-control label + input + label {
+  border-left: 1px solid var(--item-line);
+}
+.axiom.item-sheet .segmented-control input:checked + label,
+.axiom-item-sheet .segmented-control input:checked + label {
+  background: var(--item-panel);
+  color: var(--item-bone);
+  box-shadow: inset 0 -2px 0 var(--item-bone), 0 0 10px var(--item-shadow-bone);
+}
+.axiom.item-sheet .armor-value-grid,
+.axiom-item-sheet .armor-value-grid,
+.axiom.item-sheet .range-band-grid,
+.axiom-item-sheet .range-band-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.axiom.item-sheet .armor-value-card,
+.axiom-item-sheet .armor-value-card,
+.axiom.item-sheet .range-band-card,
+.axiom-item-sheet .range-band-card {
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  padding: 8px;
+  text-align: center;
+  box-shadow: inset 0 -3px 0 var(--item-bone);
+}
+.axiom.item-sheet .armor-value-card span,
+.axiom-item-sheet .armor-value-card span,
+.axiom.item-sheet .range-band-card span,
+.axiom-item-sheet .range-band-card span {
+  display: block;
+  color: var(--item-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.axiom.item-sheet .armor-value-card input,
+.axiom-item-sheet .armor-value-card input {
+  width: 100%;
+  height: 38px;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--item-text);
+  text-shadow: 0 0 8px var(--item-shadow-bone);
+}
+.axiom.item-sheet .range-band-grid,
+.axiom-item-sheet .range-band-grid {
+  margin-top: 10px;
+}
+.axiom.item-sheet .range-band-card strong,
+.axiom-item-sheet .range-band-card strong {
+  display: block;
+  margin-top: 4px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  color: var(--item-bone);
+}
+.axiom.item-sheet .range-band-card small,
+.axiom-item-sheet .range-band-card small {
+  display: block;
+  margin-top: 2px;
+  color: var(--item-blue);
+  font-size: 10px;
+  font-weight: 800;
+}
+.axiom.item-sheet .sheet-list,
+.axiom-item-sheet .sheet-list {
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  padding: 8px;
+}
+.axiom.item-sheet .list-header,
+.axiom-item-sheet .list-header,
+.axiom.item-sheet .list-row,
+.axiom-item-sheet .list-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+.axiom.item-sheet .list-header,
+.axiom-item-sheet .list-header {
+  color: var(--item-bone);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.axiom.item-sheet .list-row,
+.axiom-item-sheet .list-row {
+  grid-template-columns: 28px 1fr auto;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--item-line-soft);
+}
+.axiom.item-sheet .list-row img,
+.axiom-item-sheet .list-row img {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--item-line);
+  border-radius: 4px;
+  object-fit: cover;
+}
+.axiom.item-sheet .row-controls,
+.axiom-item-sheet .row-controls {
+  display: flex;
+  gap: 6px;
+}
+.axiom.item-sheet .empty-row,
+.axiom-item-sheet .empty-row {
+  padding: 18px 10px;
+  color: var(--item-muted);
+  text-align: center;
+  font-size: 12px;
+}
+.application.sheet.axiom.item.item-sheet .window-content {
+  padding: 0;
+  background: var(--item-bg, #1a1a1c);
+}
+/* ----------------------------------------- */
+/*  Equipment Sheet                          */
+/* ----------------------------------------- */
+.axiom.item-sheet .equipment-roll-note,
+.axiom-item-sheet .equipment-roll-note {
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  border: 1px solid var(--item-line-soft);
+  border-radius: var(--item-radius);
+  background: var(--item-panel-dark);
+  color: var(--item-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+/* ----------------------------------------- */
+/*  Trait Sheet                              */
+/* ----------------------------------------- */
+.axiom.item-sheet .detail-card > span,
+.axiom-item-sheet .detail-card > span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--item-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+/* ----------------------------------------- */
+/*  Currency Fields                          */
+/* ----------------------------------------- */
+.axiom.item-sheet .item-price-field,
+.axiom-item-sheet .item-price-field {
+  min-width: 0;
+}
+.axiom.item-sheet .item-price-field.fantasy-price-field,
+.axiom-item-sheet .item-price-field.fantasy-price-field {
+  grid-column: span 2;
+}
+.axiom.item-sheet .fantasy-currency-grid .item-field,
+.axiom-item-sheet .fantasy-currency-grid .item-field {
+  min-width: 0;
+}
+.axiom.item-sheet .fantasy-currency-grid .item-field input,
+.axiom-item-sheet .fantasy-currency-grid .item-field input {
+  min-width: 0;
+}
+.axiom.item-sheet .standard-currency-input,
+.axiom-item-sheet .standard-currency-input {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 4px;
+}
+.axiom.item-sheet .standard-currency-input > span,
+.axiom-item-sheet .standard-currency-input > span {
+  color: var(--item-bone);
+  font-family: "Roboto Mono", monospace;
+  font-weight: 800;
+}
+.axiom.item-sheet .coin-input-grid,
+.axiom-item-sheet .coin-input-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+.axiom.item-sheet .coin-input-grid label,
+.axiom-item-sheet .coin-input-grid label {
+  display: grid;
+  gap: 2px;
+}
+.axiom.item-sheet .coin-input-grid label > span,
+.axiom-item-sheet .coin-input-grid label > span {
+  color: var(--item-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.axiom.item-sheet .coin-input-grid input,
+.axiom-item-sheet .coin-input-grid input {
+  min-width: 0;
+  padding-inline: 5px;
+}
+@media (max-width: 500px) {
+  .axiom.item-sheet .item-header-fields.fantasy-currency-grid,
+  .axiom-item-sheet .item-header-fields.fantasy-currency-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .axiom.item-sheet .item-price-field.fantasy-price-field,
+  .axiom-item-sheet .item-price-field.fantasy-price-field {
+    grid-column: 1 / -1;
+  }
+}
+/* ----------------------------------------- */
+/*  Rich Text Editors                        */
+/* ----------------------------------------- */
+.axiom.item-sheet .editor-section,
+.axiom-item-sheet .editor-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.axiom.item-sheet .editor-section .form-group,
+.axiom-item-sheet .editor-section .form-group,
+.axiom.item-sheet .editor-section .form-fields,
+.axiom-item-sheet .editor-section .form-fields {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+}
+.axiom.item-sheet .editor-section .editor,
+.axiom-item-sheet .editor-section .editor,
+.axiom.item-sheet .editor-section prose-mirror,
+.axiom-item-sheet .editor-section prose-mirror,
+.axiom.item-sheet .editor-section .prosemirror,
+.axiom-item-sheet .editor-section .prosemirror,
+.axiom.item-sheet .editor-section .editor-content,
+.axiom-item-sheet .editor-section .editor-content {
+  width: 100%;
+  min-height: 220px;
+  background: var(--item-panel-dark);
+  border: 1px solid var(--item-line);
+  border-radius: 5px;
+  color: var(--item-text);
+  line-height: 1.45;
+}
+.axiom.item-sheet .editor-section .editor-content,
+.axiom-item-sheet .editor-section .editor-content {
+  padding: 8px;
+  overflow: auto;
+}
+.axiom.item-sheet .editor-section .editor-menu,
+.axiom-item-sheet .editor-section .editor-menu,
+.axiom.item-sheet .editor-section menu,
+.axiom-item-sheet .editor-section menu {
+  border-color: var(--item-line);
+  background: var(--item-panel);
+  color: var(--item-text);
+}
+.axiom.item-sheet .editor-section button,
+.axiom-item-sheet .editor-section button,
+.axiom.item-sheet .editor-section .editor-edit,
+.axiom-item-sheet .editor-section .editor-edit {
+  color: var(--item-text);
+}
+/* ===== ROLL WINDOW ===== */
+.application.axiom.roll-window-app {
+  --axiom-bg: #101012;
+  --axiom-panel: #1b1b1f;
+  --axiom-panel-2: #24242a;
+  --axiom-panel-3: #151519;
+  --axiom-border: #3a3a42;
+  --axiom-text: #e8e4dc;
+  --axiom-muted: #a7a198;
+  --axiom-accent: #c73a32;
+  --axiom-gold: #d8c69a;
+  --axiom-blue: #5fb7d7;
+  font-family: "Marcellus", serif;
+  color: var(--axiom-text);
+}
+.application.axiom.roll-window-app .window-content {
+  padding: 0;
+  background: radial-gradient(circle at top left, rgba(199, 58, 50, 0.12), transparent 24rem), var(--axiom-bg);
+}
+.application.axiom.roll-window-app select,
+.application.axiom.roll-window-app input {
+  width: 100%;
+  height: 30px;
+  min-width: 0;
+  background: #121216;
+  border: 1px solid var(--axiom-border);
+  color: var(--axiom-text);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-family: inherit;
+  font-size: 13px;
+}
+.application.axiom.roll-window-app select:focus,
+.application.axiom.roll-window-app input:focus {
+  outline: none;
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+.application.axiom.roll-window-app .axiom-roll-window {
+  background: radial-gradient(circle at top left, rgba(199, 58, 50, 0.12), transparent 24rem), var(--axiom-bg);
+}
+.application.axiom.roll-window-app .roll-body {
+  display: grid;
+  grid-template-columns: 235px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 12px;
+}
+.application.axiom.roll-window-app .column {
+  min-width: 0;
+}
+.application.axiom.roll-window-app .modifiers-column {
+  min-width: 0;
+}
+.application.axiom.roll-window-app .modifiers-heading {
+  margin-bottom: 7px;
+}
+.application.axiom.roll-window-app .section-title {
+  margin: 0 0 7px;
+  padding: 5px 8px;
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  color: var(--axiom-gold);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: inset -3px 0 0 var(--axiom-gold);
+}
+.application.axiom.roll-window-app .form-row {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.application.axiom.roll-window-app label,
+.application.axiom.roll-window-app .label {
+  color: var(--axiom-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.application.axiom.roll-window-app .summary-card {
+  margin-top: 10px;
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.application.axiom.roll-window-app .summary-line {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 8px;
+  border: 0;
+  border-bottom: 1px solid var(--axiom-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--axiom-text);
+  font-family: inherit;
+  text-align: left;
+}
+.application.axiom.roll-window-app .summary-line:last-child {
+  border-bottom: 0;
+}
+.application.axiom.roll-window-app .summary-line strong {
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 15px;
+  color: var(--axiom-text);
+}
+.application.axiom.roll-window-app .summary-line.total strong {
+  color: var(--axiom-gold);
+  font-size: 18px;
+}
+.application.axiom.roll-window-app .summary-line.pool-toggle {
+  cursor: pointer;
+  background: linear-gradient(90deg, rgba(216, 198, 154, 0.06), transparent);
+}
+.application.axiom.roll-window-app .summary-line.pool-toggle:hover .label {
+  color: var(--axiom-gold);
+}
+.application.axiom.roll-window-app .summary-line.pool-toggle .label::before {
+  content: "▸";
+  display: inline-block;
+  width: 14px;
+  color: var(--axiom-gold);
+}
+.application.axiom.roll-window-app .summary-line.pool-toggle[aria-expanded="true"] .label::before {
+  content: "▾";
+}
+.application.axiom.roll-window-app .pool-editor {
+  padding: 8px;
+  background: #151519;
+  border-bottom: 1px solid var(--axiom-border);
+}
+.application.axiom.roll-window-app .pool-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 46px;
+  gap: 6px;
+  align-items: end;
+}
+.application.axiom.roll-window-app .pool-field span {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--axiom-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.application.axiom.roll-window-app .pool-field select,
+.application.axiom.roll-window-app .pool-field input {
+  height: 26px;
+  padding: 0 5px;
+  font-size: 12px;
+}
+.application.axiom.roll-window-app .pool-field input {
+  text-align: center;
+  font-family: "Roboto Mono", Consolas, monospace;
+}
+.application.axiom.roll-window-app .pool-note {
+  margin: 6px 0 0;
+  color: var(--axiom-muted);
+  font-size: 10px;
+  line-height: 1.25;
+}
+.application.axiom.roll-window-app .ap-row {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+.application.axiom.roll-window-app .ap-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+.application.axiom.roll-window-app .ap-button {
+  height: 28px;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  background: var(--axiom-panel-2);
+  color: var(--axiom-text);
+  font-weight: 700;
+  font-family: "Roboto Mono", Consolas, monospace;
+}
+.application.axiom.roll-window-app .ap-button.active {
+  border-color: var(--axiom-accent);
+  box-shadow: 0 0 0 1px rgba(199, 58, 50, 0.7) inset, 0 0 6px rgba(199, 58, 50, 0.35);
+}
+.application.axiom.roll-window-app .modifier-panel {
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+  padding: 6px;
+  box-shadow: inset -3px 0 0 var(--axiom-gold);
+}
+.application.axiom.roll-window-app .mod-row {
+  display: grid;
+  grid-template-columns: 1fr 52px 24px;
+  gap: 5px;
+  align-items: center;
+  min-height: 27px;
+  padding: 3px 4px;
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+.application.axiom.roll-window-app .mod-row.header {
+  background: #151519;
+  color: var(--axiom-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  min-height: 21px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+.application.axiom.roll-window-app .mod-row .label {
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.application.axiom.roll-window-app .mod-row input {
+  height: 21px;
+  padding: 0 3px;
+  text-align: center;
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 12px;
+}
+.application.axiom.roll-window-app .mod-row.locked input {
+  color: var(--axiom-gold);
+  background: #151519;
+  opacity: 0.9;
+}
+.application.axiom.roll-window-app .mod-row.automatic .label {
+  color: var(--axiom-gold);
+}
+.application.axiom.roll-window-app .mod-row.conditional .label {
+  color: var(--axiom-blue);
+}
+.application.axiom.roll-window-app .conditional-effect-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+.application.axiom.roll-window-app .conditional-effect-toggle input {
+  width: auto;
+  height: auto;
+  margin: 0;
+  cursor: pointer;
+}
+.application.axiom.roll-window-app .icon-button {
+  width: 22px;
+  height: 21px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--axiom-border);
+  border-radius: 3px;
+  background: #151519;
+  color: var(--axiom-muted);
+  cursor: pointer;
+  line-height: 1;
+}
+.application.axiom.roll-window-app .icon-button:hover {
+  color: var(--axiom-accent);
+  border-color: var(--axiom-accent);
+}
+.application.axiom.roll-window-app .lock-button {
+  color: var(--axiom-gold);
+}
+.application.axiom.roll-window-app .lock-button:hover {
+  color: var(--axiom-blue);
+  border-color: var(--axiom-blue);
+  box-shadow: 0 0 5px rgba(95, 183, 215, 0.25);
+}
+.application.axiom.roll-window-app .add-mod {
+  width: 100%;
+  height: 25px;
+  border: 1px dashed rgba(216, 198, 154, 0.5);
+  border-radius: 5px;
+  background: #151519;
+  color: var(--axiom-gold);
+  font-family: inherit;
+  cursor: pointer;
+}
+.application.axiom.roll-window-app .footer {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 8px;
+  padding: 0 12px 12px;
+}
+.application.axiom.roll-window-app .roll-mode,
+.application.axiom.roll-window-app .roll-button {
+  height: 34px;
+}
+.application.axiom.roll-window-app .roll-button {
+  border: 1px solid var(--axiom-gold);
+  border-radius: 5px;
+  background: #151519;
+  color: var(--axiom-gold);
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.application.axiom.roll-window-app .roll-button:hover {
+  box-shadow: 0 0 8px rgba(216, 198, 154, 0.28);
+}
+/* ===== ROLL MODIFIER PROMPT ===== */
+.application.modifier-dialog .window-content {
+  padding: 8px 10px 10px;
+}
+.application.modifier-dialog .form-footer,
+.application.modifier-dialog .dialog-buttons {
+  margin-top: 8px;
+}
+.application.modifier-dialog button[data-action="ok"] {
+  min-height: 30px;
+}
+.modifier-prompt {
+  --axiom-panel: #1b1b1f;
+  --axiom-panel-2: #24242a;
+  --axiom-panel-3: #151519;
+  --axiom-border: #3a3a42;
+  --axiom-text: #e8e4dc;
+  --axiom-muted: #a7a198;
+  --axiom-accent: #c73a32;
+  --axiom-gold: #d8c69a;
+  color: var(--axiom-text);
+  font-family: "Marcellus", serif;
+}
+.modifier-prompt .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.modifier-prompt .form-group:last-child {
+  margin-bottom: 0;
+}
+.modifier-prompt label {
+  color: var(--axiom-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: left;
+}
+.modifier-prompt input {
+  height: 28px;
+  min-width: 0;
+  background: #121216;
+  border: 1px solid var(--axiom-border);
+  color: var(--axiom-text);
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-family: inherit;
+  font-size: 12px;
+}
+.modifier-prompt input:focus {
+  outline: none;
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+.modifier-prompt .modifier-value-group {
+  align-items: stretch;
+}
+.modifier-prompt .modifier-stepper {
+  display: grid;
+  grid-template-columns: 28px 1fr 28px;
+  gap: 5px;
+  align-items: center;
+}
+.modifier-prompt .modifier-stepper input {
+  text-align: center;
+  font-family: "Roboto Mono", Consolas, monospace;
+}
+.modifier-prompt .modifier-step {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  background: var(--axiom-panel-3);
+  color: var(--axiom-gold);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.modifier-prompt .modifier-step:hover {
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.25);
+}
+/* ===== PREDEFINED ROLL MODIFIERS ===== */
+.modifier-prompt .modifier-prompt-top {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 8px;
+  align-items: end;
+}
+.modifier-prompt .predefined-modifiers {
+  margin-top: 8px;
+}
+.modifier-prompt .predefined-modifiers > label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--axiom-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.modifier-prompt .predefined-modifier-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.modifier-prompt .predefined-modifier {
+  min-height: 24px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 5px;
+  align-items: center;
+  padding: 3px 5px;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  background: var(--axiom-panel-3);
+  color: var(--axiom-text);
+  font-family: inherit;
+  cursor: pointer;
+}
+.modifier-prompt .predefined-modifier span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--axiom-muted);
+  font-size: 10.5px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.modifier-prompt .predefined-modifier strong {
+  color: var(--axiom-gold);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 10.5px;
+}
+.modifier-prompt .predefined-modifier:hover {
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.22);
+}
+.timeframe-roll-button {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  background: var(--axiom-panel-2);
+  color: var(--axiom-text);
+  cursor: pointer;
+}
+.timeframe-roll-button:hover:not(:disabled) {
+  border-color: var(--axiom-gold);
+  color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.22);
+}
+.timeframe-roll-button.rolled {
+  border-color: rgba(95, 183, 215, 0.55);
+  color: var(--axiom-blue);
+}
+.timeframe-roll-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.timeframe-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  width: max-content;
+  min-width: 0;
+}
+.timeframe-control {
+  min-width: 0;
+}
+.application.axiom.roll-window-app .called-shot-button {
+  margin-top: 5px;
+}
+.called-shot-prompt .called-shot-summary {
+  grid-template-columns: 76px 1fr;
+}
+.called-shot-prompt .called-shot-value,
+.called-shot-prompt .called-shot-target {
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  background: #121216;
+  border: 1px solid var(--axiom-border);
+  color: var(--axiom-text);
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: 12px;
+}
+.called-shot-prompt .called-shot-value {
+  justify-content: center;
+  color: var(--axiom-gold);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-weight: 700;
+}
+.called-shot-prompt .called-shot-choice.active {
+  border-color: var(--axiom-accent);
+  box-shadow: 0 0 0 1px rgba(199, 58, 50, 0.65) inset, 0 0 5px rgba(199, 58, 50, 0.25);
+}
+.called-shot-prompt .called-shot-effect {
+  min-height: 34px;
+  margin: 6px 0 0;
+  padding: 6px 7px;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+/* General system UI styling that is not tied to a specific sheet. */
+.chat-message.message.axiom-initiative-message {
+  --axiom-bg: #101012;
+  --axiom-panel: #1b1b1f;
+  --axiom-panel-2: #24242a;
+  --axiom-border: #3a3a42;
+  --axiom-text: #e8e4dc;
+  --axiom-muted: #a7a198;
+  --axiom-accent: #c73a32;
+  --axiom-gold: #d8c69a;
+  overflow: hidden;
+  padding: 0;
+  background: radial-gradient(circle at top left, rgba(199, 58, 50, 0.12), transparent 16rem), var(--axiom-bg);
+  border: 1px solid #050506;
+  border-radius: 8px;
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(216, 198, 154, 0.06) inset;
+}
+.chat-message.message.axiom-initiative-message .message-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 8px;
+  align-items: center;
+  padding: 6px 8px 5px;
+  background: #0c0c10;
+  border-bottom: 1px solid var(--axiom-border);
+  color: var(--axiom-text);
+  line-height: 1.1;
+}
+.chat-message.message.axiom-initiative-message .message-sender {
+  overflow: hidden;
+  margin: 0;
+  color: var(--axiom-text);
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-message.message.axiom-initiative-message .message-metadata {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--axiom-muted);
+  font-size: 10px;
+}
+.chat-message.message.axiom-initiative-message .message-delete {
+  color: var(--axiom-muted);
+}
+.chat-message.message.axiom-initiative-message .message-delete:hover,
+.chat-message.message.axiom-initiative-message .message-delete:focus {
+  color: var(--axiom-accent);
+  text-shadow: none;
+}
+.chat-message.message.axiom-initiative-message .flavor-text {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  margin: 1px 0 0;
+  color: var(--axiom-gold);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.chat-message.message.axiom-initiative-message .message-content {
+  margin: 0;
+  padding: 6px 8px 8px;
+  background: transparent;
+}
+.chat-message.message.axiom-initiative-message .dice-roll {
+  margin: 0;
+}
+.chat-message.message.axiom-initiative-message .dice-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 58px;
+  gap: 6px;
+  align-items: stretch;
+}
+.chat-message.message.axiom-initiative-message .dice-formula,
+.chat-message.message.axiom-initiative-message .dice-total {
+  min-height: 30px;
+  margin: 0;
+  padding: 5px 7px;
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  box-shadow: none;
+  color: var(--axiom-text);
+  font-family: "Roboto Mono", Consolas, monospace;
+  line-height: 18px;
+  text-align: center;
+}
+.chat-message.message.axiom-initiative-message .dice-formula {
+  overflow: hidden;
+  color: var(--axiom-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-message.message.axiom-initiative-message .dice-total {
+  color: var(--axiom-gold);
+  font-size: 18px;
+  font-weight: 900;
+}
+.chat-message.message.axiom-initiative-message .dice-tooltip {
+  grid-column: 1 / -1;
+  margin-top: 0;
+  padding: 6px;
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  color: var(--axiom-text);
+}
+.chat-message.message.axiom-initiative-message .dice-tooltip .part-header {
+  min-height: unset;
+  margin: 0 0 4px;
+  padding: 0;
+  border: 0;
+  color: var(--axiom-muted);
+  font-size: 11px;
+}
+.chat-message.message.axiom-initiative-message .dice-tooltip .dice-rolls {
+  margin: 0;
+}
+.status-effects {
+  height: auto;
+}
+.axiom-currency-refresh-note {
+  display: block;
+  width: 100%;
+  margin: -4px 0 8px;
+  padding-left: 0;
+  flex-basis: 100%;
+  clear: both;
+}
+/* Combat tracker AP pips */
+#combat-tracker .combatant .axiom-combatant-ap,
+.combat-tracker .combatant .axiom-combatant-ap,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-ap,
+#combat-tracker .combatant-row .axiom-combatant-ap,
+.combat-tracker .combatant-row .axiom-combatant-ap,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-ap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 2px 0 0;
+  color: var(--axiom-muted, #a7a198);
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+}
+#combat-tracker .combatant .axiom-combatant-ap-label,
+.combat-tracker .combatant .axiom-combatant-ap-label,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-ap-label,
+#combat-tracker .combatant-row .axiom-combatant-ap-label,
+.combat-tracker .combatant-row .axiom-combatant-ap-label,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-ap-label {
+  color: var(--axiom-muted, #a7a198);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+#combat-tracker .combatant .axiom-combatant-ap-pips,
+.combat-tracker .combatant .axiom-combatant-ap-pips,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-ap-pips,
+#combat-tracker .combatant-row .axiom-combatant-ap-pips,
+.combat-tracker .combatant-row .axiom-combatant-ap-pips,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-ap-pips {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+#combat-tracker .combatant .axiom-combatant-ap-pip,
+.combat-tracker .combatant .axiom-combatant-ap-pip,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-ap-pip,
+#combat-tracker .combatant-row .axiom-combatant-ap-pip,
+.combat-tracker .combatant-row .axiom-combatant-ap-pip,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-ap-pip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 9px;
+  opacity: 0.25;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+#combat-tracker .combatant .axiom-combatant-ap-pip i,
+.combat-tracker .combatant .axiom-combatant-ap-pip i,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-ap-pip i,
+#combat-tracker .combatant-row .axiom-combatant-ap-pip i,
+.combat-tracker .combatant-row .axiom-combatant-ap-pip i,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-ap-pip i {
+  color: var(--axiom-accent, #c73a32);
+  font-size: 10px;
+  line-height: 1;
+  text-shadow: none;
+}
+#combat-tracker .combatant .axiom-combatant-ap-pip.active,
+.combat-tracker .combatant .axiom-combatant-ap-pip.active,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-ap-pip.active,
+#combat-tracker .combatant-row .axiom-combatant-ap-pip.active,
+.combat-tracker .combatant-row .axiom-combatant-ap-pip.active,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-ap-pip.active {
+  opacity: 1;
+}
+#combat-tracker .combatant .axiom-combatant-ap-pip.active i,
+.combat-tracker .combatant .axiom-combatant-ap-pip.active i,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-ap-pip.active i,
+#combat-tracker .combatant-row .axiom-combatant-ap-pip.active i,
+.combat-tracker .combatant-row .axiom-combatant-ap-pip.active i,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-ap-pip.active i {
+  text-shadow: 0 0 4px rgba(199, 58, 50, 0.45);
+}
+#combat-tracker .combatant .axiom-combatant-ap:hover .axiom-combatant-ap-pip.active,
+.combat-tracker .combatant .axiom-combatant-ap:hover .axiom-combatant-ap-pip.active,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-ap:hover .axiom-combatant-ap-pip.active,
+#combat-tracker .combatant-row .axiom-combatant-ap:hover .axiom-combatant-ap-pip.active,
+.combat-tracker .combatant-row .axiom-combatant-ap:hover .axiom-combatant-ap-pip.active,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-ap:hover .axiom-combatant-ap-pip.active,
+#combat-tracker .combatant .axiom-combatant-ap:focus .axiom-combatant-ap-pip.active,
+.combat-tracker .combatant .axiom-combatant-ap:focus .axiom-combatant-ap-pip.active,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-ap:focus .axiom-combatant-ap-pip.active,
+#combat-tracker .combatant-row .axiom-combatant-ap:focus .axiom-combatant-ap-pip.active,
+.combat-tracker .combatant-row .axiom-combatant-ap:focus .axiom-combatant-ap-pip.active,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-ap:focus .axiom-combatant-ap-pip.active {
+  transform: translateY(-1px);
+}
+/* Combat tracker initiative button */
+#combat-tracker .combatant .token-initiative .combatant-control.roll.axiom-roll-initiative,
+.combat-tracker .combatant .token-initiative .combatant-control.roll.axiom-roll-initiative,
+.sidebar-tab.combat-sidebar .combatant .token-initiative .combatant-control.roll.axiom-roll-initiative,
+#combat-tracker .combatant-row .token-initiative .combatant-control.roll.axiom-roll-initiative,
+.combat-tracker .combatant-row .token-initiative .combatant-control.roll.axiom-roll-initiative,
+.sidebar-tab.combat-sidebar .combatant-row .token-initiative .combatant-control.roll.axiom-roll-initiative {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 20px 20px;
+}
+/* Axiom combat tracker pass controls */
+#combat-tracker .axiom-combat-tracker-controls,
+.combat-tracker .axiom-combat-tracker-controls,
+.sidebar-tab.combat-sidebar .axiom-combat-tracker-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 6px;
+  margin: 0 0 6px;
+  background: rgba(16, 16, 18, 0.92);
+  border: 1px solid var(--axiom-border, #3a3a42);
+  border-radius: 6px;
+}
+#combat-tracker .axiom-combat-pass-label,
+.combat-tracker .axiom-combat-pass-label,
+.sidebar-tab.combat-sidebar .axiom-combat-pass-label {
+  grid-column: 1 / -1;
+  color: var(--axiom-muted, #a7a198);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+}
+#combat-tracker .axiom-combat-control,
+.combat-tracker .axiom-combat-control,
+.sidebar-tab.combat-sidebar .axiom-combat-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 28px;
+  padding: 4px 6px;
+  border: 1px solid var(--axiom-border, #3a3a42);
+  border-radius: 5px;
+  background: #17171b;
+  color: var(--axiom-muted, #a7a198);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+#combat-tracker .axiom-combat-control-primary,
+.combat-tracker .axiom-combat-control-primary,
+.sidebar-tab.combat-sidebar .axiom-combat-control-primary {
+  border-color: var(--axiom-accent, #c73a32);
+  color: var(--axiom-text, #e8e4dc);
+  box-shadow: inset 0 -2px 0 var(--axiom-accent, #c73a32);
+}
+#combat-tracker .axiom-combat-control-secondary,
+.combat-tracker .axiom-combat-control-secondary,
+.sidebar-tab.combat-sidebar .axiom-combat-control-secondary {
+  border-color: var(--axiom-border, #3a3a42);
+}
+#combat-tracker .axiom-combat-control:hover,
+.combat-tracker .axiom-combat-control:hover,
+.sidebar-tab.combat-sidebar .axiom-combat-control:hover,
+#combat-tracker .axiom-combat-control:focus,
+.combat-tracker .axiom-combat-control:focus,
+.sidebar-tab.combat-sidebar .axiom-combat-control:focus {
+  color: var(--axiom-gold, #d8c69a);
+  border-color: var(--axiom-gold, #d8c69a);
+}
+.axiom-combat-tracker-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 6px;
+  margin: 0 0 6px;
+  background: rgba(16, 16, 18, 0.92);
+  border: 1px solid var(--axiom-border, #3a3a42);
+  border-radius: 6px;
+}
+/* ----------------------------------------- */
+/*  General Foundry Interface Styling         */
+/* ----------------------------------------- */
+body.system-axiom #interface,
+body.system-axiom #hud {
+  --axiom-bg: #101012;
+  --axiom-panel: #1b1b1f;
+  --axiom-panel-2: #24242a;
+  --axiom-panel-3: #151519;
+  --axiom-border: #3a3a42;
+  --axiom-text: #e8e4dc;
+  --axiom-muted: #a7a198;
+  --axiom-accent: #c73a32;
+  --axiom-gold: #d8c69a;
+  --axiom-blue: #5fb7d7;
+  --axiom-shadow-red: rgba(199, 58, 50, 0.35);
+  --axiom-shadow-gold: rgba(216, 198, 154, 0.25);
+}
+body.system-axiom #interface {
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+}
+body.system-axiom #chat-notifications,
+body.system-axiom #scene-controls menu,
+body.system-axiom #players,
+body.system-axiom #scene-navigation,
+body.system-axiom #hotbar {
+  background: radial-gradient(circle at top left, rgba(199, 58, 50, 0.1), transparent 17rem), var(--axiom-bg);
+  border: 1px solid #050506;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(216, 198, 154, 0.06) inset;
+  color: var(--axiom-text);
+}
+body.system-axiom #sidebar {
+  border-radius: 0;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+body.system-axiom #sidebar-content {
+  background: var(--axiom-bg);
+  width: auto;
+  border: 1px solid var(--axiom-border);
+  border-left: 4px double var(--axiom-gold);
+}
+body.system-axiom #sidebar-tabs .ui-control,
+body.system-axiom #scene-controls .ui-control,
+body.system-axiom #hotbar .ui-control,
+body.system-axiom #chat-controls .ui-control,
+body.system-axiom .directory-header .inline-control,
+body.system-axiom .placeables-sidebar .inline-control,
+body.system-axiom .combat-sidebar .inline-control,
+body.system-axiom .combat-sidebar .combat-control {
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  background: var(--axiom-panel-3);
+  color: var(--axiom-muted);
+  box-shadow: none;
+}
+body.system-axiom #sidebar-tabs .ui-control:hover,
+body.system-axiom #sidebar-tabs .ui-control:focus,
+body.system-axiom #scene-controls .ui-control:hover,
+body.system-axiom #scene-controls .ui-control:focus,
+body.system-axiom #hotbar .ui-control:hover,
+body.system-axiom #hotbar .ui-control:focus,
+body.system-axiom #chat-controls .ui-control:hover,
+body.system-axiom #chat-controls .ui-control:focus,
+body.system-axiom .directory-header .inline-control:hover,
+body.system-axiom .directory-header .inline-control:focus,
+body.system-axiom .placeables-sidebar .inline-control:hover,
+body.system-axiom .placeables-sidebar .inline-control:focus,
+body.system-axiom .combat-sidebar .inline-control:hover,
+body.system-axiom .combat-sidebar .inline-control:focus,
+body.system-axiom .combat-sidebar .combat-control:hover,
+body.system-axiom .combat-sidebar .combat-control:focus {
+  color: var(--axiom-gold);
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.28);
+  text-shadow: none;
+}
+body.system-axiom #sidebar-tabs .ui-control.active,
+body.system-axiom #sidebar-tabs .ui-control[aria-pressed="true"],
+body.system-axiom #scene-controls .ui-control.active,
+body.system-axiom #scene-controls .ui-control[aria-pressed="true"],
+body.system-axiom #hotbar .ui-control.active,
+body.system-axiom #hotbar .ui-control[aria-pressed="true"],
+body.system-axiom #chat-controls .ui-control.active,
+body.system-axiom #chat-controls .ui-control[aria-pressed="true"] {
+  color: var(--axiom-gold);
+  border-color: var(--axiom-gold);
+  box-shadow: inset 0 -2px 0 var(--axiom-gold), 0 0 10px var(--axiom-shadow-gold);
+}
+body.system-axiom #scene-controls menu {
+  padding: 6px;
+  gap: 5px;
+}
+body.system-axiom #scene-navigation {
+  padding: 8px;
+}
+body.system-axiom #scene-navigation .scene {
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  box-shadow: inset -3px 0 0 var(--axiom-gold);
+  color: var(--axiom-text);
+}
+body.system-axiom #scene-navigation .scene-name {
+  color: var(--axiom-text);
+  font-weight: 700;
+}
+body.system-axiom #players {
+  padding: 8px;
+}
+body.system-axiom #players .player {
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  box-shadow: inset -3px 0 0 var(--player-color, var(--axiom-gold));
+  color: var(--axiom-text);
+}
+body.system-axiom #players .player-name {
+  color: var(--axiom-text);
+  font-weight: 700;
+}
+body.system-axiom #performance-stats {
+  gap: 5px;
+  margin-top: 6px;
+}
+body.system-axiom #performance-stats > div,
+body.system-axiom #players-expand {
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-muted);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 10px;
+  text-align: center;
+}
+body.system-axiom #performance-stats label {
+  color: var(--axiom-muted);
+}
+body.system-axiom #performance-stats span {
+  color: var(--axiom-text);
+}
+body.system-axiom #hotbar {
+  padding: 7px;
+}
+body.system-axiom #hotbar #action-bar {
+  gap: 4px;
+}
+body.system-axiom #hotbar .slot {
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  box-shadow: inset -3px 0 0 rgba(216, 198, 154, 0.26);
+}
+body.system-axiom #hotbar .slot:hover,
+body.system-axiom #hotbar .slot:focus {
+  border-color: var(--axiom-gold);
+  box-shadow: inset -3px 0 0 var(--axiom-gold), 0 0 6px var(--axiom-shadow-gold);
+}
+body.system-axiom #hotbar .slot .key {
+  color: var(--axiom-muted);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 10px;
+}
+body.system-axiom #hotbar-page-controls,
+body.system-axiom #hotbar .hotbar-controls {
+  gap: 5px;
+}
+body.system-axiom #hotbar-page-controls .hotbar-page-number {
+  color: var(--axiom-gold);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+body.system-axiom .directory-header,
+body.system-axiom .combat-tracker-header,
+body.system-axiom .placeables-sidebar > nav.tabs,
+body.system-axiom .settings-sidebar .info {
+  background: #0c0c10;
+  border-bottom: 1px solid var(--axiom-border);
+  color: var(--axiom-text);
+}
+body.system-axiom .directory-header .header-actions button,
+body.system-axiom .directory-footer button,
+body.system-axiom .settings-sidebar button,
+body.system-axiom .settings-sidebar a.button,
+body.system-axiom .dsn-sidebar-tab button,
+body.system-axiom .placeables-sidebar button,
+body.system-axiom .combat-sidebar .combat-control-lg {
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  background: var(--axiom-panel-3);
+  color: var(--axiom-muted);
+  font-family: Marcellus, Georgia, serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  box-shadow: none;
+}
+body.system-axiom .directory-header .header-actions button:hover,
+body.system-axiom .directory-header .header-actions button:focus,
+body.system-axiom .directory-footer button:hover,
+body.system-axiom .directory-footer button:focus,
+body.system-axiom .settings-sidebar button:hover,
+body.system-axiom .settings-sidebar button:focus,
+body.system-axiom .settings-sidebar a.button:hover,
+body.system-axiom .settings-sidebar a.button:focus,
+body.system-axiom .dsn-sidebar-tab button:hover,
+body.system-axiom .dsn-sidebar-tab button:focus,
+body.system-axiom .placeables-sidebar button:hover,
+body.system-axiom .placeables-sidebar button:focus,
+body.system-axiom .combat-sidebar .combat-control-lg:hover,
+body.system-axiom .combat-sidebar .combat-control-lg:focus {
+  color: var(--axiom-gold);
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.25);
+  text-shadow: none;
+}
+body.system-axiom .directory-header search,
+body.system-axiom .placeables-sidebar search,
+body.system-axiom #chat-message,
+body.system-axiom .chat-form,
+body.system-axiom #chat-controls {
+  background: #121216;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-text);
+}
+body.system-axiom .directory-header search input,
+body.system-axiom .placeables-sidebar search input {
+  background: transparent;
+  border: 0;
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+}
+body.system-axiom .directory-header search input::placeholder,
+body.system-axiom .placeables-sidebar search input::placeholder {
+  color: var(--axiom-muted);
+}
+body.system-axiom .directory-list .directory-item {
+  background: transparent;
+  border-bottom: 2px solid var(--axiom-border);
+  color: var(--axiom-text);
+}
+body.system-axiom .directory-list .directory-item:hover {
+  background: rgba(216, 198, 154, 0.045);
+}
+body.system-axiom .directory-list .directory-item .thumbnail,
+body.system-axiom .placeable-directory .thumbnail {
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+}
+body.system-axiom .directory-list .directory-item .entry-name {
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+  font-size: 13px;
+}
+body.system-axiom .directory-list .directory-item .entry-name:hover,
+body.system-axiom .directory-list .directory-item .entry-name:focus {
+  color: var(--axiom-gold);
+  text-shadow: none;
+}
+body.system-axiom .directory-footer {
+  border-top: 1px solid var(--axiom-border);
+}
+body.system-axiom .combat-sidebar .encounter-controls,
+body.system-axiom .combat-sidebar .encounters,
+body.system-axiom .combat-sidebar .combat-controls {
+  background: transparent;
+  color: var(--axiom-text);
+}
+body.system-axiom .combat-sidebar .encounter-title {
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+body.system-axiom .combat-sidebar .combatant {
+  background: var(--axiom-panel-2);
+  border-bottom: 1px solid var(--axiom-border);
+  color: var(--axiom-text);
+}
+body.system-axiom .combat-sidebar .combatant.active,
+body.system-axiom .combat-sidebar .combatant.active-turn {
+  background: linear-gradient(90deg, rgba(199, 58, 50, 0.12), var(--axiom-panel-2));
+  box-shadow: inset -3px 0 0 var(--axiom-accent);
+}
+body.system-axiom .combat-sidebar .combatant .token-image {
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+}
+body.system-axiom .combat-sidebar .combatant .name {
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+}
+body.system-axiom .chat-sidebar .chat-scroll,
+body.system-axiom #chat-notifications .overflow {
+  background: transparent;
+}
+body.system-axiom .chat-log.themed.theme-light {
+  background: transparent;
+}
+body.system-axiom #chat-message {
+  background: #0c0c10;
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+body.system-axiom #chat-message .editor-menu {
+  background: #0c0c10;
+  border-bottom: 1px solid var(--axiom-border);
+  color: var(--axiom-text);
+}
+body.system-axiom #chat-message .editor-menu button {
+  color: var(--axiom-muted);
+}
+body.system-axiom #chat-message .editor-menu button:hover,
+body.system-axiom #chat-message .editor-menu button:focus {
+  color: var(--axiom-gold);
+  background: var(--axiom-panel-3);
+}
+body.system-axiom #chat-message .editor-content {
+  background: #121216;
+  color: var(--axiom-text);
+}
+body.system-axiom #chat-controls {
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+body.system-axiom .settings-sidebar {
+  background: var(--axiom-bg);
+  color: var(--axiom-text);
+}
+body.system-axiom .settings-sidebar h1,
+body.system-axiom .settings-sidebar h4,
+body.system-axiom .settings-sidebar .label {
+  color: var(--axiom-gold);
+}
+body.system-axiom .settings-sidebar .subtitle,
+body.system-axiom .settings-sidebar .value {
+  color: var(--axiom-muted);
+}
+body.system-axiom .dsn-sidebar-tab {
+  background: var(--axiom-bg);
+  color: var(--axiom-text);
+}
+body.system-axiom .dsn-sidebar-tab .dsn-toolbox-section,
+body.system-axiom .dsn-sidebar-tab .dsn-toolbox-dice-row,
+body.system-axiom .global-control {
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+  color: var(--axiom-text);
+}
+/* ----------------------------------------- */
+/*  General Foundry Interface Cleanup         */
+/* ----------------------------------------- */
+/* Keep the Axiom treatment on buttons and contents, but do not turn Foundry's
+   layout columns into large opaque panels. */
+body.system-axiom #ui-left,
+body.system-axiom #ui-left-column-1,
+body.system-axiom #ui-left-column-2,
+body.system-axiom #ui-right-column-1,
+body.system-axiom #scene-controls,
+body.system-axiom #scene-navigation,
+body.system-axiom #chat-notifications {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+body.system-axiom #ui-left-column-1 {
+  width: auto;
+}
+/* The scene controls are vertical button stacks. Styling the whole menu creates
+   a tall black column in Foundry V14, so keep only the buttons styled. */
+body.system-axiom #scene-controls menu,
+body.system-axiom #scene-controls-layers,
+body.system-axiom #scene-controls-tools {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+/* The scene navigation already has strong UI placement. Avoid the large browser
+   backdrop and leave the actual scene pill readable. */
+body.system-axiom #scene-navigation {
+  padding: 0;
+}
+/* Chat notifications live in ui-right-column-1 and can span most of the screen.
+   Do not give that wrapper a permanent panel background. */
+body.system-axiom #chat-notifications,
+body.system-axiom #chat-notifications .overflow {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+/* Some Foundry panes use faded-ui/flexcol wrappers as layout containers rather
+   than visible panels. Keep those containers invisible unless a more specific
+   Axiom rule styles their actual contents. */
+body.system-axiom #ui-left .faded-ui.flexcol,
+body.system-axiom #ui-right-column-1 > .faded-ui.flexcol {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+button.icon,
+a.button.icon {
+  width: 40px;
+}
+/* Foundry wraps chat message content in a themed .chat-message container.
+   Roll cards own their full visual frame, so strip the outer message chrome. */
+.chat-message.message.axiom-roll-message {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.chat-message.message.axiom-roll-message .message-header {
+  display: none;
+}
+.chat-message.message.axiom-roll-message .message-content {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}
+.chat-message.message.axiom-roll-message .message-content > .axiom-chat-card.roll-card {
+  margin: 0;
+}
+/* Fallback for worlds or Foundry themes that do not preserve cssClass on messages. */
+.chat-message.message:has(.axiom-chat-card.roll-card) {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.chat-message.message:has(.axiom-chat-card.roll-card) .message-header {
+  display: none;
+}
+.chat-message.message:has(.axiom-chat-card.roll-card) .message-content {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}
+.axiom-chat-card.roll-card {
+  --axiom-bg: #101012;
+  --axiom-panel: #1b1b1f;
+  --axiom-panel-2: #24242a;
+  --axiom-panel-3: #151519;
+  --axiom-border: #3a3a42;
+  --axiom-text: #e8e4dc;
+  --axiom-muted: #a7a198;
+  --axiom-accent: #c73a32;
+  --axiom-gold: #d8c69a;
+  --axiom-blue: #5fb7d7;
+  overflow: hidden;
+  background: radial-gradient(circle at top left, rgba(199, 58, 50, 0.12), transparent 20rem), var(--axiom-bg);
+  border: 1px solid #050506;
+  border-radius: 8px;
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(216, 198, 154, 0.06) inset;
+}
+.axiom-chat-card.roll-card .card-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  background: #0c0c10;
+  border-bottom: 1px solid var(--axiom-border);
+}
+.axiom-chat-card.roll-card .card-title {
+  min-width: 0;
+}
+.axiom-chat-card.roll-card .card-title strong {
+  display: block;
+  overflow: hidden;
+  color: var(--axiom-text);
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.axiom-chat-card.roll-card .card-title span {
+  display: block;
+  margin-top: 2px;
+  color: var(--axiom-muted);
+  font-size: 11px;
+}
+.axiom-chat-card.roll-card .card-badge {
+  padding: 3px 7px;
+  border: 1px solid rgba(216, 198, 154, 0.45);
+  border-radius: 999px;
+  background: #151519;
+  color: var(--axiom-gold);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.axiom-chat-card.roll-card .card-body {
+  padding: 10px;
+}
+.axiom-chat-card.roll-card .result-focus {
+  display: grid;
+  grid-template-columns: 74px 1fr 74px;
+  gap: 8px;
+  align-items: stretch;
+}
+.axiom-chat-card.roll-card .result-side,
+.axiom-chat-card.roll-card .result-main {
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+}
+.axiom-chat-card.roll-card .result-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 74px;
+  padding: 6px;
+  text-align: center;
+}
+.axiom-chat-card.roll-card .result-side span {
+  color: var(--axiom-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.axiom-chat-card.roll-card .result-side strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--axiom-text);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 18px;
+}
+.axiom-chat-card.roll-card .result-main {
+  min-height: 74px;
+  padding: 8px;
+  text-align: center;
+  box-shadow: inset 0 -3px 0 var(--axiom-gold);
+}
+.axiom-chat-card.roll-card .result-main.failure {
+  box-shadow: inset 0 -3px 0 var(--axiom-accent);
+}
+.axiom-chat-card.roll-card .result-main span {
+  color: var(--axiom-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.axiom-chat-card.roll-card .hits {
+  display: block;
+  color: var(--axiom-gold);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1;
+}
+.axiom-chat-card.roll-card .result-main.failure .hits {
+  color: var(--axiom-accent);
+}
+.axiom-chat-card.roll-card .outcome {
+  display: block;
+  margin-top: 4px;
+  color: var(--axiom-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+.axiom-chat-card.roll-card .outcome-tier {
+  display: block;
+  margin-top: 1px;
+  color: var(--axiom-muted);
+  font-size: 11px;
+}
+.axiom-chat-card.roll-card .complication-strip {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 7px;
+  align-items: center;
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  color: var(--axiom-text);
+  font-size: 12px;
+}
+.axiom-chat-card.roll-card .complication-strip .icon {
+  color: var(--axiom-muted);
+  font-size: 15px;
+}
+.axiom-chat-card.roll-card .complication-strip.has-complication {
+  background: rgba(199, 58, 50, 0.09);
+  border-color: rgba(199, 58, 50, 0.45);
+}
+.axiom-chat-card.roll-card .complication-strip.has-complication .icon {
+  color: var(--axiom-accent);
+}
+.axiom-chat-card.roll-card .complication-strip.accepted {
+  background: rgba(216, 198, 154, 0.08);
+  border-color: rgba(216, 198, 154, 0.45);
+}
+.axiom-chat-card.roll-card .complication-strip.accepted .icon {
+  color: var(--axiom-gold);
+}
+.axiom-chat-card.roll-card .complication-strip.negated {
+  background: rgba(95, 183, 215, 0.08);
+  border-color: rgba(95, 183, 215, 0.4);
+}
+.axiom-chat-card.roll-card .complication-strip.negated .icon {
+  color: var(--axiom-blue);
+}
+.axiom-chat-card.roll-card .complication-actions {
+  display: inline-grid;
+  grid-template-columns: repeat(2, 22px);
+  gap: 4px;
+}
+.axiom-chat-card.roll-card .complication-action {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  background: #151519;
+  color: var(--axiom-muted);
+  font-size: 10px;
+  cursor: pointer;
+}
+.axiom-chat-card.roll-card .complication-action:hover {
+  border-color: rgba(216, 198, 154, 0.55);
+  color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.2);
+}
+.axiom-chat-card.roll-card .complication-action.negate:hover {
+  color: var(--axiom-blue);
+}
+.axiom-chat-card.roll-card .complication-action.accept:hover {
+  color: var(--axiom-gold);
+}
+.axiom-chat-card.roll-card .quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 8px;
+}
+.axiom-chat-card.roll-card .quick-line {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 7px;
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+}
+.axiom-chat-card.roll-card .quick-line span {
+  color: var(--axiom-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+.axiom-chat-card.roll-card .quick-line strong {
+  color: var(--axiom-text);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 12px;
+}
+.axiom-chat-card.roll-card details.breakdown {
+  margin-top: 8px;
+  overflow: hidden;
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+}
+.axiom-chat-card.roll-card details.breakdown summary {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 8px;
+  color: var(--axiom-gold);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  list-style: none;
+}
+.axiom-chat-card.roll-card details.breakdown summary::-webkit-details-marker {
+  display: none;
+}
+.axiom-chat-card.roll-card details.breakdown summary::before {
+  content: "▸";
+  color: var(--axiom-gold);
+}
+.axiom-chat-card.roll-card details.breakdown[open] summary::before {
+  content: "▾";
+}
+.axiom-chat-card.roll-card .breakdown-content {
+  padding: 0 8px 8px;
+}
+.axiom-chat-card.roll-card .breakdown-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  min-height: 24px;
+  border-top: 1px solid rgba(58, 58, 66, 0.75);
+  color: var(--axiom-muted);
+  font-size: 11px;
+}
+.axiom-chat-card.roll-card .breakdown-row strong {
+  color: var(--axiom-text);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 11px;
+}
+.axiom-chat-card.roll-card .card-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 8px;
+}
+.axiom-chat-card.roll-card .card-action {
+  height: 28px;
+  border: 1px solid rgba(216, 198, 154, 0.7);
+  border-radius: 5px;
+  background: #151519;
+  color: var(--axiom-gold);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.axiom-chat-card.roll-card .card-action:hover {
+  box-shadow: 0 0 8px rgba(216, 198, 154, 0.25);
+}
+.axiom-chat-card.roll-card .card-action.secondary {
+  border-color: var(--axiom-border);
+  color: var(--axiom-muted);
+}
+.axiom-chat-card.roll-card .editable-roll-side {
+  gap: 5px;
+}
+.axiom-chat-card.roll-card .roll-value-input {
+  width: 52px;
+  height: 30px;
+  margin: 5px auto 0;
+  background: #101012;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-text);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+.axiom-chat-card.roll-card .roll-value-input:focus {
+  outline: none;
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+.axiom-chat-card.roll-card .modifier-breakdown-title {
+  padding: 7px 0 3px;
+  border-top: 1px solid rgba(58, 58, 66, 0.75);
+  color: var(--axiom-gold);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.axiom-chat-card.roll-card .modifier-detail-row {
+  grid-template-columns: 20px 1fr auto;
+}
+.axiom-chat-card.roll-card .modifier-detail-row.fixed {
+  grid-template-columns: 1fr auto;
+  padding-left: 20px;
+}
+.axiom-chat-card.roll-card .modifier-detail-row.inactive {
+  opacity: 0.45;
+}
+.axiom-chat-card.roll-card .modifier-detail-row.inactive span,
+.axiom-chat-card.roll-card .modifier-detail-row.inactive strong {
+  text-decoration: line-through;
+}
+.axiom-chat-card.roll-card .modifier-toggle {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--axiom-gold);
+  font-size: 12px;
+  cursor: pointer;
+}
+.axiom-chat-card.roll-card .modifier-toggle:hover {
+  color: var(--axiom-accent);
+}
+.axiom-chat-card.roll-card .roll-label-row {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+}
+.axiom-chat-card.roll-card .roll-edit-button {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--axiom-muted);
+  font-size: 10px;
+  cursor: pointer;
+}
+.axiom-chat-card.roll-card .roll-edit-button:hover {
+  border-color: var(--axiom-border);
+  color: var(--axiom-gold);
+  background: #151519;
+}
+.axiom-chat-card.roll-card .roll-value-input[readonly] {
+  border-color: transparent;
+  background: transparent;
+  cursor: default;
+}
+.axiom-chat-card.roll-card .editable-roll-side.editing .roll-value-input,
+.axiom-chat-card.roll-card .roll-value-input:not([readonly]) {
+  border-color: var(--axiom-gold);
+  background: #101012;
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.25);
+}
+.axiom-chat-card.roll-card .timeframe-strip {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  align-items: center;
+  min-height: 30px;
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: rgba(95, 183, 215, 0.08);
+  border: 1px solid rgba(95, 183, 215, 0.35);
+  border-radius: 5px;
+}
+.axiom-chat-card.roll-card .timeframe-strip span {
+  color: var(--axiom-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.axiom-chat-card.roll-card .timeframe-strip strong {
+  color: var(--axiom-blue);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 13px;
+}
+.axiom-chat-card.roll-card .timeframe-focus {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  background: var(--axiom-panel);
+  border: 1px solid rgba(95, 183, 215, 0.35);
+  border-radius: 6px;
+  text-align: center;
+  box-shadow: inset 0 -3px 0 var(--axiom-blue);
+}
+.axiom-chat-card.roll-card .timeframe-focus span {
+  color: var(--axiom-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.axiom-chat-card.roll-card .timeframe-focus strong {
+  color: var(--axiom-blue);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 28px;
+  line-height: 1.1;
+}
+.axiom-chat-card.roll-card .timeframe-focus em {
+  color: var(--axiom-muted);
+  font-size: 11px;
+  font-style: normal;
+}
+.axiom-chat-card.roll-card .result-main {
+  position: relative;
+}
+.axiom-chat-card.roll-card .second-wind-button {
+  position: absolute;
+  top: 4px;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--axiom-muted);
+  font-size: 10px;
+  cursor: pointer;
+}
+.axiom-chat-card.roll-card .second-wind-button:hover {
+  border-color: rgba(216, 198, 154, 0.55);
+  background: #151519;
+  color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.2);
+}
+.axiom-chat-card.roll-card .second-wind-reroll {
+  left: 4px;
+}
+.axiom-chat-card.roll-card .second-wind-hit {
+  right: 4px;
+}
+.axiom-chat-card.roll-card .fate-detail-row strong {
+  color: var(--axiom-gold);
+}
+.axiom-chat-card.roll-card .combat-target-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 5px 7px;
+  border: 1px solid rgba(216, 198, 154, 0.2);
+  border-radius: 4px;
+  background: rgba(10, 10, 12, 0.72);
+  font-size: 11px;
+}
+.axiom-chat-card.roll-card .combat-target-strip span,
+.axiom-chat-card.roll-card .combat-target-strip em {
+  color: var(--axiom-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-style: normal;
+}
+.axiom-chat-card.roll-card .combat-target-strip strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--axiom-gold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.axiom-chat-card.roll-card .combat-target-strip.pending strong {
+  color: var(--axiom-muted);
+}
+.axiom-chat-card.roll-card .combat-action-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.axiom-chat-card.roll-card .combat-action-strip.icon-only button {
+  flex: 0 0 30px;
+  width: 30px;
+  min-height: 28px;
+  padding: 0;
+  font-size: 13px;
+}
+.axiom-chat-card.roll-card .combat-action-strip button,
+.axiom-chat-card.roll-card .apply-wound-button {
+  flex: 1 1 0;
+  min-height: 26px;
+  border: 1px solid rgba(216, 198, 154, 0.35);
+  border-radius: 4px;
+  background: #151519;
+  color: var(--axiom-gold);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.axiom-chat-card.roll-card .combat-action-strip button:hover,
+.axiom-chat-card.roll-card .apply-wound-button:hover {
+  border-color: var(--axiom-accent);
+  color: var(--axiom-text);
+  box-shadow: 0 0 6px rgba(199, 58, 50, 0.25);
+}
+.axiom-chat-card.roll-card .combat-result {
+  display: grid;
+  gap: 7px;
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  background: rgba(10, 10, 12, 0.72);
+}
+.axiom-chat-card.roll-card .combat-result.hit {
+  border-color: rgba(199, 58, 50, 0.6);
+  box-shadow: inset 3px 0 0 var(--axiom-accent);
+}
+.axiom-chat-card.roll-card .combat-result.miss {
+  border-color: rgba(95, 183, 215, 0.45);
+  box-shadow: inset 3px 0 0 var(--axiom-blue);
+}
+.axiom-chat-card.roll-card .combat-result header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--axiom-muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.axiom-chat-card.roll-card .combat-result header strong {
+  color: var(--axiom-text);
+}
+.axiom-chat-card.roll-card .combat-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+.axiom-chat-card.roll-card .combat-result-grid div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 6px;
+  border: 1px solid rgba(216, 198, 154, 0.14);
+  border-radius: 4px;
+  background: #111115;
+  font-size: 11px;
+}
+.axiom-chat-card.roll-card .combat-result-grid span {
+  color: var(--axiom-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.axiom-chat-card.roll-card .combat-result-grid strong {
+  color: var(--axiom-text);
+  text-align: right;
+}
+.axiom-chat-card.roll-card .combat-damage-details summary {
+  cursor: pointer;
+  color: var(--axiom-gold);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.axiom-chat-card.roll-card .apply-wound-button {
+  width: 100%;
+}
+.axiom-chat-card.roll-card .wound-applied-note {
+  padding: 5px 7px;
+  border: 1px solid rgba(95, 183, 215, 0.35);
+  border-radius: 4px;
+  color: var(--axiom-blue);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+.axiom-chat-card.opposed-test-card,
+.axiom-chat-card.combat-result-card {
+  --axiom-bg: #101012;
+  --axiom-panel: #1b1b1f;
+  --axiom-panel-2: #24242a;
+  --axiom-border: #3a3a42;
+  --axiom-text: #e8e4dc;
+  --axiom-muted: #a7a198;
+  --axiom-accent: #c73a32;
+  --axiom-gold: #d8c69a;
+  --axiom-blue: #5fb7d7;
+  overflow: hidden;
+  background: radial-gradient(circle at top left, rgba(199, 58, 50, 0.12), transparent 20rem), var(--axiom-bg);
+  border: 1px solid #050506;
+  border-radius: 8px;
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(216, 198, 154, 0.06) inset;
+}
+.axiom-chat-card.opposed-test-card .card-header,
+.axiom-chat-card.combat-result-card .card-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  background: #0c0c10;
+  border-bottom: 1px solid var(--axiom-border);
+}
+.axiom-chat-card.opposed-test-card .card-title,
+.axiom-chat-card.combat-result-card .card-title {
+  min-width: 0;
+}
+.axiom-chat-card.opposed-test-card .card-title strong,
+.axiom-chat-card.combat-result-card .card-title strong {
+  display: block;
+  overflow: hidden;
+  color: var(--axiom-text);
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.axiom-chat-card.opposed-test-card .card-title span,
+.axiom-chat-card.combat-result-card .card-title span {
+  display: block;
+  margin-top: 2px;
+  color: var(--axiom-muted);
+  font-size: 11px;
+}
+.axiom-chat-card.opposed-test-card .card-badge,
+.axiom-chat-card.combat-result-card .card-badge {
+  padding: 3px 7px;
+  border: 1px solid rgba(216, 198, 154, 0.45);
+  border-radius: 999px;
+  background: #151519;
+  color: var(--axiom-gold);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.axiom-chat-card.opposed-test-card .card-body,
+.axiom-chat-card.combat-result-card .card-body {
+  padding: 10px;
+}
+.axiom-chat-card.opposed-test-card .combat-versus-grid,
+.axiom-chat-card.combat-result-card .combat-versus-grid {
+  display: grid;
+  grid-template-columns: 1fr 34px 1fr;
+  gap: 6px;
+  align-items: stretch;
+}
+.axiom-chat-card.opposed-test-card .combat-side,
+.axiom-chat-card.combat-result-card .combat-side,
+.axiom-chat-card.opposed-test-card .combat-vs,
+.axiom-chat-card.combat-result-card .combat-vs,
+.axiom-chat-card.opposed-test-card .combat-result-summary,
+.axiom-chat-card.combat-result-card .combat-result-summary,
+.axiom-chat-card.opposed-test-card .combat-damage-focus,
+.axiom-chat-card.combat-result-card .combat-damage-focus {
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+  background: var(--axiom-panel);
+}
+.axiom-chat-card.opposed-test-card .combat-side,
+.axiom-chat-card.combat-result-card .combat-side {
+  padding: 7px;
+  min-width: 0;
+}
+.axiom-chat-card.opposed-test-card .combat-side span,
+.axiom-chat-card.combat-result-card .combat-side span,
+.axiom-chat-card.opposed-test-card .combat-side em,
+.axiom-chat-card.combat-result-card .combat-side em {
+  display: block;
+  color: var(--axiom-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-style: normal;
+}
+.axiom-chat-card.opposed-test-card .combat-side strong,
+.axiom-chat-card.combat-result-card .combat-side strong {
+  display: block;
+  margin: 3px 0;
+  overflow: hidden;
+  color: var(--axiom-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.axiom-chat-card.opposed-test-card .combat-vs,
+.axiom-chat-card.combat-result-card .combat-vs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--axiom-gold);
+  font-size: 12px;
+  font-weight: 900;
+}
+.axiom-chat-card.opposed-test-card .combat-note,
+.axiom-chat-card.combat-result-card .combat-note {
+  margin-top: 7px;
+  padding: 5px 7px;
+  border: 1px solid rgba(216, 198, 154, 0.24);
+  border-radius: 4px;
+  background: rgba(216, 198, 154, 0.06);
+  color: var(--axiom-gold);
+  font-size: 11px;
+}
+.axiom-chat-card.opposed-test-card .combat-target-strip,
+.axiom-chat-card.combat-result-card .combat-target-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 5px 7px;
+  border: 1px solid rgba(216, 198, 154, 0.2);
+  border-radius: 4px;
+  background: rgba(10, 10, 12, 0.72);
+  font-size: 11px;
+}
+.axiom-chat-card.opposed-test-card .combat-target-strip span,
+.axiom-chat-card.combat-result-card .combat-target-strip span,
+.axiom-chat-card.opposed-test-card .combat-target-strip em,
+.axiom-chat-card.combat-result-card .combat-target-strip em {
+  color: var(--axiom-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-style: normal;
+}
+.axiom-chat-card.opposed-test-card .combat-target-strip strong,
+.axiom-chat-card.combat-result-card .combat-target-strip strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--axiom-gold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.axiom-chat-card.opposed-test-card .combat-target-strip.pending strong,
+.axiom-chat-card.combat-result-card .combat-target-strip.pending strong {
+  color: var(--axiom-muted);
+}
+.axiom-chat-card.opposed-test-card .combat-action-strip,
+.axiom-chat-card.combat-result-card .combat-action-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.axiom-chat-card.opposed-test-card .combat-action-strip.icon-only button,
+.axiom-chat-card.combat-result-card .combat-action-strip.icon-only button {
+  flex: 0 0 30px;
+  width: 30px;
+  min-height: 28px;
+  padding: 0;
+  font-size: 13px;
+}
+.axiom-chat-card.opposed-test-card .combat-action-strip button,
+.axiom-chat-card.combat-result-card .combat-action-strip button,
+.axiom-chat-card.opposed-test-card .apply-wound-button,
+.axiom-chat-card.combat-result-card .apply-wound-button {
+  flex: 1 1 0;
+  min-height: 26px;
+  border: 1px solid rgba(216, 198, 154, 0.35);
+  border-radius: 4px;
+  background: #151519;
+  color: var(--axiom-gold);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.axiom-chat-card.opposed-test-card .combat-action-strip button:hover,
+.axiom-chat-card.combat-result-card .combat-action-strip button:hover,
+.axiom-chat-card.opposed-test-card .apply-wound-button:hover,
+.axiom-chat-card.combat-result-card .apply-wound-button:hover {
+  border-color: var(--axiom-accent);
+  color: var(--axiom-text);
+  box-shadow: 0 0 6px rgba(199, 58, 50, 0.25);
+}
+.axiom-chat-card.opposed-test-card .combat-result-grid,
+.axiom-chat-card.combat-result-card .combat-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 8px;
+}
+.axiom-chat-card.opposed-test-card .combat-result-grid div,
+.axiom-chat-card.combat-result-card .combat-result-grid div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 6px;
+  border: 1px solid rgba(216, 198, 154, 0.14);
+  border-radius: 4px;
+  background: #111115;
+  font-size: 11px;
+}
+.axiom-chat-card.opposed-test-card .combat-result-grid span,
+.axiom-chat-card.combat-result-card .combat-result-grid span {
+  color: var(--axiom-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.axiom-chat-card.opposed-test-card .combat-result-grid strong,
+.axiom-chat-card.combat-result-card .combat-result-grid strong {
+  color: var(--axiom-text);
+  text-align: right;
+}
+.axiom-chat-card.opposed-test-card .combat-result-summary,
+.axiom-chat-card.combat-result-card .combat-result-summary,
+.axiom-chat-card.opposed-test-card .combat-damage-focus,
+.axiom-chat-card.combat-result-card .combat-damage-focus {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  box-shadow: inset 0 -3px 0 var(--axiom-blue);
+}
+.axiom-chat-card.opposed-test-card .combat-result-summary.hit,
+.axiom-chat-card.combat-result-card .combat-result-summary.hit,
+.axiom-chat-card.opposed-test-card .combat-damage-focus.hit,
+.axiom-chat-card.combat-result-card .combat-damage-focus.hit {
+  box-shadow: inset 0 -3px 0 var(--axiom-accent);
+}
+.axiom-chat-card.opposed-test-card .combat-result-summary span,
+.axiom-chat-card.combat-result-card .combat-result-summary span,
+.axiom-chat-card.opposed-test-card .combat-damage-focus span,
+.axiom-chat-card.combat-result-card .combat-damage-focus span,
+.axiom-chat-card.opposed-test-card .combat-result-summary em,
+.axiom-chat-card.combat-result-card .combat-result-summary em,
+.axiom-chat-card.opposed-test-card .combat-damage-focus em,
+.axiom-chat-card.combat-result-card .combat-damage-focus em {
+  color: var(--axiom-muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-style: normal;
+}
+.axiom-chat-card.opposed-test-card .combat-result-summary strong,
+.axiom-chat-card.combat-result-card .combat-result-summary strong,
+.axiom-chat-card.opposed-test-card .combat-damage-focus strong,
+.axiom-chat-card.combat-result-card .combat-damage-focus strong,
+.axiom-chat-card.opposed-test-card .combat-result-summary input[data-result-field="finalDamageOverride"],
+.axiom-chat-card.combat-result-card .combat-result-summary input[data-result-field="finalDamageOverride"],
+.axiom-chat-card.opposed-test-card .combat-damage-focus input[data-result-field="finalDamageOverride"],
+.axiom-chat-card.combat-result-card .combat-damage-focus input[data-result-field="finalDamageOverride"] {
+  width: 76px;
+  min-width: 0;
+  height: 38px;
+  padding: 0 4px;
+  border: 1px solid rgba(216, 198, 154, 0.22);
+  border-radius: 5px;
+  background: rgba(12, 12, 16, 0.6);
+  color: var(--axiom-gold);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+}
+.axiom-chat-card.opposed-test-card .combat-result-summary input[data-result-field="finalDamageOverride"]:focus,
+.axiom-chat-card.combat-result-card .combat-result-summary input[data-result-field="finalDamageOverride"]:focus,
+.axiom-chat-card.opposed-test-card .combat-damage-focus input[data-result-field="finalDamageOverride"]:focus,
+.axiom-chat-card.combat-result-card .combat-damage-focus input[data-result-field="finalDamageOverride"]:focus {
+  border-color: var(--axiom-gold);
+  outline: none;
+  box-shadow: 0 0 8px rgba(216, 198, 154, 0.2);
+}
+.axiom-chat-card.opposed-test-card .combat-edit-grid,
+.axiom-chat-card.combat-result-card .combat-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 8px;
+}
+.axiom-chat-card.opposed-test-card .combat-edit-grid label,
+.axiom-chat-card.combat-result-card .combat-edit-grid label {
+  display: grid;
+  grid-template-columns: 1fr 56px;
+  gap: 5px;
+  align-items: center;
+  padding: 4px 6px;
+  border: 1px solid rgba(216, 198, 154, 0.14);
+  border-radius: 4px;
+  background: #111115;
+  font-size: 11px;
+}
+.axiom-chat-card.opposed-test-card .combat-edit-grid span,
+.axiom-chat-card.combat-result-card .combat-edit-grid span {
+  color: var(--axiom-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.axiom-chat-card.opposed-test-card .combat-edit-grid input,
+.axiom-chat-card.combat-result-card .combat-edit-grid input {
+  height: 22px;
+  min-width: 0;
+  border: 1px solid var(--axiom-border);
+  border-radius: 3px;
+  background: #0c0c10;
+  color: var(--axiom-text);
+  text-align: right;
+}
+.axiom-chat-card.opposed-test-card .apply-wound-button,
+.axiom-chat-card.combat-result-card .apply-wound-button {
+  width: 100%;
+  margin-top: 8px;
+}
+.axiom-chat-card.opposed-test-card .wound-applied-note,
+.axiom-chat-card.combat-result-card .wound-applied-note {
+  margin-top: 8px;
+  padding: 5px 7px;
+  border: 1px solid rgba(95, 183, 215, 0.35);
+  border-radius: 4px;
+  color: var(--axiom-blue);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+.axiom-chat-card.opposed-test-card details.combat-damage-details.breakdown,
+.axiom-chat-card.combat-result-card details.combat-damage-details.breakdown {
+  margin-top: 8px;
+  overflow: hidden;
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+  background: var(--axiom-panel);
+}
+.axiom-chat-card.opposed-test-card details.combat-damage-details.breakdown summary,
+.axiom-chat-card.combat-result-card details.combat-damage-details.breakdown summary {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 8px;
+  color: var(--axiom-gold);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  list-style: none;
+}
+.axiom-chat-card.opposed-test-card details.combat-damage-details.breakdown summary::-webkit-details-marker,
+.axiom-chat-card.combat-result-card details.combat-damage-details.breakdown summary::-webkit-details-marker {
+  display: none;
+}
+.axiom-chat-card.opposed-test-card details.combat-damage-details.breakdown summary::before,
+.axiom-chat-card.combat-result-card details.combat-damage-details.breakdown summary::before {
+  content: "▸";
+  color: var(--axiom-gold);
+}
+.axiom-chat-card.opposed-test-card details.combat-damage-details.breakdown[open] summary::before,
+.axiom-chat-card.combat-result-card details.combat-damage-details.breakdown[open] summary::before {
+  content: "▾";
+}
+.axiom-chat-card.opposed-test-card details.combat-damage-details.breakdown .damage-formula-line,
+.axiom-chat-card.combat-result-card details.combat-damage-details.breakdown .damage-formula-line {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  gap: 6px;
+  align-items: center;
+  padding: 0 8px 4px;
+  color: var(--axiom-text);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 12px;
+  text-align: center;
+}
+.axiom-chat-card.opposed-test-card details.combat-damage-details.breakdown .formula-term,
+.axiom-chat-card.combat-result-card details.combat-damage-details.breakdown .formula-term,
+.axiom-chat-card.opposed-test-card details.combat-damage-details.breakdown .formula-result,
+.axiom-chat-card.combat-result-card details.combat-damage-details.breakdown .formula-result {
+  padding: 3px 4px;
+  border: 1px solid rgba(216, 198, 154, 0.16);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.18);
+  cursor: help;
+}
+.axiom-chat-card.opposed-test-card details.combat-damage-details.breakdown .formula-result,
+.axiom-chat-card.combat-result-card details.combat-damage-details.breakdown .formula-result {
+  color: var(--axiom-gold);
+  border-color: rgba(216, 198, 154, 0.32);
+}
+.axiom-chat-card.opposed-test-card details.combat-damage-details.breakdown .formula-operator,
+.axiom-chat-card.combat-result-card details.combat-damage-details.breakdown .formula-operator {
+  color: var(--axiom-muted);
+  font-weight: 800;
+}
+.axiom-chat-card.opposed-test-card details.combat-damage-details.breakdown .damage-formula-labels,
+.axiom-chat-card.combat-result-card details.combat-damage-details.breakdown .damage-formula-labels {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  padding: 0 8px 8px;
+  color: var(--axiom-muted);
+  font-size: 9px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+.chat-message.message:has(.axiom-chat-card.opposed-test-card),
+.chat-message.message:has(.axiom-chat-card.combat-result-card) {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.chat-message.message:has(.axiom-chat-card.opposed-test-card) .message-header,
+.chat-message.message:has(.axiom-chat-card.combat-result-card) .message-header {
+  display: none;
+}
+.chat-message.message:has(.axiom-chat-card.opposed-test-card) .message-content,
+.chat-message.message:has(.axiom-chat-card.combat-result-card) .message-content {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}

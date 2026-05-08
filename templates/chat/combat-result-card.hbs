@@ -1,0 +1,51 @@
+<article class="axiom-chat-card combat-result-card {{card.outcomeCss}}" data-result-id="{{card.id}}">
+  <header class="card-header">
+    <div class="card-title">
+      <strong>{{localize "AXIOM.Combat.CombatResult"}}</strong>
+      <span>{{card.attackerName}} → {{card.defenderName}}</span>
+    </div>
+    <div class="card-badge">{{localize card.outcomeLabel}}</div>
+  </header>
+
+  <section class="card-body">
+    <div class="combat-damage-focus {{card.outcomeCss}}">
+      <span>{{localize "AXIOM.Combat.FinalDamage"}}</span>
+      <input type="number" min="0" step="1" value="{{card.finalDamage}}" data-result-field="finalDamageOverride" aria-label="{{localize 'AXIOM.Combat.FinalDamage'}}">
+      <em>{{localize card.woundSeverityLabel}}</em>
+    </div>
+
+    <div class="combat-result-grid compact">
+      <div><span>{{localize "AXIOM.Combat.NetHits"}}</span><strong>{{card.netHitsDisplay}}</strong></div>
+      <div><span>{{localize "AXIOM.RollCard.Location"}}</span><strong>{{card.hitLocationText}}</strong></div>
+    </div>
+
+    {{#if card.canApplyWound}}
+      <button type="button" class="apply-wound-button" data-action="applyCombatResultWound">
+        <i class="fa-solid fa-kit-medical"></i> {{localize "AXIOM.Combat.ApplyWound"}}
+      </button>
+    {{/if}}
+
+    {{#if card.woundApplied}}
+      <div class="wound-applied-note">{{localize "AXIOM.Combat.WoundApplied"}}</div>
+    {{/if}}
+
+    <details class="combat-damage-details breakdown compact-formula">
+      <summary>{{localize "AXIOM.Combat.DamageDetails"}}</summary>
+      <div class="damage-formula-line">
+        <span class="formula-term" title="{{card.rawDamageTooltip}}">{{card.rawDamage}}</span>
+        <span class="formula-operator">-</span>
+        <span class="formula-term" title="{{card.effectiveArmorTooltip}}">{{card.effectiveArmor}}</span>
+        <span class="formula-operator">-</span>
+        <span class="formula-term" title="{{card.toughnessTooltip}}">{{card.values.toughness}}</span>
+        <span class="formula-operator">=</span>
+        <strong class="formula-result" title="{{card.finalDamageTooltip}}">{{card.finalDamage}}</strong>
+      </div>
+      <div class="damage-formula-labels">
+        <span>{{localize "AXIOM.Combat.RawDamage"}}</span>
+        <span>{{localize "AXIOM.Combat.EffectiveArmor"}}</span>
+        <span>{{localize "AXIOM.Combat.Toughness"}}</span>
+        <span>{{localize "AXIOM.Combat.FinalDamage"}}</span>
+      </div>
+    </details>
+  </section>
+</article>

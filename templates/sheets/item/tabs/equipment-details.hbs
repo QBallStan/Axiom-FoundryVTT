@@ -1,0 +1,18 @@
+<section class="tab-section details-tab equipment-details">
+  <div class="form-grid compact equipment-grid">
+    <label class="field-group equipment-skill-field">
+      <span>{{localize "AXIOM.Equipment.Skill"}}</span>
+      <select name="system.skill">
+        <option value="">{{localize "AXIOM.Equipment.NoSkill"}}</option>
+        {{selectOptions equipment.skills selected=system.skill}}
+      </select>
+    </label>
+
+    <label class="field-group equipment-roll-modifier-field">
+      <span>{{localize "AXIOM.Equipment.RollModifier"}}</span>
+      <input type="number" name="system.rollModifier" value="{{system.rollModifier}}" step="5" />
+    </label>
+  </div>
+
+  <p class="equipment-roll-note">{{localize "AXIOM.Equipment.RollNote"}}</p>
+</section>

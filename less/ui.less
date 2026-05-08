@@ -1,0 +1,794 @@
+// main: ./axiom.less
+
+/* General system UI styling that is not tied to a specific sheet. */
+
+.chat-message.message.axiom-initiative-message {
+  --axiom-bg: #101012;
+  --axiom-panel: #1b1b1f;
+  --axiom-panel-2: #24242a;
+  --axiom-border: #3a3a42;
+  --axiom-text: #e8e4dc;
+  --axiom-muted: #a7a198;
+  --axiom-accent: #c73a32;
+  --axiom-gold: #d8c69a;
+
+  overflow: hidden;
+  padding: 0;
+  background: radial-gradient(circle at top left, rgba(199, 58, 50, 0.12), transparent 16rem), var(--axiom-bg);
+  border: 1px solid #050506;
+  border-radius: 8px;
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(216, 198, 154, 0.06) inset;
+
+  .message-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px 8px;
+    align-items: center;
+    padding: 6px 8px 5px;
+    background: #0c0c10;
+    border-bottom: 1px solid var(--axiom-border);
+    color: var(--axiom-text);
+    line-height: 1.1;
+  }
+
+  .message-sender {
+    overflow: hidden;
+    margin: 0;
+    color: var(--axiom-text);
+    font-size: 12px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .message-metadata {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    color: var(--axiom-muted);
+    font-size: 10px;
+  }
+
+  .message-delete {
+    color: var(--axiom-muted);
+
+    &:hover,
+    &:focus {
+      color: var(--axiom-accent);
+      text-shadow: none;
+    }
+  }
+
+  .flavor-text {
+    grid-column: 1 / -1;
+    overflow: hidden;
+    margin: 1px 0 0;
+    color: var(--axiom-gold);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .message-content {
+    margin: 0;
+    padding: 6px 8px 8px;
+    background: transparent;
+  }
+
+  .dice-roll {
+    margin: 0;
+  }
+
+  .dice-result {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 58px;
+    gap: 6px;
+    align-items: stretch;
+  }
+
+  .dice-formula,
+  .dice-total {
+    min-height: 30px;
+    margin: 0;
+    padding: 5px 7px;
+    background: var(--axiom-panel);
+    border: 1px solid var(--axiom-border);
+    border-radius: 5px;
+    box-shadow: none;
+    color: var(--axiom-text);
+    font-family: "Roboto Mono", Consolas, monospace;
+    line-height: 18px;
+    text-align: center;
+  }
+
+  .dice-formula {
+    overflow: hidden;
+    color: var(--axiom-muted);
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dice-total {
+    color: var(--axiom-gold);
+    font-size: 18px;
+    font-weight: 900;
+  }
+
+  .dice-tooltip {
+    grid-column: 1 / -1;
+    margin-top: 0;
+    padding: 6px;
+    background: var(--axiom-panel-2);
+    border: 1px solid var(--axiom-border);
+    border-radius: 5px;
+    color: var(--axiom-text);
+  }
+
+  .dice-tooltip .part-header {
+    min-height: unset;
+    margin: 0 0 4px;
+    padding: 0;
+    border: 0;
+    color: var(--axiom-muted);
+    font-size: 11px;
+  }
+
+  .dice-tooltip .dice-rolls {
+    margin: 0;
+  }
+}
+
+.status-effects {
+  height:auto
+}
+
+.axiom-currency-refresh-note {
+  display: block;
+  width: 100%;
+  margin: -4px 0 8px;
+  padding-left: 0;
+  flex-basis: 100%;
+  clear: both;
+}
+
+
+/* Combat tracker AP pips */
+#combat-tracker,
+.combat-tracker,
+.sidebar-tab.combat-sidebar {
+  .combatant,
+  .combatant-row {
+    .axiom-combatant-ap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin: 2px 0 0;
+      color: var(--axiom-muted, #a7a198);
+      font-size: 10px;
+      line-height: 1;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .axiom-combatant-ap-label {
+      color: var(--axiom-muted, #a7a198);
+      font-family: "Roboto Mono", Consolas, monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .axiom-combatant-ap-pips {
+      display: inline-flex;
+      align-items: center;
+      gap: 1px;
+    }
+
+    .axiom-combatant-ap-pip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 9px;
+      opacity: 0.25;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+
+      i {
+        color: var(--axiom-accent, #c73a32);
+        font-size: 10px;
+        line-height: 1;
+        text-shadow: none;
+      }
+
+      &.active {
+        opacity: 1;
+
+        i {
+          text-shadow: 0 0 4px rgba(199, 58, 50, 0.45);
+        }
+      }
+    }
+
+    .axiom-combatant-ap:hover .axiom-combatant-ap-pip.active,
+    .axiom-combatant-ap:focus .axiom-combatant-ap-pip.active {
+      transform: translateY(-1px);
+    }
+  }
+}
+
+/* Combat tracker initiative button */
+#combat-tracker,
+.combat-tracker,
+.sidebar-tab.combat-sidebar {
+  .combatant,
+  .combatant-row {
+    .token-initiative .combatant-control.roll.axiom-roll-initiative {
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 20px 20px;
+    }
+  }
+}
+
+/* Axiom combat tracker pass controls */
+#combat-tracker,
+.combat-tracker,
+.sidebar-tab.combat-sidebar {
+  .axiom-combat-tracker-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 6px;
+    margin: 0 0 6px;
+    background: rgba(16, 16, 18, 0.92);
+    border: 1px solid var(--axiom-border, #3a3a42);
+    border-radius: 6px;
+  }
+
+  .axiom-combat-pass-label {
+    grid-column: 1 / -1;
+    color: var(--axiom-muted, #a7a198);
+    font-family: "Roboto Mono", Consolas, monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .axiom-combat-control {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 28px;
+    padding: 4px 6px;
+    border: 1px solid var(--axiom-border, #3a3a42);
+    border-radius: 5px;
+    background: #17171b;
+    color: var(--axiom-muted, #a7a198);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .axiom-combat-control-primary {
+    border-color: var(--axiom-accent, #c73a32);
+    color: var(--axiom-text, #e8e4dc);
+    box-shadow: inset 0 -2px 0 var(--axiom-accent, #c73a32);
+  }
+
+  .axiom-combat-control-secondary {
+    border-color: var(--axiom-border, #3a3a42);
+  }
+
+  .axiom-combat-control:hover,
+  .axiom-combat-control:focus {
+    color: var(--axiom-gold, #d8c69a);
+    border-color: var(--axiom-gold, #d8c69a);
+  }
+}
+
+.axiom-combat-tracker-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 6px;
+  margin: 0 0 6px;
+  background: rgba(16, 16, 18, 0.92);
+  border: 1px solid var(--axiom-border, #3a3a42);
+  border-radius: 6px;
+}
+
+/* ----------------------------------------- */
+/*  General Foundry Interface Styling         */
+/* ----------------------------------------- */
+
+body.system-axiom #interface,
+body.system-axiom #hud {
+  --axiom-bg: #101012;
+  --axiom-panel: #1b1b1f;
+  --axiom-panel-2: #24242a;
+  --axiom-panel-3: #151519;
+  --axiom-border: #3a3a42;
+  --axiom-text: #e8e4dc;
+  --axiom-muted: #a7a198;
+  --axiom-accent: #c73a32;
+  --axiom-gold: #d8c69a;
+  --axiom-blue: #5fb7d7;
+  --axiom-shadow-red: rgba(199, 58, 50, 0.35);
+  --axiom-shadow-gold: rgba(216, 198, 154, 0.25);
+}
+
+body.system-axiom #interface {
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+}
+
+body.system-axiom #chat-notifications,
+body.system-axiom #scene-controls menu,
+body.system-axiom #players,
+body.system-axiom #scene-navigation,
+body.system-axiom #hotbar {
+  background: radial-gradient(circle at top left, rgba(199, 58, 50, 0.1), transparent 17rem), var(--axiom-bg);
+  border: 1px solid #050506;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(216, 198, 154, 0.06) inset;
+  color: var(--axiom-text);
+}
+
+body.system-axiom #sidebar {
+  border-radius: 0;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+body.system-axiom #sidebar-content {
+  background: var(--axiom-bg);
+  width:auto;
+  border: 1px solid var(--axiom-border);
+  border-left: 4px double var(--axiom-gold);
+}
+
+body.system-axiom #sidebar-tabs .ui-control,
+body.system-axiom #scene-controls .ui-control,
+body.system-axiom #hotbar .ui-control,
+body.system-axiom #chat-controls .ui-control,
+body.system-axiom .directory-header .inline-control,
+body.system-axiom .placeables-sidebar .inline-control,
+body.system-axiom .combat-sidebar .inline-control,
+body.system-axiom .combat-sidebar .combat-control {
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  background: var(--axiom-panel-3);
+  color: var(--axiom-muted);
+  box-shadow: none;
+}
+
+body.system-axiom #sidebar-tabs .ui-control:hover,
+body.system-axiom #sidebar-tabs .ui-control:focus,
+body.system-axiom #scene-controls .ui-control:hover,
+body.system-axiom #scene-controls .ui-control:focus,
+body.system-axiom #hotbar .ui-control:hover,
+body.system-axiom #hotbar .ui-control:focus,
+body.system-axiom #chat-controls .ui-control:hover,
+body.system-axiom #chat-controls .ui-control:focus,
+body.system-axiom .directory-header .inline-control:hover,
+body.system-axiom .directory-header .inline-control:focus,
+body.system-axiom .placeables-sidebar .inline-control:hover,
+body.system-axiom .placeables-sidebar .inline-control:focus,
+body.system-axiom .combat-sidebar .inline-control:hover,
+body.system-axiom .combat-sidebar .inline-control:focus,
+body.system-axiom .combat-sidebar .combat-control:hover,
+body.system-axiom .combat-sidebar .combat-control:focus {
+  color: var(--axiom-gold);
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.28);
+  text-shadow: none;
+}
+
+body.system-axiom #sidebar-tabs .ui-control.active,
+body.system-axiom #sidebar-tabs .ui-control[aria-pressed="true"],
+body.system-axiom #scene-controls .ui-control.active,
+body.system-axiom #scene-controls .ui-control[aria-pressed="true"],
+body.system-axiom #hotbar .ui-control.active,
+body.system-axiom #hotbar .ui-control[aria-pressed="true"],
+body.system-axiom #chat-controls .ui-control.active,
+body.system-axiom #chat-controls .ui-control[aria-pressed="true"] {
+  color: var(--axiom-gold);
+  border-color: var(--axiom-gold);
+  box-shadow: inset 0 -2px 0 var(--axiom-gold), 0 0 10px var(--axiom-shadow-gold);
+}
+
+body.system-axiom #scene-controls menu {
+  padding: 6px;
+  gap: 5px;
+}
+
+body.system-axiom #scene-navigation {
+  padding: 8px;
+}
+
+body.system-axiom #scene-navigation .scene {
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  box-shadow: inset -3px 0 0 var(--axiom-gold);
+  color: var(--axiom-text);
+}
+
+body.system-axiom #scene-navigation .scene-name {
+  color: var(--axiom-text);
+  font-weight: 700;
+}
+
+body.system-axiom #players {
+  padding: 8px;
+}
+
+body.system-axiom #players .player {
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  box-shadow: inset -3px 0 0 var(--player-color, var(--axiom-gold));
+  color: var(--axiom-text);
+}
+
+body.system-axiom #players .player-name {
+  color: var(--axiom-text);
+  font-weight: 700;
+}
+
+body.system-axiom #performance-stats {
+  gap: 5px;
+  margin-top: 6px;
+}
+
+body.system-axiom #performance-stats > div,
+body.system-axiom #players-expand {
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-muted);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 10px;
+  text-align: center;
+}
+
+body.system-axiom #performance-stats label {
+  color: var(--axiom-muted);
+}
+
+body.system-axiom #performance-stats span {
+  color: var(--axiom-text);
+}
+
+body.system-axiom #hotbar {
+  padding: 7px;
+}
+
+body.system-axiom #hotbar #action-bar {
+  gap: 4px;
+}
+
+body.system-axiom #hotbar .slot {
+  background: var(--axiom-panel-2);
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  box-shadow: inset -3px 0 0 rgba(216, 198, 154, 0.26);
+}
+
+body.system-axiom #hotbar .slot:hover,
+body.system-axiom #hotbar .slot:focus {
+  border-color: var(--axiom-gold);
+  box-shadow: inset -3px 0 0 var(--axiom-gold), 0 0 6px var(--axiom-shadow-gold);
+}
+
+body.system-axiom #hotbar .slot .key {
+  color: var(--axiom-muted);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 10px;
+}
+
+body.system-axiom #hotbar-page-controls,
+body.system-axiom #hotbar .hotbar-controls {
+  gap: 5px;
+}
+
+body.system-axiom #hotbar-page-controls .hotbar-page-number {
+  color: var(--axiom-gold);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+body.system-axiom .directory-header,
+body.system-axiom .combat-tracker-header,
+body.system-axiom .placeables-sidebar > nav.tabs,
+body.system-axiom .settings-sidebar .info {
+  background: #0c0c10;
+  border-bottom: 1px solid var(--axiom-border);
+  color: var(--axiom-text);
+}
+
+body.system-axiom .directory-header .header-actions button,
+body.system-axiom .directory-footer button,
+body.system-axiom .settings-sidebar button,
+body.system-axiom .settings-sidebar a.button,
+body.system-axiom .dsn-sidebar-tab button,
+body.system-axiom .placeables-sidebar button,
+body.system-axiom .combat-sidebar .combat-control-lg {
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  background: var(--axiom-panel-3);
+  color: var(--axiom-muted);
+  font-family: Marcellus, Georgia, serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  box-shadow: none;
+}
+
+body.system-axiom .directory-header .header-actions button:hover,
+body.system-axiom .directory-header .header-actions button:focus,
+body.system-axiom .directory-footer button:hover,
+body.system-axiom .directory-footer button:focus,
+body.system-axiom .settings-sidebar button:hover,
+body.system-axiom .settings-sidebar button:focus,
+body.system-axiom .settings-sidebar a.button:hover,
+body.system-axiom .settings-sidebar a.button:focus,
+body.system-axiom .dsn-sidebar-tab button:hover,
+body.system-axiom .dsn-sidebar-tab button:focus,
+body.system-axiom .placeables-sidebar button:hover,
+body.system-axiom .placeables-sidebar button:focus,
+body.system-axiom .combat-sidebar .combat-control-lg:hover,
+body.system-axiom .combat-sidebar .combat-control-lg:focus {
+  color: var(--axiom-gold);
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.25);
+  text-shadow: none;
+}
+
+body.system-axiom .directory-header search,
+body.system-axiom .placeables-sidebar search,
+body.system-axiom #chat-message,
+body.system-axiom .chat-form,
+body.system-axiom #chat-controls {
+  background: #121216;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-text);
+}
+
+body.system-axiom .directory-header search input,
+body.system-axiom .placeables-sidebar search input {
+  background: transparent;
+  border: 0;
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+}
+
+body.system-axiom .directory-header search input::placeholder,
+body.system-axiom .placeables-sidebar search input::placeholder {
+  color: var(--axiom-muted);
+}
+
+body.system-axiom .directory-list .directory-item {
+  background: transparent;
+  border-bottom: 2px solid var(--axiom-border);
+  color: var(--axiom-text);
+}
+
+body.system-axiom .directory-list .directory-item:hover {
+  background: rgba(216, 198, 154, 0.045);
+}
+
+body.system-axiom .directory-list .directory-item .thumbnail,
+body.system-axiom .placeable-directory .thumbnail {
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+}
+
+body.system-axiom .directory-list .directory-item .entry-name {
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+  font-size: 13px;
+}
+
+body.system-axiom .directory-list .directory-item .entry-name:hover,
+body.system-axiom .directory-list .directory-item .entry-name:focus {
+  color: var(--axiom-gold);
+  text-shadow: none;
+}
+
+body.system-axiom .directory-footer {
+  border-top: 1px solid var(--axiom-border);
+}
+
+body.system-axiom .combat-sidebar .encounter-controls,
+body.system-axiom .combat-sidebar .encounters,
+body.system-axiom .combat-sidebar .combat-controls {
+  background: transparent;
+  color: var(--axiom-text);
+}
+
+body.system-axiom .combat-sidebar .encounter-title {
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+body.system-axiom .combat-sidebar .combatant {
+  background: var(--axiom-panel-2);
+  border-bottom: 1px solid var(--axiom-border);
+  color: var(--axiom-text);
+}
+
+body.system-axiom .combat-sidebar .combatant.active,
+body.system-axiom .combat-sidebar .combatant.active-turn {
+  background: linear-gradient(90deg, rgba(199, 58, 50, 0.12), var(--axiom-panel-2));
+  box-shadow: inset -3px 0 0 var(--axiom-accent);
+}
+
+body.system-axiom .combat-sidebar .combatant .token-image {
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+}
+
+body.system-axiom .combat-sidebar .combatant .name {
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+}
+
+body.system-axiom .chat-sidebar .chat-scroll,
+body.system-axiom #chat-notifications .overflow {
+  background: transparent;
+}
+
+body.system-axiom .chat-log.themed.theme-light {
+  background: transparent;
+}
+
+body.system-axiom #chat-message {
+  background: #0c0c10;
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+body.system-axiom #chat-message .editor-menu {
+  background: #0c0c10;
+  border-bottom: 1px solid var(--axiom-border);
+  color: var(--axiom-text);
+}
+
+body.system-axiom #chat-message .editor-menu button {
+  color: var(--axiom-muted);
+}
+
+body.system-axiom #chat-message .editor-menu button:hover,
+body.system-axiom #chat-message .editor-menu button:focus {
+  color: var(--axiom-gold);
+  background: var(--axiom-panel-3);
+}
+
+body.system-axiom #chat-message .editor-content {
+  background: #121216;
+  color: var(--axiom-text);
+}
+
+body.system-axiom #chat-controls {
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+body.system-axiom .settings-sidebar {
+  background: var(--axiom-bg);
+  color: var(--axiom-text);
+}
+
+body.system-axiom .settings-sidebar h1,
+body.system-axiom .settings-sidebar h4,
+body.system-axiom .settings-sidebar .label {
+  color: var(--axiom-gold);
+}
+
+body.system-axiom .settings-sidebar .subtitle,
+body.system-axiom .settings-sidebar .value {
+  color: var(--axiom-muted);
+}
+
+body.system-axiom .dsn-sidebar-tab {
+  background: var(--axiom-bg);
+  color: var(--axiom-text);
+}
+
+body.system-axiom .dsn-sidebar-tab .dsn-toolbox-section,
+body.system-axiom .dsn-sidebar-tab .dsn-toolbox-dice-row,
+body.system-axiom .global-control {
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+  color: var(--axiom-text);
+}
+
+/* ----------------------------------------- */
+/*  General Foundry Interface Cleanup         */
+/* ----------------------------------------- */
+
+/* Keep the Axiom treatment on buttons and contents, but do not turn Foundry's
+   layout columns into large opaque panels. */
+body.system-axiom #ui-left,
+body.system-axiom #ui-left-column-1,
+body.system-axiom #ui-left-column-2,
+body.system-axiom #ui-right-column-1,
+body.system-axiom #scene-controls,
+body.system-axiom #scene-navigation,
+body.system-axiom #chat-notifications {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body.system-axiom #ui-left-column-1 {
+  width: auto;
+}
+
+/* The scene controls are vertical button stacks. Styling the whole menu creates
+   a tall black column in Foundry V14, so keep only the buttons styled. */
+body.system-axiom #scene-controls menu,
+body.system-axiom #scene-controls-layers,
+body.system-axiom #scene-controls-tools {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* The scene navigation already has strong UI placement. Avoid the large browser
+   backdrop and leave the actual scene pill readable. */
+body.system-axiom #scene-navigation {
+  padding: 0;
+}
+
+/* Chat notifications live in ui-right-column-1 and can span most of the screen.
+   Do not give that wrapper a permanent panel background. */
+body.system-axiom #chat-notifications,
+body.system-axiom #chat-notifications .overflow {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Some Foundry panes use faded-ui/flexcol wrappers as layout containers rather
+   than visible panels. Keep those containers invisible unless a more specific
+   Axiom rule styles their actual contents. */
+body.system-axiom #ui-left .faded-ui.flexcol,
+body.system-axiom #ui-right-column-1 > .faded-ui.flexcol {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+button.icon, a.button.icon {
+  width: 40px;
+}

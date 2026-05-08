@@ -1,0 +1,87 @@
+{
+  "id": "axiom",
+  "title": "Axiom//Core System",
+  "description": "The official Axiom//Core system created by PlexiStan",
+  "version": "0.0.1",
+  "authors": [
+    {
+      "name": "PlexiStan",
+      "discord": "PlexiStan"
+    }
+  ],
+  "compatibility": {
+    "minimum": 14,
+    "verified": "14.360",
+    "maximum": 14
+  },
+  "esmodules": ["axiom.mjs"],
+  "styles": ["axiom.css"],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "fr",
+      "name": "Français",
+      "path": "lang/fr.json"
+    }
+  ],
+  "documentTypes": {
+    "Actor": {
+      "protagonist": {
+        "htmlFields": ["details.biography", "details.notes"]
+      },
+      "npc": {
+        "htmlFields": ["details.biography", "details.notes"]
+      }
+    },
+    "Item": {
+      "skill": {
+        "htmlFields": ["description.value"]
+      },
+      "armor": {
+        "htmlFields": ["description.value"]
+      },
+      "meleeWeapon": {
+        "htmlFields": ["description.value"]
+      },
+      "rangedWeapon": {
+        "htmlFields": ["description.value"]
+      },
+      "ammunition": {
+        "htmlFields": ["description.value"]
+      },
+      "equipment": {
+        "htmlFields": ["description.value"]
+      },
+      "trait": {
+        "htmlFields": ["description.value"]
+      }
+    }
+  },
+  "packs": [
+    {
+      "name": "core-skills",
+      "label": "Axiom//Core Skills",
+      "path": "packs/core-skills",
+      "type": "Item",
+      "system": "axiom",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "TRUSTED": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    }
+  ],
+  "socket": false,
+  "background" : "systems/axiom/assets/background.webp",
+  "grid": {
+    "distance": 1,
+    "units": "m"
+  },
+  "url": "https://github.com/QBallStan/Axiom-FoundryVTT",
+  "manifest": "https://github.com/QBallStan/Axiom-FoundryVTT/releases/latest/download/system.json",
+  "download": "https://github.com/QBallStan/Axiom-FoundryVTT/releases/download/v0.0.1/system.zip"
+}

@@ -1,0 +1,129 @@
+<div class="axiom-roll-window" aria-label="{{localize 'AXIOM.Roll.WindowTitle'}}">
+  <main class="roll-body">
+    <div class="column setup-column">
+      <h2 class="section-title">{{localize "AXIOM.Roll.Setup"}}</h2>
+
+      <div class="form-row timeframe-row">
+        <label class="timeframe-label">
+          <span>{{localize "AXIOM.Roll.Timeframe"}}</span>
+          <button
+            class="timeframe-roll-button {{#if roll.timeframeRolled}}rolled{{/if}}"
+            type="button"
+            data-action="rollTimeframe"
+            {{#unless roll.hasTimeframe}}disabled{{/unless}}
+            aria-label="{{localize 'AXIOM.Roll.RollTimeframe'}}"
+            title="{{#if roll.timeframeRolled}}{{roll.timeframeResultDisplay}}{{else}}{{localize 'AXIOM.Roll.RollTimeframe'}}{{/if}}"
+          >
+            <i class="fa-solid fa-dice-d6"></i>
+          </button>
+        </label>
+        <div class="timeframe-control">
+          <select data-roll-field="timeframe">
+            {{#each roll.timeframes}}
+              <option value="{{key}}" {{#if selected}}selected{{/if}}>{{localize label}}</option>
+            {{/each}}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>{{localize "AXIOM.Roll.Difficulty"}}</label>
+        <select data-roll-field="difficulty">
+          {{#each roll.difficulties}}
+            <option value="{{key}}" {{#if selected}}selected{{/if}}>{{localize label}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="summary-card">
+        <button class="summary-line pool-toggle" type="button" data-action="toggleBasePool" aria-expanded="{{roll.poolEditorOpen}}">
+          <span class="label">{{localize "AXIOM.Roll.BasePool"}}</span>
+          <strong data-preview="basePool">{{roll.basePool}}</strong>
+        </button>
+
+        {{#if roll.poolEditorOpen}}
+          <div class="pool-editor">
+            <div class="pool-grid">
+              <div class="pool-field">
+                <span>{{localize "AXIOM.Skill.AttributeOne"}}</span>
+                <select data-roll-field="attributeOne">
+                  {{#each roll.attributeOneOptions}}
+                    <option value="{{key}}" {{#if selected}}selected{{/if}}>{{localize label}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="pool-field">
+                <span>{{localize "AXIOM.Skill.AttributeTwo"}}</span>
+                <select data-roll-field="attributeTwo">
+                  {{#each roll.attributeTwoOptions}}
+                    <option value="{{key}}" {{#if selected}}selected{{/if}}>{{localize label}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="pool-field">
+                <span>{{localize "AXIOM.Roll.Skill"}}</span>
+                <input type="number" value="{{roll.skillValue}}" data-roll-field="skillValue" />
+              </div>
+            </div>
+          </div>
+        {{/if}}
+
+        <div class="summary-line"><span class="label">{{localize "AXIOM.Roll.Difficulty"}}</span><strong data-preview="difficulty">{{roll.difficulty}}</strong></div>
+        <div class="summary-line"><span class="label">{{localize "AXIOM.Roll.Modifiers"}}</span><strong data-preview="modifiers">{{roll.modifiersDisplay}}</strong></div>
+        <div class="summary-line total"><span class="label">{{localize "AXIOM.Roll.SuccessTarget"}}</span><strong data-preview="successTarget">{{roll.successTarget}}</strong></div>
+      </div>
+
+      <div class="ap-row">
+        <span class="label">{{localize "AXIOM.Roll.ActionPoints"}}</span>
+        <div class="ap-buttons">
+          <button class="ap-button {{#if roll.ap0}}active{{/if}}" type="button" data-action="selectActionPoints" data-ap="0">0</button>
+          <button class="ap-button {{#if roll.ap1}}active{{/if}}" type="button" data-action="selectActionPoints" data-ap="1">1</button>
+          <button class="ap-button {{#if roll.ap2}}active{{/if}}" type="button" data-action="selectActionPoints" data-ap="2">2</button>
+          <button class="ap-button {{#if roll.ap3}}active{{/if}}" type="button" data-action="selectActionPoints" data-ap="3">3</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="column modifiers-column">
+      <h2 class="section-title modifiers-heading">{{localize "AXIOM.Roll.Modifiers"}}</h2>
+
+      <div class="modifier-panel">
+        {{#if roll.hasModifierRows}}
+          <div class="mod-row header"><span>{{localize "AXIOM.Roll.Source"}}</span><span>{{localize "AXIOM.Roll.Value"}}</span><span></span></div>
+          {{#each roll.modifierRows}}
+            <div class="mod-row {{#if automatic}}automatic{{/if}} {{#if locked}}locked{{/if}} {{#if conditional}}conditional{{/if}}">
+              <span class="label">{{localize label}}</span>
+              <input value="{{value}}" data-modifier-value data-modifier-id="{{id}}" {{#if locked}}disabled{{/if}} />
+              {{#if conditional}}
+                <label class="conditional-effect-toggle" title="{{localize 'AXIOM.Roll.ConditionalEffectToggle'}}">
+                  <input type="checkbox" data-action="toggleConditionalEffect" data-modifier-id="{{id}}" {{#if active}}checked{{/if}}>
+                </label>
+              {{else}}
+                {{#if automatic}}
+                  <button class="icon-button lock-button" type="button" data-action="toggleModifierLock" data-modifier-id="{{id}}" title="{{localize lockLabel}}" aria-label="{{localize lockLabel}}"><i class="{{lockIcon}}"></i></button>
+                {{else}}
+                  <button class="icon-button" type="button" data-action="removeModifier" data-modifier-id="{{id}}" data-modifier-index="{{@index}}">×</button>
+                {{/if}}
+              {{/if}}
+            </div>
+          {{/each}}
+        {{/if}}
+        <button class="add-mod" type="button" data-action="addModifier">+ {{localize "AXIOM.Roll.AddModifier"}}</button>
+        {{#if roll.isWeaponRoll}}
+          <button class="add-mod called-shot-button" type="button" data-action="addCalledShot">+ {{localize "AXIOM.Roll.AddCalledShot"}}</button>
+        {{/if}}
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <select class="roll-mode" data-roll-field="rollMode">
+      {{#each roll.rollModes}}
+        <option value="{{key}}" {{#if selected}}selected{{/if}}>{{localize label}}</option>
+      {{/each}}
+    </select>
+    <button class="roll-button" type="button" data-action="rollD100">◆ {{localize "AXIOM.Roll.RollD100"}}</button>
+  </footer>
+</div>
