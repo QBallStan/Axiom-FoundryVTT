@@ -9,6 +9,7 @@ import AxiomProtagonistData from "./modules/model/actor/protagonist.mjs";
 import AxiomNpcData from "./modules/model/actor/npc.mjs";
 import AxiomSkillData from "./modules/model/item/skill.mjs";
 import AxiomArmorData from "./modules/model/item/armor.mjs";
+import AxiomShieldData from "./modules/model/item/shield.mjs";
 import AxiomWeaponData from "./modules/model/item/weapon.mjs";
 import AxiomMeleeWeaponData from "./modules/model/item/melee-weapon.mjs";
 import AxiomRangedWeaponData from "./modules/model/item/ranged-weapon.mjs";
@@ -19,6 +20,7 @@ import AxiomProtagonistSheet from "./modules/sheets/actor/protagonist-sheet.mjs"
 import AxiomNpcSheet from "./modules/sheets/actor/npc-sheet.mjs";
 import AxiomSkillSheet from "./modules/sheets/item/skill-sheet.mjs";
 import AxiomArmorSheet from "./modules/sheets/item/armor-sheet.mjs";
+import AxiomShieldSheet from "./modules/sheets/item/shield-sheet.mjs";
 import AxiomWeaponSheet from "./modules/sheets/item/weapon-sheet.mjs";
 import AxiomMeleeWeaponSheet from "./modules/sheets/item/melee-weapon-sheet.mjs";
 import AxiomRangedWeaponSheet from "./modules/sheets/item/ranged-weapon-sheet.mjs";
@@ -35,6 +37,7 @@ import { registerAxiomSettings } from "./modules/system/settings.mjs";
 import AxiomCombat from "./modules/system/combat.mjs";
 import { registerAxiomCombatTracker } from "./modules/system/combat-tracker.mjs";
 import { registerAxiomTokenOverlays } from "./modules/system/token-overlays.mjs";
+import { registerAxiomDice } from "./modules/system/dice.mjs";
 
 const { Actor, Item } = foundry.documents;
 const { DocumentSheetConfig } = foundry.applications.apps;
@@ -119,6 +122,8 @@ Hooks.once("init", async function () {
 
   registerAxiomSettings();
 
+  registerAxiomDice();
+
   game.axiom = {
     config: AXIOM,
     applications: { AxiomRollWindow },
@@ -141,6 +146,7 @@ Hooks.once("init", async function () {
   CONFIG.Actor.dataModels.npc = AxiomNpcData;
   CONFIG.Item.dataModels.skill = AxiomSkillData;
   CONFIG.Item.dataModels.armor = AxiomArmorData;
+  CONFIG.Item.dataModels.shield = AxiomShieldData;
   CONFIG.Item.dataModels.weapon = AxiomWeaponData;
   CONFIG.Item.dataModels.meleeWeapon = AxiomMeleeWeaponData;
   CONFIG.Item.dataModels.rangedWeapon = AxiomRangedWeaponData;
@@ -173,6 +179,12 @@ Hooks.once("init", async function () {
     types: ["armor"],
     makeDefault: true,
     label: "Axiom//Core Armor Sheet"
+  });
+
+  DocumentSheetConfig.registerSheet(Item, "axiom", AxiomShieldSheet, {
+    types: ["shield"],
+    makeDefault: true,
+    label: "Axiom//Core Shield Sheet"
   });
 
   DocumentSheetConfig.registerSheet(Item, "axiom", AxiomWeaponSheet, {
@@ -284,6 +296,7 @@ async function preloadTemplates() {
     "systems/axiom/templates/sheets/item/tabs/description.hbs",
     "systems/axiom/templates/sheets/item/tabs/skill-details.hbs",
     "systems/axiom/templates/sheets/item/tabs/armor-details.hbs",
+    "systems/axiom/templates/sheets/item/tabs/shield-details.hbs",
     "systems/axiom/templates/sheets/item/tabs/weapon-details.hbs",
     "systems/axiom/templates/sheets/item/tabs/equipment-details.hbs",
     "systems/axiom/templates/sheets/item/tabs/trait-details.hbs",

@@ -9,34 +9,60 @@
     </div>
   </div>
 
-  {{#if combatTab.meleeWeapons.length}}
+  {{#if combatTab.meleeItems.length}}
     <section class="combat-gear-section">
-      <h2 class="section-title"><i class="fa-solid fa-gavel"></i> {{localize "AXIOM.Actor.Combat.MeleeWeapons"}}</h2>
+      <h2 class="section-title"><i class="fa-solid fa-gavel"></i> {{localize "AXIOM.Actor.Combat.Melee"}}</h2>
       <div class="combat-gear-list">
-        {{#each combatTab.meleeWeapons}}
-          <article class="combat-item-row weapon-row" data-item-id="{{id}}">
-            <img class="combat-item-img" src="{{img}}" alt="{{name}}" />
-            <div class="combat-item-line">
-              <span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span>
-              <span>{{localize "AXIOM.Weapon.Skill"}} {{#if skill}}{{skill}}{{else}}{{localize "AXIOM.Weapon.NoSkill"}}{{/if}}</span>
-              <span>{{localize "AXIOM.Weapon.Damage"}} {{damage}}</span>
-              <span>{{localize "AXIOM.Weapon.ArmorPenetration"}} {{armorPenetration}}</span>
-              <span>{{delivery}}</span>
-            </div>
-            <div class="combat-item-actions">
-              <select class="combat-state-select" data-action="updateCombatItemState" title="{{localize 'AXIOM.Item.State.Label'}}">
-                {{#each stateOptions}}
-                  <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
-                {{/each}}
-              </select>
-              <button type="button" data-action="rollWeaponAttack" title="{{localize 'AXIOM.Actor.Combat.Attack'}}"><i class="fa-solid fa-dice-d20"></i></button>
-              <button type="button" data-action="editCombatItem" title="{{localize 'AXIOM.Actor.Combat.EditItem'}}"><i class="fa-solid fa-pen-to-square"></i></button>
-              <button type="button" data-action="deleteCombatItem" title="{{localize 'AXIOM.Actor.Combat.DeleteItem'}}"><i class="fa-solid fa-trash"></i></button>
-            </div>
-            {{#if description}}
-              <div class="item-description-inline combat-item-description" hidden>{{{description}}}</div>
-            {{/if}}
-          </article>
+        {{#each combatTab.meleeItems}}
+          {{#if isShield}}
+            <article class="combat-item-row shield-row" data-item-id="{{id}}">
+              <img class="combat-item-img" src="{{img}}" alt="{{name}}" />
+              <div class="combat-item-line">
+                <span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span>
+                <span>{{localize "AXIOM.Shield.Skill"}} {{#if skill}}{{skill}}{{else}}{{localize "AXIOM.Weapon.NoSkill"}}{{/if}}</span>
+                <span>{{localize "AXIOM.Shield.BlockValue"}} {{blockValue}}</span>
+                <span>{{localize "AXIOM.Shield.ArmorBonus"}} {{armorBonus}}</span>
+                <span>{{localize "AXIOM.Shield.Cover.Label"}} {{coverLabel}}</span>
+              </div>
+              <div class="combat-item-actions">
+                <select class="combat-state-select" data-action="updateCombatItemState" title="{{localize 'AXIOM.Item.State.Label'}}">
+                  {{#each stateOptions}}
+                    <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+                  {{/each}}
+                </select>
+                <button type="button" data-action="rollShieldBlock" title="{{localize 'AXIOM.Combat.Block'}}"><i class="fa-solid fa-shield-halved"></i></button>
+                <button type="button" data-action="editCombatItem" title="{{localize 'AXIOM.Actor.Combat.EditItem'}}"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button type="button" data-action="deleteCombatItem" title="{{localize 'AXIOM.Actor.Combat.DeleteItem'}}"><i class="fa-solid fa-trash"></i></button>
+              </div>
+              {{#if description}}
+                <div class="item-description-inline combat-item-description" hidden>{{{description}}}</div>
+              {{/if}}
+            </article>
+          {{else}}
+            <article class="combat-item-row weapon-row" data-item-id="{{id}}">
+              <img class="combat-item-img" src="{{img}}" alt="{{name}}" />
+              <div class="combat-item-line">
+                <span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span>
+                <span>{{localize "AXIOM.Weapon.Skill"}} {{#if skill}}{{skill}}{{else}}{{localize "AXIOM.Weapon.NoSkill"}}{{/if}}</span>
+                <span>{{localize "AXIOM.Weapon.Damage"}} {{damage}}</span>
+                <span>{{localize "AXIOM.Weapon.ArmorPenetration"}} {{armorPenetration}}</span>
+                <span>{{delivery}}</span>
+              </div>
+              <div class="combat-item-actions">
+                <select class="combat-state-select" data-action="updateCombatItemState" title="{{localize 'AXIOM.Item.State.Label'}}">
+                  {{#each stateOptions}}
+                    <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+                  {{/each}}
+                </select>
+                <button type="button" data-action="rollWeaponAttack" title="{{localize 'AXIOM.Actor.Combat.Attack'}}"><i class="fa-solid fa-dice-d20"></i></button>
+                <button type="button" data-action="editCombatItem" title="{{localize 'AXIOM.Actor.Combat.EditItem'}}"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button type="button" data-action="deleteCombatItem" title="{{localize 'AXIOM.Actor.Combat.DeleteItem'}}"><i class="fa-solid fa-trash"></i></button>
+              </div>
+              {{#if description}}
+                <div class="item-description-inline combat-item-description" hidden>{{{description}}}</div>
+              {{/if}}
+            </article>
+          {{/if}}
         {{/each}}
       </div>
     </section>
@@ -44,7 +70,7 @@
 
   {{#if combatTab.rangedWeapons.length}}
     <section class="combat-gear-section">
-      <h2 class="section-title"><i class="fa-solid fa-crosshairs"></i> {{localize "AXIOM.Actor.Combat.RangedWeapons"}}</h2>
+      <h2 class="section-title"><i class="fa-solid fa-crosshairs"></i> {{localize "AXIOM.Actor.Combat.Range"}}</h2>
       <div class="combat-gear-list">
         {{#each combatTab.rangedWeapons}}
           <article class="combat-item-row weapon-row ranged-row" data-item-id="{{id}}">

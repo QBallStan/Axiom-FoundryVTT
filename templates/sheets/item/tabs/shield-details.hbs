@@ -1,0 +1,37 @@
+<section class="tab-section details-tab shield-details">
+  <div class="form-grid compact shield-grid">
+    <label class="field-group">
+      <span>{{localize "AXIOM.Shield.Skill"}}</span>
+      <input type="text" name="system.skill" value="{{system.skill}}" list="shield-skills-{{item.id}}" placeholder="{{localize 'AXIOM.Weapon.SkillPlaceholder'}}" autocomplete="off" />
+      <datalist id="shield-skills-{{item.id}}">
+        {{#each shield.skills}}
+          <option value="{{this}}"></option>
+        {{/each}}
+      </datalist>
+    </label>
+
+    <label class="field-group">
+      <span>{{localize "AXIOM.Shield.BlockValue"}}</span>
+      <input type="number" name="system.blockValue" value="{{system.blockValue}}" min="0" step="1" />
+    </label>
+
+    <label class="field-group">
+      <span>{{localize "AXIOM.Shield.ArmorBonus"}}</span>
+      <input type="number" name="system.armorBonus" value="{{system.armorBonus}}" min="0" step="1" />
+    </label>
+
+    <label class="field-group">
+      <span>{{localize "AXIOM.Shield.Cover.Label"}}</span>
+      <select name="system.cover">
+        {{selectOptions config.coverTypes selected=system.cover localize=true}}
+      </select>
+    </label>
+
+    <label class="field-group">
+      <span>{{localize "AXIOM.Item.State.Label"}}</span>
+      <select name="system.state">
+        {{selectOptions config.gearStates selected=system.state localize=true}}
+      </select>
+    </label>
+  </div>
+</section>

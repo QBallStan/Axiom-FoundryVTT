@@ -3,7 +3,7 @@ import AxiomItemSheet from "./base.mjs";
 export default class AxiomTraitSheet extends AxiomItemSheet {
   static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS, {
     classes: ["axiom", "sheet", "item", "item-sheet", "trait"],
-    position: { width: 520, height: 400 }
+    position: { width: 520, height: 500 }
   }, { inplace: false });
 
   static DISPLAY_COMMON_FIELDS = false;

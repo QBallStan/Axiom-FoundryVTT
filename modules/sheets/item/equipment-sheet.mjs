@@ -3,7 +3,7 @@ import AxiomItemSheet from "./base.mjs";
 export default class AxiomEquipmentSheet extends AxiomItemSheet {
   static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS, {
     classes: ["axiom", "sheet", "item", "item-sheet", "equipment"],
-    position: { width: 520, height: 420 }
+    position: { width: 520, height: 500 }
   }, { inplace: false });
 
   static TABS = {

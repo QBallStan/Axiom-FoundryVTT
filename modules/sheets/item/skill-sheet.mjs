@@ -5,7 +5,7 @@ export default class AxiomSkillSheet extends AxiomItemSheet {
     classes: ["axiom", "sheet", "item", "item-sheet", "skill"],
     position: {
       width: 520,
-      height: 440
+      height: 500
     }
   }, { inplace: false });
 

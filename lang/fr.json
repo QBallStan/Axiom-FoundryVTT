@@ -306,7 +306,11 @@
         "NoMeleeWeapons": "Aucune arme de mêlée.",
         "NoRangedWeapons": "Aucune arme à distance.",
         "NoArmor": "Aucune armure.",
-        "NoAmmunition": "Aucune munition."
+        "NoAmmunition": "Aucune munition.",
+        "Melee": "Mêlée",
+        "Range": "Distance",
+        "Shields": "Boucliers",
+        "NoShields": "Aucun bouclier."
       },
       "NPC": {
         "Config": "Configuration PNJ",
@@ -705,6 +709,18 @@
       "SmartAdvanceHint": "Avance selon les règles de passes et de PA d’Axiom. Si ce combattant n’a pas dépensé de PA, il perd 1 PA.",
       "ForceNextHint": "Ignore le filtrage des passes par PA et passe au combattant suivant dans l’ordre d’initiative.",
       "PassLabel": "Passe {pass}"
+    },
+    "Shield": {
+      "Skill": "Compétence",
+      "BlockValue": "Blocage",
+      "ArmorBonus": "Bonus d’armure",
+      "Cover": {
+        "Label": "Couvert",
+        "None": "Aucun",
+        "Light": "Léger",
+        "Medium": "Moyen",
+        "Heavy": "Lourd"
+      }
     }
   },
   "TYPES": {
@@ -720,7 +736,13 @@
       "weapon": "Arme (héritée)",
       "ammunition": "Munition",
       "equipment": "Équipement",
-      "trait": "Trait"
+      "trait": "Trait",
+      "shield": "Bouclier"
     }
-  }
+  },
+  "AXIOM.Combat.Block": "Bloquer",
+  "AXIOM.Combat.BlockWith": "Bloquer avec {shield}",
+  "AXIOM.Roll.ModifierSources.ShieldBlock": "Blocage du bouclier",
+  "AXIOM.Shield.NoSkillSelectedWarning": "{shield} utilise {skill}, mais cette compétence est introuvable sur cet acteur.",
+  "AXIOM.Combat.NoShieldAvailable": "{actor} n’a pas de bouclier équipé."
 }

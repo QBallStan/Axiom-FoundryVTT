@@ -306,7 +306,11 @@
         "NoMeleeWeapons": "No melee weapons.",
         "NoRangedWeapons": "No ranged weapons.",
         "NoArmor": "No armor.",
-        "NoAmmunition": "No ammunition."
+        "NoAmmunition": "No ammunition.",
+        "Melee": "Melee",
+        "Range": "Range",
+        "Shields": "Shields",
+        "NoShields": "No shields."
       },
       "NPC": {
         "Config": "NPC Configuration",
@@ -705,6 +709,18 @@
       "SmartAdvanceHint": "Advance using Axiom AP pass rules. If this combatant did not spend AP, they lose 1 AP.",
       "ForceNextHint": "Bypass AP pass filtering and move to the next combatant in initiative order.",
       "PassLabel": "Pass {pass}"
+    },
+    "Shield": {
+      "Skill": "Skill",
+      "BlockValue": "Block",
+      "ArmorBonus": "Armor Bonus",
+      "Cover": {
+        "Label": "Cover",
+        "None": "None",
+        "Light": "Light",
+        "Medium": "Medium",
+        "Heavy": "Heavy"
+      }
     }
   },
   "TYPES": {
@@ -720,7 +736,13 @@
       "weapon": "Weapon (Legacy)",
       "ammunition": "Ammunition",
       "equipment": "Equipment",
-      "trait": "Trait"
+      "trait": "Trait",
+      "shield": "Shield"
     }
-  }
+  },
+  "AXIOM.Combat.Block": "Block",
+  "AXIOM.Combat.BlockWith": "Block with {shield}",
+  "AXIOM.Roll.ModifierSources.ShieldBlock": "Shield Block",
+  "AXIOM.Shield.NoSkillSelectedWarning": "{shield} uses {skill}, but that skill could not be found on this actor.",
+  "AXIOM.Combat.NoShieldAvailable": "{actor} has no equipped shield."
 }

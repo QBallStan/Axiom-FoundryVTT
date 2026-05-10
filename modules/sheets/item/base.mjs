@@ -2,7 +2,7 @@ const { ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { mergeObject } = foundry.utils;
 import { getStoredPriceCoins, prepareCurrencyContext, priceCoinsToValue } from "../../system/currency.mjs";
-import { getWeaponCategory, isMeleeWeaponItem, isRangedWeaponItem, isWeaponItem } from "../../system/items.mjs";
+import { getWeaponCategory, isMeleeWeaponItem, isRangedWeaponItem, isWeaponItem, isShieldItem } from "../../system/items.mjs";
 
 
 function getSystemSchemaField(system, path) {
@@ -90,6 +90,7 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
     context.config = this._getConfig();
     context.isSkill = this.item.type === "skill";
     context.isArmor = this.item.type === "armor";
+    context.isShield = isShieldItem(this.item);
     context.isWeapon = isWeaponItem(this.item);
     context.isMeleeWeapon = isMeleeWeaponItem(this.item);
     context.isRangedWeapon = isRangedWeaponItem(this.item);
@@ -111,6 +112,7 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
     };
     context.effects = context.hasEffectsTab ? this._prepareEffects() : { active: [], disabled: [] };
     context.weapon = this._prepareWeaponContext(context.system);
+    context.shield = this._prepareShieldContext(context.system);
     context.equipment = this._prepareEquipmentContext(context.system);
 
     return context;
@@ -151,6 +153,17 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
         long: range * 2,
         extreme: range * 3
       }
+    };
+  }
+
+
+  _prepareShieldContext(system = {}) {
+    const cover = system.cover ?? "light";
+
+    return {
+      cover,
+      skills: this._getWeaponSkillNameOptions(),
+      coverLabel: this._localizeConfigLabel(this._getConfig()?.coverTypes?.[cover], cover)
     };
   }
 
@@ -204,6 +217,11 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
     return Object.fromEntries(ammunition.map(item => [item.id, item.name]));
   }
 
+  _localizeConfigLabel(label, fallback = "") {
+    if (!label) return fallback;
+    return game.i18n.localize(label);
+  }
+
   _getConfig() {
     const fallback = {
       attributes: {
@@ -223,6 +241,11 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
       traitCategories: {
         quality: "AXIOM.Trait.Categories.Quality",
         flaw: "AXIOM.Trait.Categories.Flaw"
+      },
+      coverTypes: {
+        light: "AXIOM.Shield.Cover.Light",
+        medium: "AXIOM.Shield.Cover.Medium",
+        heavy: "AXIOM.Shield.Cover.Heavy"
       }
     };
 

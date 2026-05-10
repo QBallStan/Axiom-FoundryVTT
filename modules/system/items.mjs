@@ -1,6 +1,7 @@
 export const MELEE_WEAPON_TYPE = "meleeWeapon";
 export const RANGED_WEAPON_TYPE = "rangedWeapon";
 export const LEGACY_WEAPON_TYPE = "weapon";
+export const SHIELD_ITEM_TYPE = "shield";
 export const WEAPON_ITEM_TYPES = [MELEE_WEAPON_TYPE, RANGED_WEAPON_TYPE, LEGACY_WEAPON_TYPE];
 
 export function isWeaponItem(item) {
@@ -25,4 +26,8 @@ export function getWeaponCategory(item) {
   if (isMeleeWeaponItem(item)) return "melee";
   if (isRangedWeaponItem(item)) return "ranged";
   return item?.system?.category ?? "";
+}
+
+export function isShieldItem(item) {
+  return item?.type === SHIELD_ITEM_TYPE;
 }

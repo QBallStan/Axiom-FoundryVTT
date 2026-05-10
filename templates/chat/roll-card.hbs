@@ -119,6 +119,9 @@
         {{#if card.showParryAction}}
           <button type="button" data-action="combatParry" data-tooltip="{{localize 'AXIOM.Combat.Parry'}}" aria-label="{{localize 'AXIOM.Combat.Parry'}}"><i class="fa-solid fa-shield-halved"></i></button>
         {{/if}}
+        {{#if card.showBlockAction}}
+          <button type="button" data-action="combatBlock" data-tooltip="{{localize 'AXIOM.Combat.Block'}}" aria-label="{{localize 'AXIOM.Combat.Block'}}"><i class="fa-solid fa-shield"></i></button>
+        {{/if}}
         <button type="button" data-action="combatUnopposed" data-tooltip="{{localize 'AXIOM.Combat.Unopposed'}}" aria-label="{{localize 'AXIOM.Combat.Unopposed'}}"><i class="fa-solid fa-bullseye"></i></button>
       </div>
     {{/if}}

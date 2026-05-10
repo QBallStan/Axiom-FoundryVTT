@@ -482,6 +482,25 @@
   font-size: 22px;
   font-family: "Roboto Mono", monospace;
 }
+.application.sheet.axiom.actor.protagonist .corruption-stat .ratio-value,
+.application.sheet.axiom.actor.npc .corruption-stat .ratio-value {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+.application.sheet.axiom.actor.protagonist .corruption-stat input,
+.application.sheet.axiom.actor.npc .corruption-stat input {
+  width: 48px;
+  height: 28px;
+  padding: 2px 4px;
+  text-align: center;
+  font: inherit;
+  color: var(--axiom-text);
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+}
 .application.sheet.axiom.actor.protagonist .two-col,
 .application.sheet.axiom.actor.npc .two-col {
   display: grid;
@@ -2021,6 +2040,16 @@
 .application.sheet.axiom.actor.npc .npc-stat-grid .stat-card strong {
   font-size: 14px;
 }
+.application.sheet.axiom.actor.npc .npc-stat-grid .corruption-stat .ratio-value {
+  justify-content: flex-end;
+  gap: 3px;
+}
+.application.sheet.axiom.actor.npc .npc-stat-grid .corruption-stat input {
+  width: 34px;
+  height: 22px;
+  padding: 1px 3px;
+  font-size: 14px;
+}
 .application.sheet.axiom.actor.npc .npc-main-lower-grid,
 .application.sheet.axiom.actor.npc .npc-two-column-grid,
 .application.sheet.axiom.actor.npc .npc-skills-split-grid {
@@ -3070,9 +3099,7 @@
 .axiom.item-sheet .editor-section prose-mirror,
 .axiom-item-sheet .editor-section prose-mirror,
 .axiom.item-sheet .editor-section .prosemirror,
-.axiom-item-sheet .editor-section .prosemirror,
-.axiom.item-sheet .editor-section .editor-content,
-.axiom-item-sheet .editor-section .editor-content {
+.axiom-item-sheet .editor-section .prosemirror {
   width: 100%;
   min-height: 220px;
   background: var(--item-panel-dark);
@@ -3080,11 +3107,19 @@
   border-radius: 5px;
   color: var(--item-text);
   line-height: 1.45;
+  box-sizing: border-box;
 }
 .axiom.item-sheet .editor-section .editor-content,
 .axiom-item-sheet .editor-section .editor-content {
+  min-height: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--item-text);
+  line-height: 1.45;
   padding: 8px;
-  overflow: auto;
+  box-sizing: border-box;
+  overflow: visible;
 }
 .axiom.item-sheet .editor-section .editor-menu,
 .axiom-item-sheet .editor-section .editor-menu,
@@ -4147,7 +4182,6 @@ body.system-axiom .combat-sidebar .combat-control-lg {
   border-radius: 5px;
   background: var(--axiom-panel-3);
   color: var(--axiom-muted);
-  font-family: Marcellus, Georgia, serif;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -4371,6 +4405,667 @@ body.system-axiom #ui-right-column-1 > .faded-ui.flexcol {
 button.icon,
 a.button.icon {
   width: 40px;
+}
+/* ----------------------------------------- */
+/*  Chat Messages - Color Pass Only          */
+/* ----------------------------------------- */
+body.system-axiom .chat-message.message {
+  --axiom-chat-bg: #101012;
+  --axiom-chat-panel: #1b1b1f;
+  --axiom-chat-panel-2: #24242a;
+  --axiom-chat-border: #3a3a42;
+  --axiom-chat-text: #e8e4dc;
+  --axiom-chat-muted: #a7a198;
+  --axiom-chat-accent: #c73a32;
+  --axiom-chat-gold: #d8c69a;
+  --axiom-chat-blue: #5fb7d7;
+  background: radial-gradient(circle at top left, rgba(199, 58, 50, 0.1), transparent 140px), linear-gradient(180deg, var(--axiom-chat-panel), var(--axiom-chat-bg));
+  border-color: var(--axiom-chat-border);
+  color: var(--axiom-chat-text);
+  box-shadow: inset -3px 0 0 rgba(216, 198, 154, 0.65), 0 2px 8px rgba(0, 0, 0, 0.28);
+}
+body.system-axiom .chat-message.message.whisper {
+  border-color: rgba(95, 183, 215, 0.45);
+  box-shadow: inset -3px 0 0 rgba(95, 183, 215, 0.7), 0 2px 8px rgba(0, 0, 0, 0.28);
+}
+body.system-axiom .chat-message.message.blind {
+  border-color: rgba(199, 58, 50, 0.55);
+  box-shadow: inset -3px 0 0 rgba(199, 58, 50, 0.8), 0 2px 8px rgba(0, 0, 0, 0.28);
+}
+body.system-axiom .chat-message.message .message-header {
+  background: rgba(21, 21, 25, 0.9);
+  border-color: var(--axiom-chat-border);
+}
+body.system-axiom .chat-message.message .message-sender {
+  color: var(--axiom-chat-gold);
+}
+body.system-axiom .chat-message.message .message-metadata,
+body.system-axiom .chat-message.message .message-timestamp {
+  color: var(--axiom-chat-muted);
+}
+body.system-axiom .chat-message.message .message-delete {
+  color: var(--axiom-chat-muted);
+}
+body.system-axiom .chat-message.message .message-delete:hover {
+  color: var(--axiom-chat-accent);
+  text-shadow: 0 0 6px rgba(199, 58, 50, 0.55);
+}
+body.system-axiom .chat-message.message .message-content {
+  color: var(--axiom-chat-text);
+}
+body.system-axiom .chat-message.message .message-content a {
+  color: var(--axiom-chat-blue);
+}
+body.system-axiom .chat-message.message .message-content h1,
+body.system-axiom .chat-message.message .message-content h2,
+body.system-axiom .chat-message.message .message-content h3,
+body.system-axiom .chat-message.message .message-content h4 {
+  color: var(--axiom-chat-gold);
+}
+/* Default Foundry dice rolls */
+body.system-axiom .chat-message.message .dice-formula {
+  background: #151519;
+  border-color: var(--axiom-chat-border);
+  color: var(--axiom-chat-muted);
+}
+body.system-axiom .chat-message.message .dice-total {
+  background: radial-gradient(circle at center, rgba(199, 58, 50, 0.14), transparent 70%), var(--axiom-chat-panel-2);
+  border-color: var(--axiom-chat-border);
+  color: var(--axiom-chat-text);
+  text-shadow: 0 0 8px rgba(216, 198, 154, 0.28);
+}
+body.system-axiom .chat-message.message .part-header {
+  background: #151519;
+  border-color: var(--axiom-chat-border);
+  color: var(--axiom-chat-muted);
+}
+body.system-axiom .chat-message.message .part-formula {
+  color: var(--axiom-chat-muted);
+}
+body.system-axiom .chat-message.message .part-total {
+  color: var(--axiom-chat-gold);
+}
+body.system-axiom .chat-message.message .dice-rolls {
+  background: var(--axiom-chat-panel-2);
+  border-color: var(--axiom-chat-border);
+}
+body.system-axiom .chat-message.message .dice-rolls .roll {
+  background: #151519;
+  border-color: var(--axiom-chat-border);
+  color: var(--axiom-chat-text);
+  box-shadow: none;
+}
+body.system-axiom .chat-message.message .dice-rolls .roll.max {
+  color: var(--axiom-chat-gold);
+  border-color: rgba(216, 198, 154, 0.65);
+  box-shadow: 0 0 6px rgba(216, 198, 154, 0.25);
+}
+body.system-axiom .chat-message.message .dice-rolls .roll.min {
+  color: var(--axiom-chat-accent);
+  border-color: rgba(199, 58, 50, 0.65);
+  box-shadow: 0 0 6px rgba(199, 58, 50, 0.25);
+}
+/* ----------------------------------------- */
+/*  Journal Sheets - Axiom Rulebook Variant  */
+/* ----------------------------------------- */
+body.system-axiom .application.sheet.journal-sheet.journal-entry {
+  --axiom-journal-bg: #0f0f11;
+  --axiom-journal-page: #141417;
+  --axiom-journal-panel: #1b1b1f;
+  --axiom-journal-panel-2: #24242a;
+  --axiom-journal-panel-3: #151519;
+  --axiom-journal-border: #3a3a42;
+  --axiom-journal-border-soft: rgba(216, 198, 154, 0.18);
+  --axiom-journal-text: #e8e4dc;
+  --axiom-journal-muted: #a7a198;
+  --axiom-journal-accent: #b83a34;
+  --axiom-journal-accent-soft: rgba(184, 58, 52, 0.45);
+  --axiom-journal-gold: #d8c69a;
+  --axiom-journal-blue: #5fb7d7;
+}
+/* Window shell */
+body.system-axiom .application.sheet.journal-sheet.journal-entry .window-content {
+  background: radial-gradient(circle at top left, rgba(184, 58, 52, 0.1), transparent 260px), linear-gradient(180deg, #151519, var(--axiom-journal-bg));
+  color: var(--axiom-journal-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .window-header {
+  background: #101012;
+  border-color: var(--axiom-journal-border);
+  color: var(--axiom-journal-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .window-title {
+  color: var(--axiom-journal-gold);
+  font-family: "Marcellus", serif;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .header-control {
+  color: var(--axiom-journal-muted);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .header-control:hover {
+  color: var(--axiom-journal-gold);
+  text-shadow: 0 0 6px rgba(216, 198, 154, 0.35);
+}
+/* Sidebar */
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-sidebar {
+  background: linear-gradient(180deg, #17171b, #111114);
+  border-color: var(--axiom-journal-border);
+  color: var(--axiom-journal-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-sidebar search {
+  background: #111114;
+  border-color: var(--axiom-journal-border);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-sidebar input[type="search"] {
+  background: #121216;
+  border-color: var(--axiom-journal-border);
+  color: var(--axiom-journal-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-sidebar input[type="search"]::placeholder {
+  color: var(--axiom-journal-muted);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-sidebar input[type="search"]:focus {
+  border-color: var(--axiom-journal-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-sidebar .inline-control {
+  background: transparent;
+  color: var(--axiom-journal-muted);
+  border-color: transparent;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-sidebar .inline-control:hover {
+  color: var(--axiom-journal-gold);
+  text-shadow: 0 0 6px rgba(216, 198, 154, 0.35);
+}
+/* Table of contents */
+body.system-axiom .application.sheet.journal-sheet.journal-entry .toc {
+  background: transparent;
+  color: var(--axiom-journal-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .toc li {
+  color: var(--axiom-journal-muted);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .toc .page-heading {
+  color: var(--axiom-journal-text);
+  border-color: transparent;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .toc .page.active > .page-heading {
+  background: linear-gradient(90deg, rgba(184, 58, 52, 0.26), rgba(216, 198, 154, 0.05));
+  color: var(--axiom-journal-gold);
+  box-shadow: inset 3px 0 0 var(--axiom-journal-accent), inset -2px 0 0 rgba(216, 198, 154, 0.65);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .toc .page-heading:hover {
+  background: rgba(216, 198, 154, 0.08);
+  color: var(--axiom-journal-gold);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .toc .page-index {
+  color: var(--axiom-journal-accent);
+  font-family: "Roboto Mono", monospace;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .toc .page-title {
+  color: inherit;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .toc .heading-link {
+  color: var(--axiom-journal-muted);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .toc .heading-link:hover {
+  color: var(--axiom-journal-blue);
+  text-shadow: 0 0 5px rgba(95, 183, 215, 0.25);
+}
+/* Sidebar footer */
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-sidebar .action-buttons {
+  background: #111114;
+  border-color: var(--axiom-journal-border);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-sidebar .action-buttons button {
+  background: #151519;
+  border-color: var(--axiom-journal-border);
+  color: var(--axiom-journal-muted);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-sidebar .action-buttons button:hover:not(:disabled) {
+  border-color: var(--axiom-journal-gold);
+  color: var(--axiom-journal-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-sidebar .action-buttons button:disabled {
+  color: rgba(167, 161, 152, 0.35);
+  border-color: rgba(58, 58, 66, 0.65);
+}
+/* Main journal area */
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-entry-content {
+  background: radial-gradient(circle at top, rgba(216, 198, 154, 0.05), transparent 300px), var(--axiom-journal-bg);
+  color: var(--axiom-journal-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-header {
+  background: linear-gradient(90deg, rgba(184, 58, 52, 0.06), rgba(216, 198, 154, 0.08), rgba(184, 58, 52, 0.06)), #16161a;
+  border-color: var(--axiom-journal-border);
+  box-shadow: inset 0 -1px 0 rgba(216, 198, 154, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-header .title {
+  background: transparent;
+  border-color: transparent;
+  color: var(--axiom-journal-gold);
+  font-family: "Marcellus", serif;
+  text-shadow: 0 0 10px rgba(216, 198, 154, 0.2);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-header .title::placeholder {
+  color: var(--axiom-journal-muted);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-header .title:focus {
+  border-color: var(--axiom-journal-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-entry-pages {
+  background: radial-gradient(circle at top left, rgba(184, 58, 52, 0.08), transparent 300px), linear-gradient(180deg, #16161a, #101012);
+  color: var(--axiom-journal-text);
+  box-shadow: inset 1px 0 0 rgba(216, 198, 154, 0.08), inset 0 1px 0 rgba(216, 198, 154, 0.08);
+}
+/* Page content, without targeting .journal-entry-page */
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-header {
+  border-color: transparent;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content {
+  color: var(--axiom-journal-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-header h1,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h1,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h2,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h3,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h4,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h5,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h6 {
+  border-color: transparent;
+  text-shadow: none;
+}
+/* Unified H1: page title and content H1 */
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-header h1,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h1 {
+  margin-left: 10px;
+  padding-left: 10px;
+  color: var(--axiom-journal-accent);
+  font-family: "Marcellus", serif;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(184, 58, 52, 0.22);
+  box-shadow: inset 4px 0 0 rgba(184, 58, 52, 0.75);
+  background: linear-gradient(90deg, rgba(184, 58, 52, 0.1), transparent 55%);
+}
+/* Section headings */
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h2 {
+  margin-left: 10px;
+  padding-left: 10px;
+  color: var(--axiom-journal-gold);
+  font-family: "Marcellus", serif;
+  text-transform: uppercase;
+  box-shadow: inset 4px 0 0 rgba(184, 58, 52, 0.55);
+  background: linear-gradient(90deg, rgba(216, 198, 154, 0.08), transparent 50%);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h3 {
+  margin-left: 10px;
+  color: var(--axiom-journal-gold);
+  font-family: "Marcellus", serif;
+  text-transform: uppercase;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h4 {
+  margin-left: 10px;
+  color: #cfc4a5;
+  font-family: "Marcellus", serif;
+  text-transform: uppercase;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h5 {
+  margin-left: 10px;
+  color: var(--axiom-journal-text);
+  text-transform: uppercase;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h6 {
+  margin-left: 10px;
+  color: var(--axiom-journal-muted);
+  text-transform: uppercase;
+}
+/* Remove any previous pseudo-underlines */
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h1::after,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h2::after,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h3::after,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h4::after,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h5::after,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content h6::after {
+  content: none;
+  display: none;
+}
+/* Body text */
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content p,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content ul,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content ol,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content table,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content blockquote {
+  margin-left: 10px;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content p,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content li {
+  color: var(--axiom-journal-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content a {
+  color: var(--axiom-journal-blue);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content strong,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content b {
+  color: var(--axiom-journal-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content em,
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content i {
+  color: var(--axiom-journal-gold);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content blockquote {
+  background: #1c1c1e;
+  border-color: var(--axiom-journal-accent);
+  color: #dddddd;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content table {
+  color: var(--axiom-journal-text);
+  border-color: var(--axiom-journal-border);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content table th {
+  background: #111;
+  border-color: #444;
+  color: var(--axiom-journal-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content table td {
+  background: #1a1a1c;
+  border-color: #333;
+  color: var(--axiom-journal-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content table tbody tr:nth-child(even) td {
+  background: #232326;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content table tbody tr:hover td {
+  background: #2e2e30;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .journal-page-content li::marker {
+  color: var(--axiom-journal-accent);
+}
+/* Edit button */
+body.system-axiom .application.sheet.journal-sheet.journal-entry .edit-container button {
+  background: #151519;
+  border-color: var(--axiom-journal-border);
+  color: var(--axiom-journal-muted);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry .edit-container button:hover {
+  border-color: var(--axiom-journal-gold);
+  color: var(--axiom-journal-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+/* ----------------------------------------- */
+/*  Journal Page Text Editor                 */
+/* ----------------------------------------- */
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text {
+  --axiom-editor-bg: #0f0f11;
+  --axiom-editor-page: #141417;
+  --axiom-editor-panel: #1b1b1f;
+  --axiom-editor-panel-2: #24242a;
+  --axiom-editor-panel-3: #151519;
+  --axiom-editor-border: #3a3a42;
+  --axiom-editor-text: #e8e4dc;
+  --axiom-editor-muted: #a7a198;
+  --axiom-editor-accent: #b83a34;
+  --axiom-editor-gold: #d8c69a;
+  --axiom-editor-blue: #5fb7d7;
+}
+/* Window shell */
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .window-content {
+  background: radial-gradient(circle at top left, rgba(184, 58, 52, 0.1), transparent 240px), linear-gradient(180deg, #151519, var(--axiom-editor-bg));
+  color: var(--axiom-editor-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .window-header {
+  background: #101012;
+  border-color: var(--axiom-editor-border);
+  color: var(--axiom-editor-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .window-title {
+  color: var(--axiom-editor-gold);
+  font-family: "Marcellus", serif;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .window-icon,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .header-control {
+  color: var(--axiom-editor-muted);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .header-control:hover {
+  color: var(--axiom-editor-gold);
+  text-shadow: 0 0 6px rgba(216, 198, 154, 0.35);
+}
+/* Header */
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .journal-header {
+  background: linear-gradient(90deg, rgba(184, 58, 52, 0.06), rgba(216, 198, 154, 0.08), rgba(184, 58, 52, 0.06)), #16161a;
+  border-color: var(--axiom-editor-border);
+  box-shadow: inset 0 -1px 0 rgba(216, 198, 154, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .journal-header .title {
+  background: transparent;
+  border-color: transparent;
+  color: var(--axiom-editor-gold);
+  font-family: "Marcellus", serif;
+  text-shadow: 0 0 10px rgba(216, 198, 154, 0.2);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .journal-header .title::placeholder {
+  color: var(--axiom-editor-muted);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .journal-header .title:focus {
+  border-color: var(--axiom-editor-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .page-metadata {
+  color: var(--axiom-editor-muted);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .page-metadata label,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .heading-level label {
+  color: var(--axiom-editor-muted);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .page-metadata select {
+  background: #121216;
+  border-color: var(--axiom-editor-border);
+  color: var(--axiom-editor-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .page-metadata select:focus {
+  border-color: var(--axiom-editor-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .show-title .checkbox {
+  color: var(--axiom-editor-muted);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text input[type="checkbox"] {
+  accent-color: var(--axiom-editor-accent);
+}
+/* ProseMirror shell */
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text prose-mirror.journal-page-content {
+  background: radial-gradient(circle at top left, rgba(184, 58, 52, 0.08), transparent 280px), linear-gradient(180deg, #16161a, #101012);
+  color: var(--axiom-editor-text);
+  border-color: var(--axiom-editor-border);
+  box-shadow: inset 1px 0 0 rgba(216, 198, 154, 0.08), inset 0 1px 0 rgba(216, 198, 154, 0.08);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text prose-mirror .editor-container {
+  background: radial-gradient(circle at top left, rgba(184, 58, 52, 0.06), transparent 260px), var(--axiom-editor-bg);
+  color: var(--axiom-editor-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text prose-mirror .editor-content {
+  background: transparent;
+  color: var(--axiom-editor-text);
+}
+/* Editor menu */
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text prose-mirror .menu-container {
+  background: #111114;
+  border-color: var(--axiom-editor-border);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text prose-mirror menu.editor-menu {
+  background: #111114;
+  border-color: var(--axiom-editor-border);
+  color: var(--axiom-editor-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text prose-mirror menu.editor-menu button {
+  background: transparent;
+  border-color: transparent;
+  color: var(--axiom-editor-muted);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text prose-mirror menu.editor-menu button:hover,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text prose-mirror menu.editor-menu button.active {
+  background: rgba(216, 198, 154, 0.1);
+  border-color: rgba(216, 198, 154, 0.3);
+  color: var(--axiom-editor-gold);
+  text-shadow: 0 0 5px rgba(216, 198, 154, 0.25);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text prose-mirror menu.editor-menu .pm-dropdown > ul,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text prose-mirror menu.editor-menu .pm-dropdown ul ul {
+  background: #151519;
+  border-color: var(--axiom-editor-border);
+  color: var(--axiom-editor-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text prose-mirror menu.editor-menu .pm-dropdown li {
+  color: var(--axiom-editor-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text prose-mirror menu.editor-menu .pm-dropdown li:hover {
+  background: rgba(216, 198, 154, 0.1);
+  color: var(--axiom-editor-gold);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text prose-mirror menu.editor-menu .pm-dropdown li.divider {
+  border-color: var(--axiom-editor-border);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text prose-mirror menu.editor-menu .concurrent-users {
+  color: var(--axiom-editor-muted);
+}
+/* Editable content styling */
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror {
+  color: var(--axiom-editor-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror:focus {
+  outline-color: rgba(216, 198, 154, 0.35);
+}
+/* Headings inside editor */
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h1,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h2,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h3,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h4,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h5,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h6 {
+  border-color: transparent;
+  text-shadow: none;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h1 {
+  margin-left: 10px;
+  padding-left: 10px;
+  color: var(--axiom-editor-accent);
+  font-family: "Marcellus", serif;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(184, 58, 52, 0.22);
+  box-shadow: inset 4px 0 0 rgba(184, 58, 52, 0.75);
+  background: linear-gradient(90deg, rgba(184, 58, 52, 0.1), transparent 55%);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h2 {
+  margin-left: 10px;
+  padding-left: 10px;
+  color: var(--axiom-editor-gold);
+  font-family: "Marcellus", serif;
+  text-transform: uppercase;
+  box-shadow: inset 4px 0 0 rgba(184, 58, 52, 0.55);
+  background: linear-gradient(90deg, rgba(216, 198, 154, 0.08), transparent 50%);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h3 {
+  margin-left: 10px;
+  color: var(--axiom-editor-gold);
+  font-family: "Marcellus", serif;
+  text-transform: uppercase;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h4 {
+  margin-left: 10px;
+  color: #cfc4a5;
+  font-family: "Marcellus", serif;
+  text-transform: uppercase;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h5 {
+  margin-left: 10px;
+  color: var(--axiom-editor-text);
+  text-transform: uppercase;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h6 {
+  margin-left: 10px;
+  color: var(--axiom-editor-muted);
+  text-transform: uppercase;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h1::after,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h2::after,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h3::after,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h4::after,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h5::after,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror h6::after {
+  content: none;
+  display: none;
+}
+/* Body text inside editor */
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror p,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror ul,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror ol,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror table,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror blockquote {
+  margin-left: 10px;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror p,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror li {
+  color: var(--axiom-editor-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror a {
+  color: var(--axiom-editor-blue);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror strong,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror b {
+  color: var(--axiom-editor-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror em,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror i {
+  color: var(--axiom-editor-gold);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror li::marker {
+  color: var(--axiom-editor-accent);
+}
+/* Blocks and tables inside editor */
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror blockquote {
+  background: #1c1c1e;
+  border-color: var(--axiom-editor-accent);
+  color: #dddddd;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror code,
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror pre {
+  background: #151519;
+  border-color: var(--axiom-editor-border);
+  color: var(--axiom-editor-gold);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror table {
+  color: var(--axiom-editor-text);
+  border-color: var(--axiom-editor-border);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror table th {
+  background: #111;
+  border-color: #444;
+  color: var(--axiom-editor-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror table td {
+  background: #1a1a1c;
+  border-color: #333;
+  color: var(--axiom-editor-text);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror table tbody tr:nth-child(even) td {
+  background: #232326;
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .editor-content.ProseMirror table tbody tr:hover td {
+  background: #2e2e30;
+}
+/* Footer */
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .journal-footer {
+  background: #111114;
+  border-color: var(--axiom-editor-border);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .journal-footer button {
+  background: #151519;
+  border-color: var(--axiom-editor-border);
+  color: var(--axiom-editor-muted);
+}
+body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .journal-footer button:hover {
+  border-color: var(--axiom-editor-gold);
+  color: var(--axiom-editor-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
 }
 /* Foundry wraps chat message content in a themed .chat-message container.
    Roll cards own their full visual frame, so strip the outer message chrome. */

@@ -38,6 +38,9 @@
       {{#if card.showParry}}
         <button type="button" data-action="combatParry"><i class="fa-solid fa-shield-halved"></i> {{localize "AXIOM.Combat.Parry"}}</button>
       {{/if}}
+      {{#if card.showBlock}}
+        <button type="button" data-action="combatBlock"><i class="fa-solid fa-shield"></i> {{localize "AXIOM.Combat.Block"}}</button>
+      {{/if}}
       <button type="button" data-action="combatUnopposed"><i class="fa-solid fa-bullseye"></i> {{localize "AXIOM.Combat.Unopposed"}}</button>
     </div>
   </section>

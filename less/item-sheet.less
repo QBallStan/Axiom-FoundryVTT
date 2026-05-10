@@ -850,8 +850,7 @@
 
   .editor-section .editor,
   .editor-section prose-mirror,
-  .editor-section .prosemirror,
-  .editor-section .editor-content {
+  .editor-section .prosemirror {
     width: 100%;
     min-height: 220px;
     background: var(--item-panel-dark);
@@ -859,11 +858,19 @@
     border-radius: 5px;
     color: var(--item-text);
     line-height: 1.45;
+    box-sizing: border-box;
   }
 
   .editor-section .editor-content {
+    min-height: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    color: var(--item-text);
+    line-height: 1.45;
     padding: 8px;
-    overflow: auto;
+    box-sizing: border-box;
+    overflow: visible;
   }
 
   .editor-section .editor-menu,

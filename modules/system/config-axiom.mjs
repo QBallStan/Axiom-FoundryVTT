@@ -260,6 +260,12 @@ export const AXIOM = {
     direct: "AXIOM.Weapon.Delivery.Direct"
   },
 
+  coverTypes: {
+    light: "AXIOM.Shield.Cover.Light",
+    medium: "AXIOM.Shield.Cover.Medium",
+    heavy: "AXIOM.Shield.Cover.Heavy"
+  },
+
   gearStates: {
     equipped: "AXIOM.Item.State.Equipped",
     carried: "AXIOM.Item.State.Carried",

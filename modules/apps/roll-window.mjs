@@ -1010,6 +1010,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
       case "auto-range": return this._getRangeModifierValue();
       case "auto-target-size": return this._getTargetSizeModifier();
       case "auto-cover": return AxiomCombat.getCoverBonus(this.rollData.actor);
+      case "auto-shield-block": return Number(this.rollData.combatDefense?.shield?.blockValue ?? 0);
       default:
         if (String(id ?? "").startsWith("effect-")) {
           return Number(this._getEffectModifierRows().find(row => row.id === id)?.value ?? 0);

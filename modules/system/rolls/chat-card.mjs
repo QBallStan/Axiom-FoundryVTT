@@ -178,6 +178,7 @@ export default class AxiomChatCard {
       combatResolved,
       showDefenseActions: isAttackCard && !normalized.combatOppositionCreated,
       showParryAction: normalized.weaponInfo?.category !== "ranged",
+      showBlockAction: true,
       showAttackTargetActions: false,
       combatTargetName,
       hasCombatTarget: Boolean(normalized.combatTarget?.actorId),
@@ -248,6 +249,7 @@ export default class AxiomChatCard {
     card.querySelector("[data-action='assignCombatOpponent']")?.addEventListener("click", event => this._onAssignCombatOpponent(event, message));
     card.querySelector("[data-action='combatDodge']")?.addEventListener("click", event => this._onCombatDefense(event, message, "dodge"));
     card.querySelector("[data-action='combatParry']")?.addEventListener("click", event => this._onCombatDefense(event, message, "parry"));
+    card.querySelector("[data-action='combatBlock']")?.addEventListener("click", event => this._onCombatDefense(event, message, "block"));
     card.querySelector("[data-action='combatUnopposed']")?.addEventListener("click", event => this._onCombatUnopposed(event, message));
     card.querySelector("[data-action='applyCombatWound']")?.addEventListener("click", event => this._onApplyCombatWound(event, message));
 

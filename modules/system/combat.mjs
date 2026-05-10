@@ -1,5 +1,5 @@
 import AxiomRoll from "./rolls/axiom-roll.mjs";
-import { isMeleeWeaponItem, isRangedWeaponItem } from "./items.mjs";
+import { isMeleeWeaponItem, isRangedWeaponItem, isShieldItem } from "./items.mjs";
 
 /**
  * Combat helpers for Axiom//Core.
@@ -252,6 +252,36 @@ export default class AxiomCombat extends foundry.documents.Combat {
       .filter(item => (item.system?.state ?? "carried") === "equipped") ?? [];
   }
 
+
+  static getEquippedShields(actor) {
+    if (!actor) return [];
+
+    return actor.items
+      ?.filter(item => isShieldItem(item))
+      .filter(item => (item.system?.state ?? "carried") === "equipped") ?? [];
+  }
+
+  static getPrimaryShieldBlockSkill(actor) {
+    const shield = this.getEquippedShields(actor).find(item => String(item.system?.skill ?? "").trim());
+    if (!shield) return null;
+
+    const skill = this.findActorSkillByName(actor, shield.system.skill);
+    return skill ? { skill, shield } : { skill: null, shield };
+  }
+
+  static hasEquippedShield(actor) {
+    return this.getEquippedShields(actor).length > 0;
+  }
+
+  static canBlockAttackState(state) {
+    const targetActorId = state?.combatTarget?.actorId;
+    const defender = targetActorId ? game.actors?.get(targetActorId) : null;
+    if (defender) return this.hasEquippedShield(defender);
+
+    const target = this.getSelectedOrTargetedDefender({ warn: false });
+    return this.hasEquippedShield(target?.actor);
+  }
+
   static getPrimaryParrySkill(actor) {
     const equippedWeapon = this.getEquippedMeleeWeapons(actor).find(weapon => String(weapon.system?.skill ?? "").trim());
     if (equippedWeapon) {
@@ -481,7 +511,19 @@ export default class AxiomCombat extends foundry.documents.Combat {
 
     let skill = null;
     let defenseLabel = "";
-    if (defenseType === "parry") {
+    if (defenseType === "block") {
+      const block = this.getPrimaryShieldBlockSkill(defender);
+      skill = block?.skill ?? null;
+      defenseLabel = block?.shield ? game.i18n.format("AXIOM.Combat.BlockWith", { shield: block.shield.name }) : game.i18n.localize("AXIOM.Combat.Block");
+      if (!block?.shield) {
+        ui.notifications?.warn(game.i18n.format("AXIOM.Combat.NoShieldAvailable", { actor: defender.name }));
+        return null;
+      }
+      if (!skill) {
+        this.warnMissingSkill(defender, block.shield.system?.skill ?? "", game.i18n.localize("AXIOM.Combat.Block"));
+        return null;
+      }
+    } else if (defenseType === "parry") {
       const parry = this.getPrimaryParrySkill(defender);
       skill = parry?.skill ?? null;
       defenseLabel = parry?.weapon
@@ -503,11 +545,22 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const roll = await new Roll("1d100").evaluate();
     const parts = this.getSkillRollParts(defender, skill);
     const modifierRows = this.buildAutomaticModifierRows(defender, { includeCover: isRanged });
+    if (defenseType === "block") {
+      const block = this.getPrimaryShieldBlockSkill(defender);
+      if (block?.shield) modifierRows.push({
+        id: "auto-shield-block",
+        label: "AXIOM.Roll.ModifierSources.ShieldBlock",
+        value: Number(block.shield.system?.blockValue ?? 0),
+        automatic: true,
+        locked: true
+      });
+    }
     const modifierTotal = modifierRows.reduce((sum, row) => sum + Number(row.value ?? 0), 0);
     const successTarget = Math.min(120, Math.max(5, parts.basePool + modifierTotal));
     const result = AxiomRoll.evaluateResult({ d100: roll.total, successTarget });
     const attack = this.getAttackData(state);
-    const combatResult = this.resolveAttack({ state, attack, defender, defenderToken, defense: { ...result, roll, ...parts, modifierRows, modifierTotal, successTarget, type: defenseType, label: defenseLabel, skillName: skill.name } });
+    const blockShield = defenseType === "block" ? this.getPrimaryShieldBlockSkill(defender)?.shield : null;
+    const combatResult = this.resolveAttack({ state, attack, defender, defenderToken, defense: { ...result, roll, ...parts, modifierRows, modifierTotal, successTarget, type: defenseType, label: defenseLabel, skillName: skill.name, shieldArmorBonus: Number(blockShield?.system?.armorBonus ?? 0), shieldName: blockShield?.name ?? "" } });
 
     return { roll, combatResult };
   }
@@ -538,7 +591,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const netHits = hitsAttack ? Number(attack.hits ?? 0) - Number(defense?.hits ?? 0) : 0;
     const hitLocation = state.isWeaponRoll ? AxiomRoll.getHitLocation(state.d100) : null;
     const damage = hitsAttack
-      ? this.calculateDamage({ state, defender, hitLocation, netHits })
+      ? this.calculateDamage({ state, defender, hitLocation, netHits, defense })
       : this.emptyDamage();
 
     return {
@@ -584,11 +637,15 @@ export default class AxiomCombat extends foundry.documents.Combat {
       hitsDisplay: AxiomRoll.formatSigned(defense.hits ?? 0),
       success: Boolean(defense.success),
       complication: Boolean(defense.complication),
-      outcomeTierLabel: defense.outcomeTierLabel
+      outcomeTierLabel: defense.outcomeTierLabel,
+      shieldItemId: defense.shieldItemId ?? defense.shield?.itemId ?? "",
+      shieldName: defense.shieldName ?? defense.shield?.name ?? "",
+      shieldBlockValue: Number(defense.shieldBlockValue ?? defense.shield?.blockValue ?? 0),
+      shieldArmorBonus: Number(defense.shieldArmorBonus ?? defense.shield?.armorBonus ?? 0)
     };
   }
 
-  static calculateDamage({ state, defender, hitLocation, netHits = 0 } = {}) {
+  static calculateDamage({ state, defender, hitLocation, netHits = 0, defense = null } = {}) {
     const weaponInfo = state.weaponInfo ?? {};
     const category = weaponInfo.category ?? "";
     const baseDamage = Number(weaponInfo.damage ?? 0);
@@ -596,7 +653,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const armorPenetration = Number(weaponInfo.armorPenetration ?? 0);
     const delivery = weaponInfo.delivery ?? "kinetic";
     const rawDamage = Math.max(0, baseDamage + damageModifier + Number(netHits ?? 0));
-    const armor = delivery === "direct" ? 0 : this.getArmorAtLocation(defender, hitLocation?.key);
+    const shieldArmorBonus = defense?.type === "block" ? Number(defense.shieldArmorBonus ?? defense.shield?.armorBonus ?? 0) : 0;
+    const armor = delivery === "direct" ? 0 : this.getArmorAtLocation(defender, hitLocation?.key) + shieldArmorBonus;
     const effectiveArmor = delivery === "direct" ? 0 : Math.max(0, armor - armorPenetration);
     const toughness = Number(defender?.system?.subAttributes?.toughness ?? 0);
     const finalDamage = Math.max(0, rawDamage - effectiveArmor - toughness);
@@ -609,6 +667,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
       rawDamage,
       delivery,
       armor,
+      shieldArmorBonus,
       armorPenetration,
       effectiveArmor,
       toughness,
@@ -817,7 +876,21 @@ export default class AxiomCombat extends foundry.documents.Combat {
 
     let skill = null;
     let defenseLabel = "";
-    if (defenseType === "parry") {
+    let shield = null;
+    if (defenseType === "block") {
+      const block = this.getPrimaryShieldBlockSkill(defender);
+      shield = block?.shield ?? null;
+      skill = block?.skill ?? null;
+      defenseLabel = shield ? game.i18n.format("AXIOM.Combat.BlockWith", { shield: shield.name }) : game.i18n.localize("AXIOM.Combat.Block");
+      if (!shield) {
+        ui.notifications?.warn(game.i18n.format("AXIOM.Combat.NoShieldAvailable", { actor: defender.name }));
+        return null;
+      }
+      if (!skill) {
+        this.warnMissingSkill(defender, shield.system?.skill ?? "", game.i18n.localize("AXIOM.Combat.Block"));
+        return null;
+      }
+    } else if (defenseType === "parry") {
       const parry = this.getPrimaryParrySkill(defender);
       skill = parry?.skill ?? null;
       defenseLabel = parry?.weapon
@@ -838,6 +911,13 @@ export default class AxiomCombat extends foundry.documents.Combat {
 
     const parts = this.getSkillRollParts(defender, skill);
     const modifierRows = this.buildAutomaticModifierRows(defender, { includeCover: opposedData.isRanged });
+    if (shield) modifierRows.push({
+      id: "auto-shield-block",
+      label: "AXIOM.Roll.ModifierSources.ShieldBlock",
+      value: Number(shield.system?.blockValue ?? 0),
+      automatic: true,
+      locked: true
+    });
     const { default: AxiomRollWindow } = await import("../apps/roll-window.mjs");
 
     return new AxiomRollWindow({
@@ -855,7 +935,13 @@ export default class AxiomCombat extends foundry.documents.Combat {
         combatDefense: {
           attackMessageId: attackMessage.id,
           defenseType,
-          skillName: skill.name
+          skillName: skill.name,
+          shield: shield ? {
+            itemId: shield.id,
+            name: shield.name,
+            blockValue: Number(shield.system?.blockValue ?? 0),
+            armorBonus: Number(shield.system?.armorBonus ?? 0)
+          } : null
         }
       }
     }).render({ force: true });
@@ -1043,6 +1129,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
       ...normalized,
       attackTypeLabel: normalized.isRanged ? "AXIOM.Combat.RangedAttack" : "AXIOM.Combat.MeleeAttack",
       showParry: normalized.isMelee,
+      showBlock: this.hasEquippedShield(game.actors?.get(normalized.defender.actorId)),
       assignedAfterRollNote: normalized.assignedAfterRoll ? "AXIOM.Combat.AssignedAfterRollNote" : ""
     };
   }
@@ -1057,7 +1144,21 @@ export default class AxiomCombat extends foundry.documents.Combat {
 
     let skill = null;
     let defenseLabel = "";
-    if (defenseType === "parry") {
+    let shield = null;
+    if (defenseType === "block") {
+      const block = this.getPrimaryShieldBlockSkill(defender);
+      shield = block?.shield ?? null;
+      skill = block?.skill ?? null;
+      defenseLabel = shield ? game.i18n.format("AXIOM.Combat.BlockWith", { shield: shield.name }) : game.i18n.localize("AXIOM.Combat.Block");
+      if (!shield) {
+        ui.notifications?.warn(game.i18n.format("AXIOM.Combat.NoShieldAvailable", { actor: defender.name }));
+        return null;
+      }
+      if (!skill) {
+        this.warnMissingSkill(defender, shield.system?.skill ?? "", game.i18n.localize("AXIOM.Combat.Block"));
+        return null;
+      }
+    } else if (defenseType === "parry") {
       const parry = this.getPrimaryParrySkill(defender);
       skill = parry?.skill ?? null;
       defenseLabel = parry?.weapon
@@ -1079,6 +1180,13 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const roll = await new Roll("1d100").evaluate();
     const parts = this.getSkillRollParts(defender, skill);
     const modifierRows = this.buildAutomaticModifierRows(defender, { includeCover: opposedData.isRanged });
+    if (shield) modifierRows.push({
+      id: "auto-shield-block",
+      label: "AXIOM.Roll.ModifierSources.ShieldBlock",
+      value: Number(shield.system?.blockValue ?? 0),
+      automatic: true,
+      locked: true
+    });
     const modifierTotal = modifierRows.reduce((sum, row) => sum + Number(row.value ?? 0), 0);
     const successTarget = Math.min(120, Math.max(5, parts.basePool + modifierTotal));
     const result = AxiomRoll.evaluateResult({ d100: roll.total, successTarget });
@@ -1098,7 +1206,13 @@ export default class AxiomCombat extends foundry.documents.Combat {
       combatDefense: {
         opposedMessageId: opposedMessage.id,
         defenseType,
-        skillName: skill.name
+        skillName: skill.name,
+        shield: shield ? {
+          itemId: shield.id,
+          name: shield.name,
+          blockValue: Number(shield.system?.blockValue ?? 0),
+          armorBonus: Number(shield.system?.armorBonus ?? 0)
+        } : null
       }
     };
 
@@ -1161,7 +1275,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const defense = defenseState ? this.serializeAttackForOpposition(defenseState, this.getAttackData(defenseState)) : null;
     const defender = game.actors?.get(opposedData?.defender?.actorId);
     const hitLocation = attack.hitLocation ?? null;
-    const armor = this.getArmorAtLocation(defender, hitLocation?.key);
+    const shieldArmorBonus = defenseState?.combatDefense?.defenseType === "block" ? Number(defenseState.combatDefense?.shield?.armorBonus ?? 0) : 0;
+    const armor = this.getArmorAtLocation(defender, hitLocation?.key) + shieldArmorBonus;
     const toughness = Number(defender?.system?.subAttributes?.toughness ?? 0);
 
     return this.normalizeCombatResultCard({
@@ -1194,6 +1309,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
         damageModifier: opposedData.attackType === "melee" ? Number(opposedData.weapon?.damageModifier ?? 0) : 0,
         armorPenetration: Number(opposedData.weapon?.armorPenetration ?? 0),
         armor,
+        shieldArmorBonus,
         toughness
       },
       woundApplied: false
@@ -1210,6 +1326,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const armorPenetration = Number(data.values?.armorPenetration ?? 0);
     const armor = Number(data.values?.armor ?? 0);
     const toughness = Number(data.values?.toughness ?? 0);
+    const shieldArmorBonus = Number(data.values?.shieldArmorBonus ?? 0);
     const rawDamage = hitsAttack ? Math.max(0, baseDamage + damageModifier + netHits) : 0;
     const effectiveArmor = Math.max(0, armor - armorPenetration);
     const calculatedFinalDamage = hitsAttack ? Math.max(0, rawDamage - effectiveArmor - toughness) : 0;
@@ -1220,7 +1337,9 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const armorFormula = `${armor} - ${armorPenetration} = ${effectiveArmor}`;
     const mitigationFormula = `${rawDamage} - ${effectiveArmor} - ${toughness} = ${calculatedFinalDamage}`;
     const rawDamageTooltip = `Raw Damage: Base ${baseDamage} + Mod ${damageModifier} + Hits ${netHits} = ${rawDamage}`;
-    const effectiveArmorTooltip = `Effective Armor: Armor ${armor} - AP ${armorPenetration} = ${effectiveArmor}`;
+    const effectiveArmorTooltip = shieldArmorBonus > 0
+      ? `Effective Armor: Armor ${armor - shieldArmorBonus} + Shield ${shieldArmorBonus} - AP ${armorPenetration} = ${effectiveArmor}`
+      : `Effective Armor: Armor ${armor} - AP ${armorPenetration} = ${effectiveArmor}`;
     const toughnessTooltip = `Toughness: ${toughness}`;
     const finalDamageTooltip = hasFinalDamageOverride
       ? `Manual Final Damage: ${finalDamage} (calculated ${calculatedFinalDamage})`
@@ -1252,7 +1371,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
         hitsDisplay: AxiomRoll.formatSigned(defenseHits),
         complication: Boolean(data.defense?.complication)
       },
-      values: { baseDamage, damageModifier, armorPenetration, armor, toughness },
+      values: { baseDamage, damageModifier, armorPenetration, armor, shieldArmorBonus, toughness },
       netHits,
       netHitsDisplay: AxiomRoll.formatSigned(netHits),
       hitsAttack,
@@ -1295,6 +1414,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
 
     const defender = game.actors?.get(existing.defenderActorId);
     const hitLocation = attack?.hitLocation ?? { key: existing.hitLocationKey, label: existing.hitLocationLabel, labelText: existing.hitLocationText };
+    const shieldArmorBonus = defenseState?.combatDefense?.defenseType === "block" ? Number(defenseState.combatDefense?.shield?.armorBonus ?? existing.values?.shieldArmorBonus ?? 0) : Number(existing.values?.shieldArmorBonus ?? 0);
 
     return this.normalizeCombatResultCard({
       ...existing,
@@ -1317,7 +1437,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
         baseDamage: Number(attackState?.weaponInfo?.damage ?? existing.values?.baseDamage ?? 0),
         damageModifier: attackState?.weaponInfo?.category === "melee" ? Number(attackState?.weaponInfo?.damageModifier ?? existing.values?.damageModifier ?? 0) : 0,
         armorPenetration: Number(attackState?.weaponInfo?.armorPenetration ?? existing.values?.armorPenetration ?? 0),
-        armor: this.getArmorAtLocation(defender, hitLocation?.key),
+        armor: this.getArmorAtLocation(defender, hitLocation?.key) + shieldArmorBonus,
+        shieldArmorBonus,
         toughness: Number(defender?.system?.subAttributes?.toughness ?? existing.values?.toughness ?? 0)
       }
     });
@@ -1362,6 +1483,9 @@ export default class AxiomCombat extends foundry.documents.Combat {
       });
       opposed.querySelector("[data-action='combatParry']")?.addEventListener("click", event => {
         event.preventDefault(); event.stopPropagation(); this.resolveOpposedDefense(message, "parry");
+      });
+      opposed.querySelector("[data-action='combatBlock']")?.addEventListener("click", event => {
+        event.preventDefault(); event.stopPropagation(); this.resolveOpposedDefense(message, "block");
       });
       opposed.querySelector("[data-action='combatUnopposed']")?.addEventListener("click", event => {
         event.preventDefault(); event.stopPropagation(); this.resolveOpposedUnopposed(message);

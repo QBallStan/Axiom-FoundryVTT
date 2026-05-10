@@ -14,8 +14,12 @@
     "verified": "14.360",
     "maximum": 14
   },
-  "esmodules": ["axiom.mjs"],
-  "styles": ["axiom.css"],
+  "esmodules": [
+    "axiom.mjs"
+  ],
+  "styles": [
+    "axiom.css"
+  ],
   "languages": [
     {
       "lang": "en",
@@ -31,33 +35,58 @@
   "documentTypes": {
     "Actor": {
       "protagonist": {
-        "htmlFields": ["details.biography", "details.notes"]
+        "htmlFields": [
+          "details.biography",
+          "details.notes"
+        ]
       },
       "npc": {
-        "htmlFields": ["details.biography", "details.notes"]
+        "htmlFields": [
+          "details.biography",
+          "details.notes"
+        ]
       }
     },
     "Item": {
       "skill": {
-        "htmlFields": ["description.value"]
+        "htmlFields": [
+          "description.value"
+        ]
       },
       "armor": {
-        "htmlFields": ["description.value"]
+        "htmlFields": [
+          "description.value"
+        ]
       },
       "meleeWeapon": {
-        "htmlFields": ["description.value"]
+        "htmlFields": [
+          "description.value"
+        ]
       },
       "rangedWeapon": {
-        "htmlFields": ["description.value"]
+        "htmlFields": [
+          "description.value"
+        ]
       },
       "ammunition": {
-        "htmlFields": ["description.value"]
+        "htmlFields": [
+          "description.value"
+        ]
       },
       "equipment": {
-        "htmlFields": ["description.value"]
+        "htmlFields": [
+          "description.value"
+        ]
       },
       "trait": {
-        "htmlFields": ["description.value"]
+        "htmlFields": [
+          "description.value"
+        ]
+      },
+      "shield": {
+        "htmlFields": [
+          "description.value"
+        ]
       }
     }
   },
@@ -76,7 +105,7 @@
     }
   ],
   "socket": false,
-  "background" : "systems/axiom/assets/background.webp",
+  "background": "systems/axiom/assets/background.webp",
   "grid": {
     "distance": 1,
     "units": "m"

@@ -4,7 +4,7 @@ const { mergeObject } = foundry.utils;
 import AxiomRollWindow from "../../apps/roll-window.mjs";
 import AxiomEffectBuilder from "../../apps/effect-builder.mjs";
 import { formatAxiomPrice, getStoredCurrencyCoins, prepareCurrencyContext, priceCoinsToValue } from "../../system/currency.mjs";
-import { getWeaponCategory, isMeleeWeaponItem, isRangedWeaponItem, isWeaponItem, WEAPON_ITEM_TYPES } from "../../system/items.mjs";
+import { getWeaponCategory, isMeleeWeaponItem, isRangedWeaponItem, isWeaponItem, isShieldItem, WEAPON_ITEM_TYPES, SHIELD_ITEM_TYPE } from "../../system/items.mjs";
 
 const LEGACY_ACTIVE_EFFECT_MODE_TYPES = Object.freeze({
   0: "custom",
@@ -109,6 +109,8 @@ async function enrichHTML(value, relativeTo) {
     rollData: relativeTo?.getRollData?.()
   });
 }
+
+const COMBAT_GEAR_ITEM_TYPES = ["equipment", "armor", "ammunition", SHIELD_ITEM_TYPE, ...WEAPON_ITEM_TYPES];
 
 const ATTRIBUTE_ORDER = [
   "strength",
@@ -395,7 +397,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
   }
 
   _prepareEquipmentSummary() {
-    const weightItems = this.actor.items.filter(item => ["equipment", "armor", "ammunition", ...WEAPON_ITEM_TYPES].includes(item.type));
+    const weightItems = this.actor.items.filter(item => COMBAT_GEAR_ITEM_TYPES.includes(item.type));
     const carriedItems = weightItems.filter(item => ["carried", "equipped"].includes(item.system?.state ?? "carried"));
     const equippedItems = weightItems.filter(item => (item.system?.state ?? "carried") === "equipped");
     const storedItems = weightItems.filter(item => (item.system?.state ?? "carried") === "stored");
@@ -456,6 +458,11 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       .map(item => this._prepareWeaponCombatRow(item))
       .sort((a, b) => a.name.localeCompare(b.name));
 
+    const shields = this.actor.items
+      .filter(item => isShieldItem(item))
+      .map(item => this._prepareShieldCombatRow(item))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
     const armor = this.actor.items
       .filter(item => item.type === "armor")
       .map(item => this._prepareArmorCombatRow(item))
@@ -466,10 +473,16 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       .map(item => this._prepareAmmunitionCombatRow(item))
       .sort((a, b) => a.name.localeCompare(b.name));
 
+    const meleeWeapons = weapons.filter(weapon => weapon.category === "melee");
+    const rangedWeapons = weapons.filter(weapon => weapon.category === "ranged");
+    const meleeItems = [...meleeWeapons, ...shields].sort((a, b) => a.name.localeCompare(b.name));
+
     return {
       armorSummary: this._prepareEquippedArmorSummary(),
-      meleeWeapons: weapons.filter(weapon => weapon.category === "melee"),
-      rangedWeapons: weapons.filter(weapon => weapon.category === "ranged"),
+      meleeWeapons,
+      shields,
+      meleeItems,
+      rangedWeapons,
       ammunition,
       armor
     };
@@ -521,6 +534,29 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
         long: range * 2,
         extreme: range * 3
       }
+    };
+  }
+
+
+  _prepareShieldCombatRow(item) {
+    const system = item.system ?? {};
+    const cover = system.cover ?? "light";
+
+    return {
+      id: item.id,
+      name: item.name,
+      img: item.img,
+      type: item.type,
+      isShield: true,
+      description: this._prepareItemDescription(item),
+      skill: system.skill ?? "",
+      blockValue: Number(system.blockValue ?? 0),
+      armorBonus: Number(system.armorBonus ?? 0),
+      cover,
+      coverLabel: this._localizeConfigLabel(CONFIG.AXIOM?.coverTypes?.[cover], cover),
+      state: system.state ?? "carried",
+      stateLabel: this._localizeGearState(system.state),
+      stateOptions: this._prepareGearStateOptions(system.state)
     };
   }
 
@@ -816,6 +852,10 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
 
     this.element.querySelectorAll("[data-action='rollWeaponAttack']").forEach(element => {
       element.addEventListener("click", this._onRollWeaponAttack.bind(this));
+    });
+
+    this.element.querySelectorAll("[data-action='rollShieldBlock']").forEach(element => {
+      element.addEventListener("click", this._onRollShieldBlock.bind(this));
     });
 
     this.element.querySelectorAll("[data-action='reloadWeapon']").forEach(element => {
@@ -1289,6 +1329,42 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     }).render({ force: true });
   }
 
+
+
+  _onRollShieldBlock(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const shield = this._getCombatItemFromEvent(event);
+    if (!shield || shield.type !== SHIELD_ITEM_TYPE) return;
+
+    const skill = this._resolveActorSkill(shield.system?.skill);
+    if (!skill) {
+      ui.notifications?.warn(game.i18n.format("AXIOM.Shield.NoSkillSelectedWarning", {
+        shield: shield.name,
+        skill: shield.system?.skill || game.i18n.localize("AXIOM.Weapon.NoSkill")
+      }));
+      shield.sheet?.render(true);
+      return;
+    }
+
+    new AxiomRollWindow({
+      rollData: {
+        actor: this.actor,
+        item: shield,
+        skillItem: skill,
+        title: game.i18n.format("AXIOM.Combat.BlockWith", { shield: shield.name }),
+        testName: game.i18n.format("AXIOM.Combat.BlockWith", { shield: shield.name }),
+        testType: "defense",
+        sourceType: "shield",
+        attributeOne: skill.system.attributeOne ?? "strength",
+        attributeTwo: skill.system.attributeTwo ?? skill.system.attributeOne ?? "strength",
+        skillValue: Number(skill.system.level ?? 0),
+        equipmentModifier: Number(shield.system?.blockValue ?? 0),
+        actionPoints: 0
+      }
+    }).render({ force: true });
+  }
 
   _getSkillItemFromEvent(event) {
     const itemId = event.currentTarget.closest("[data-skill-id]")?.dataset.skillId;

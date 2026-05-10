@@ -1,5 +1,3 @@
-2026/05/08-17:46:51.557 5a84 Log #9: 61 ops saved to Table #10 OK
-2026/05/08-17:46:51.558 5a84 Archiving ..\Data\systems\axiom\packs\core-skills/000009.log: OK
-2026/05/08-17:46:51.558 5a84 Table #10: 61 entries OK
-2026/05/08-17:46:51.614 5a84 Archiving ..\Data\systems\axiom\packs\core-skills/MANIFEST-000008: OK
-2026/05/08-17:46:51.656 5a84 **** Repaired leveldb ..\Data\systems\axiom\packs\core-skills; recovered 1 files; 8815 bytes. Some data may have been lost. ****
+2026/05/08-22:56:57.200 7024 Recovering log #17
+2026/05/08-22:56:57.255 7024 Delete type=0 #17
+2026/05/08-22:56:57.255 7024 Delete type=3 #15
