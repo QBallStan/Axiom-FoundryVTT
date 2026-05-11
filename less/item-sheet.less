@@ -185,7 +185,6 @@
   gap: 3px;
   padding: 0 14px;
   border-bottom: 1px solid var(--item-line);
-  overflow-x: auto;
 }
 
 .axiom.item-sheet .sheet-tabs .item,
@@ -489,7 +488,11 @@
   .axiom.item-sheet .armor-location-grid,
   .axiom-item-sheet .armor-location-grid,
   .axiom.item-sheet .weapon-range-bands,
-  .axiom-item-sheet .weapon-range-bands {
+  .axiom-item-sheet .weapon-range-bands,
+  .axiom.item-sheet .weapon-details .weapon-grid,
+  .axiom-item-sheet .weapon-details .weapon-grid,
+  .axiom.item-sheet .weapon-details .ranged-grid,
+  .axiom-item-sheet .weapon-details .ranged-grid {
     grid-template-columns: 1fr 1fr;
   }
 }
@@ -507,6 +510,18 @@
 .axiom.item-sheet .form-grid.compact,
 .axiom-item-sheet .form-grid.compact {
   gap: 8px;
+}
+
+.axiom.item-sheet .weapon-details .weapon-grid,
+.axiom-item-sheet .weapon-details .weapon-grid,
+.axiom.item-sheet .weapon-details .ranged-grid,
+.axiom-item-sheet .weapon-details .ranged-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.axiom.item-sheet .weapon-details .ranged-ammo-field,
+.axiom-item-sheet .weapon-details .ranged-ammo-field {
+  grid-column: 1 / -1;
 }
 
 .axiom.item-sheet .field-group,
@@ -884,4 +899,481 @@
   .editor-section .editor-edit {
     color: var(--item-text);
   }
+}
+
+/* ----------------------------------------- */
+/*  Item Genre Tags                          */
+/* ----------------------------------------- */
+
+.axiom.item-sheet .item-title-row,
+.axiom-item-sheet .item-title-row {
+  display: grid;
+  grid-template-columns: 1fr 32px;
+  gap: 8px;
+  align-items: center;
+}
+
+.axiom.item-sheet .item-tag-config,
+.axiom-item-sheet .item-tag-config {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--item-line);
+  border-radius: 7px;
+  background: var(--item-panel-dark);
+  color: var(--item-bone);
+  cursor: pointer;
+}
+
+.axiom.item-sheet .item-tag-config:hover,
+.axiom-item-sheet .item-tag-config:hover {
+  border-color: var(--item-bone);
+  box-shadow: 0 0 10px var(--item-shadow-bone);
+}
+
+.axiom.item-sheet .item-tag-list,
+.axiom-item-sheet .item-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: -2px;
+}
+
+.axiom.item-sheet .item-tag-pill,
+.axiom-item-sheet .item-tag-pill,
+.axiom-tag-dialog .axiom-tag-option span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 2px 7px;
+  border: 1px solid var(--item-line, #333338);
+  border-radius: 999px;
+  background: rgba(224, 212, 184, 0.08);
+  color: var(--item-bone, #e0d4b8);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.axiom-tag-dialog .hint {
+  margin: 0 0 10px;
+  color: var(--color-text-dark-secondary, #aaa);
+}
+
+.axiom-tag-dialog .axiom-tag-option-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.axiom-tag-dialog .axiom-tag-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.axiom-tag-dialog .axiom-tag-option input {
+  flex: 0 0 auto;
+}
+
+.application .axiom-tag-dialog .axiom-tag-option-grid,
+.dialog .axiom-tag-dialog .axiom-tag-option-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.application .axiom-tag-dialog .axiom-tag-option,
+.dialog .axiom-tag-dialog .axiom-tag-option {
+  width: 100%;
+  min-width: 0;
+}
+
+/* ----------------------------------------- */
+/*  Ranged Weapon Sheet Layout               */
+/* ----------------------------------------- */
+
+.axiom.item-sheet.ranged-weapon .weapon-details,
+.axiom-item-sheet.rangedWeapon .weapon-details,
+.axiom-item-sheet.ranged-weapon .weapon-details {
+  display: grid;
+  gap: 10px;
+}
+
+.axiom.item-sheet.ranged-weapon .ranged-weapon-section,
+.axiom-item-sheet.rangedWeapon .ranged-weapon-section,
+.axiom-item-sheet.ranged-weapon .ranged-weapon-section {
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  overflow: hidden;
+}
+
+.axiom.item-sheet.ranged-weapon .ranged-section-title,
+.axiom-item-sheet.rangedWeapon .ranged-section-title,
+.axiom-item-sheet.ranged-weapon .ranged-section-title {
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--item-line);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.axiom.item-sheet.ranged-weapon .ranged-section-body,
+.axiom-item-sheet.rangedWeapon .ranged-section-body,
+.axiom-item-sheet.ranged-weapon .ranged-section-body {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+}
+
+.axiom.item-sheet.ranged-weapon .span-2,
+.axiom-item-sheet.rangedWeapon .span-2,
+.axiom-item-sheet.ranged-weapon .span-2 {
+  grid-column: span 2;
+}
+
+.axiom.item-sheet.ranged-weapon .ranged-attributes-grid,
+.axiom.item-sheet.ranged-weapon .ranged-ballistics-grid,
+.axiom-item-sheet.rangedWeapon .ranged-attributes-grid,
+.axiom-item-sheet.rangedWeapon .ranged-ballistics-grid,
+.axiom-item-sheet.ranged-weapon .ranged-attributes-grid,
+.axiom-item-sheet.ranged-weapon .ranged-ballistics-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.axiom.item-sheet.ranged-weapon .ranged-range-panel,
+.axiom-item-sheet.rangedWeapon .ranged-range-panel,
+.axiom-item-sheet.ranged-weapon .ranged-range-panel {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 8px;
+  align-items: stretch;
+}
+
+.axiom.item-sheet.ranged-weapon .range-value-field,
+.axiom-item-sheet.rangedWeapon .range-value-field,
+.axiom-item-sheet.ranged-weapon .range-value-field {
+  justify-content: center;
+}
+
+.axiom.item-sheet.ranged-weapon .ranged-range-panel .range-band-grid,
+.axiom-item-sheet.rangedWeapon .ranged-range-panel .range-band-grid,
+.axiom-item-sheet.ranged-weapon .ranged-range-panel .range-band-grid {
+  margin-top: 0;
+}
+
+.axiom.item-sheet.ranged-weapon .ranged-range-panel .range-band-card,
+.axiom-item-sheet.rangedWeapon .ranged-range-panel .range-band-card,
+.axiom-item-sheet.ranged-weapon .ranged-range-panel .range-band-card {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  padding: 6px 4px;
+}
+
+.axiom.item-sheet.ranged-weapon .ranged-range-panel .range-band-card strong,
+.axiom-item-sheet.rangedWeapon .ranged-range-panel .range-band-card strong,
+.axiom-item-sheet.ranged-weapon .ranged-range-panel .range-band-card strong {
+  margin-top: 2px;
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.axiom.item-sheet.ranged-weapon .ranged-ammo-reload-grid,
+.axiom-item-sheet.rangedWeapon .ranged-ammo-reload-grid,
+.axiom-item-sheet.ranged-weapon .ranged-ammo-reload-grid {
+  grid-template-columns: 1fr 1fr 1.35fr;
+}
+
+.axiom.item-sheet.ranged-weapon .ammo-type-row,
+.axiom-item-sheet.rangedWeapon .ammo-type-row,
+.axiom-item-sheet.ranged-weapon .ammo-type-row {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (max-width: 620px) {
+  .axiom.item-sheet.ranged-weapon .ranged-attributes-grid,
+  .axiom.item-sheet.ranged-weapon .ranged-ballistics-grid,
+  .axiom.item-sheet.ranged-weapon .ranged-ammo-reload-grid,
+  .axiom-item-sheet.rangedWeapon .ranged-attributes-grid,
+  .axiom-item-sheet.rangedWeapon .ranged-ballistics-grid,
+  .axiom-item-sheet.rangedWeapon .ranged-ammo-reload-grid,
+  .axiom-item-sheet.ranged-weapon .ranged-attributes-grid,
+  .axiom-item-sheet.ranged-weapon .ranged-ballistics-grid,
+  .axiom-item-sheet.ranged-weapon .ranged-ammo-reload-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .axiom.item-sheet.ranged-weapon .ranged-range-panel,
+  .axiom-item-sheet.rangedWeapon .ranged-range-panel,
+  .axiom-item-sheet.ranged-weapon .ranged-range-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ----------------------------------------- */
+/*  Item Description Editor Height           */
+/* ----------------------------------------- */
+
+.application.sheet.axiom.item .window-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.application.sheet.axiom.item .window-content > .axiom-item-sheet,
+.application.sheet.axiom.item .window-content > .axiom.item-sheet {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.axiom.item-sheet .sheet-body,
+.axiom-item-sheet .sheet-body,
+.axiom.item-sheet .item-body,
+.axiom-item-sheet .item-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.axiom.item-sheet .sheet-body > .tab.active,
+.axiom-item-sheet .sheet-body > .tab.active,
+.axiom.item-sheet .item-body > .tab.active,
+.axiom-item-sheet .item-body > .tab.active {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.axiom.item-sheet .description-tab.editor-section,
+.axiom-item-sheet .description-tab.editor-section {
+  height: 100%;
+  min-height: 0;
+}
+
+.axiom.item-sheet .description-tab.editor-section .editor,
+.axiom.item-sheet .description-tab.editor-section prose-mirror,
+.axiom.item-sheet .description-tab.editor-section .prosemirror,
+.axiom-item-sheet .description-tab.editor-section .editor,
+.axiom-item-sheet .description-tab.editor-section prose-mirror,
+.axiom-item-sheet .description-tab.editor-section .prosemirror {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.axiom.item-sheet .description-tab.editor-section .editor-content,
+.axiom-item-sheet .description-tab.editor-section .editor-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* ----------------------------------------- */
+/*  Unified Weapon Sheet                     */
+/* ----------------------------------------- */
+
+.axiom.item-sheet .weapon-section,
+.axiom-item-sheet .weapon-section {
+  border: 1px solid var(--item-line);
+  border-radius: var(--item-radius);
+  background: var(--item-panel);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.axiom.item-sheet .weapon-section > .section-title,
+.axiom-item-sheet .weapon-section > .section-title {
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--item-line);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.axiom.item-sheet .weapon-section-body,
+.axiom-item-sheet .weapon-section-body {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+}
+
+.axiom.item-sheet .three-way-control,
+.axiom-item-sheet .three-way-control {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.axiom.item-sheet .segmented-control.three-way-control label + input + label,
+.axiom-item-sheet .segmented-control.three-way-control label + input + label {
+  border-left: 1px solid var(--item-line);
+}
+
+.axiom.item-sheet .weapon-details .unified-weapon-grid,
+.axiom-item-sheet .weapon-details .unified-weapon-grid {
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+.axiom.item-sheet .unified-weapon-grid .weapon-state-field,
+.axiom.item-sheet .unified-weapon-grid .weapon-hands-field,
+.axiom.item-sheet .unified-weapon-grid .weapon-requirement-field,
+.axiom.item-sheet .unified-weapon-grid .weapon-delivery-field,
+.axiom.item-sheet .unified-weapon-grid .weapon-elemental-field,
+.axiom-item-sheet .unified-weapon-grid .weapon-state-field,
+.axiom-item-sheet .unified-weapon-grid .weapon-hands-field,
+.axiom-item-sheet .unified-weapon-grid .weapon-requirement-field,
+.axiom-item-sheet .unified-weapon-grid .weapon-delivery-field,
+.axiom-item-sheet .unified-weapon-grid .weapon-elemental-field {
+  grid-column: span 2;
+}
+
+.axiom.item-sheet .unified-weapon-grid .compact-number-field,
+.axiom-item-sheet .unified-weapon-grid .compact-number-field {
+  grid-column: span 1;
+}
+
+.axiom.item-sheet .weapon-mode-tabs,
+.axiom-item-sheet .weapon-mode-tabs {
+  display: flex;
+  gap: 3px;
+  padding: 0;
+  border-bottom: 1px solid var(--item-line);
+}
+
+.axiom.item-sheet .weapon-mode-tab,
+.axiom-item-sheet .weapon-mode-tab {
+  flex: 0 0 auto;
+  min-width: 112px;
+  padding: 8px 12px 6px;
+  border: 1px solid var(--item-line);
+  border-top: 0;
+  border-bottom: 0;
+  border-radius: 0;
+  background: var(--item-bg);
+  color: var(--item-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.axiom.item-sheet .weapon-mode-tab.active,
+.axiom-item-sheet .weapon-mode-tab.active {
+  background: var(--item-panel);
+  color: var(--item-bone);
+  box-shadow: inset 0 -2px 0 var(--item-bone), 0 0 12px var(--item-shadow-bone);
+}
+
+.axiom.item-sheet .mode-card-title,
+.axiom-item-sheet .mode-card-title {
+  padding: 7px 10px 5px;
+  border-bottom: 1px solid var(--item-line);
+  box-shadow: inset -3px 0 0 var(--item-bone);
+  color: var(--item-bone);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.axiom.item-sheet .mode-card-body,
+.axiom-item-sheet .mode-card-body {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px;
+}
+
+.axiom.item-sheet .span-2,
+.axiom-item-sheet .span-2 { grid-column: span 2; }
+
+.axiom.item-sheet .span-3,
+.axiom-item-sheet .span-3 { grid-column: span 3; }
+
+.axiom.item-sheet .ranged-range-panel,
+.axiom-item-sheet .ranged-range-panel {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 8px;
+  align-items: stretch;
+}
+
+.axiom.item-sheet .shots-input,
+.axiom-item-sheet .shots-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 4px;
+}
+
+.axiom.item-sheet .shots-input b,
+.axiom-item-sheet .shots-input b {
+  color: var(--item-muted);
+  font-size: 14px;
+}
+
+@media (max-width: 620px) {
+  .axiom.item-sheet .weapon-details .unified-weapon-grid,
+  .axiom-item-sheet .weapon-details .unified-weapon-grid,
+  .axiom.item-sheet .mode-card-body,
+  .axiom-item-sheet .mode-card-body {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .axiom.item-sheet .ranged-range-panel,
+  .axiom-item-sheet .ranged-range-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .axiom.item-sheet .unified-weapon-grid .weapon-state-field,
+  .axiom.item-sheet .unified-weapon-grid .weapon-hands-field,
+  .axiom.item-sheet .unified-weapon-grid .weapon-requirement-field,
+  .axiom.item-sheet .unified-weapon-grid .weapon-delivery-field,
+  .axiom.item-sheet .unified-weapon-grid .weapon-elemental-field,
+  .axiom.item-sheet .unified-weapon-grid .compact-number-field,
+  .axiom-item-sheet .unified-weapon-grid .weapon-state-field,
+  .axiom-item-sheet .unified-weapon-grid .weapon-hands-field,
+  .axiom-item-sheet .unified-weapon-grid .weapon-requirement-field,
+  .axiom-item-sheet .unified-weapon-grid .weapon-delivery-field,
+  .axiom-item-sheet .unified-weapon-grid .weapon-elemental-field,
+  .axiom-item-sheet .unified-weapon-grid .compact-number-field {
+    grid-column: span 1;
+  }
+}
+
+
+.axiom.item-sheet .weapon-mode-tabs::-webkit-scrollbar,
+.axiom-item-sheet .weapon-mode-tabs::-webkit-scrollbar {
+  height: 6px;
+}
+
+.axiom.item-sheet .weapon-mode-tabs::-webkit-scrollbar-track,
+.axiom-item-sheet .weapon-mode-tabs::-webkit-scrollbar-track {
+  background: var(--item-panel-dark);
+}
+
+.axiom.item-sheet .weapon-mode-tabs::-webkit-scrollbar-thumb,
+.axiom-item-sheet .weapon-mode-tabs::-webkit-scrollbar-thumb {
+  background: var(--item-bone);
+  border-radius: 999px;
+}
+
+.axiom.item-sheet .loading-method-hint,
+.axiom-item-sheet .loading-method-hint {
+  padding: 6px 8px;
+  border: 1px solid var(--item-line-soft);
+  border-radius: 6px;
+  background: var(--item-panel-dark);
+  color: var(--item-muted);
+  font-size: 11px;
+  line-height: 1.35;
 }

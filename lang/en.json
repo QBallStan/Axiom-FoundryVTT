@@ -37,12 +37,34 @@
         "Label": "State",
         "Equipped": "Equipped",
         "Carried": "Carried",
-        "Stored": "Stored"
+        "Stored": "Stored",
+        "MainHand": "Main Hand",
+        "OffHand": "Off-Hand",
+        "BothHands": "Both Hands"
       },
       "Ammunition": {
         "NoDetails": "No ammunition-specific fields yet."
       },
-      "QuantityControlHint": "Left click -1. Right click +1. Hold Shift for 5, Shift+Ctrl for 10."
+      "QuantityControlHint": "Left click -1. Right click +1. Hold Shift for 5, Shift+Ctrl for 10.",
+      "Tags": {
+        "Label": "Tags",
+        "Configure": "Configure Tags",
+        "Hint": "Select every tag that applies to this item. These tags are stored for later filtering.",
+        "Clear": "Clear Tags",
+        "Primitive": "Primitive",
+        "Ancient": "Ancient",
+        "Medieval": "Medieval",
+        "Renaissance": "Renaissance",
+        "Industrial": "Industrial",
+        "Modern": "Modern",
+        "NearFuture": "Near-Future",
+        "Cyberpunk": "Cyberpunk",
+        "SciFi": "Sci-Fi",
+        "PostApocalyptic": "Post-Apocalyptic",
+        "Fantasy": "Fantasy",
+        "Horror": "Horror",
+        "Universal": "Universal"
+      }
     },
     "Skill": {
       "Level": "Level",
@@ -205,7 +227,8 @@
             "Attribute": "Attribute",
             "Skill": "Skill",
             "Resource": "Resource",
-            "Custom": "Custom Key"
+            "Custom": "Custom Key",
+            "AttributeCheck": "Attribute Check"
           },
           "Targets": {
             "GrazingWoundsMax": "Grazing Wound Slots",
@@ -253,7 +276,20 @@
             "Downgrade": "Downgrade"
           },
           "Conditional": "Conditional",
-          "ConditionalHint": "Conditional effects are offered in relevant roll windows instead of being applied all the time."
+          "ConditionalHint": "Conditional effects are offered in relevant roll windows instead of being applied all the time.",
+          "NoTargetsAvailable": "No targets available",
+          "Modifiers": "Modifiers",
+          "Modifier": "Modifier",
+          "AddModifier": "Add Modifier",
+          "RemoveModifier": "Remove Modifier",
+          "DefaultName": "Axiom Effect",
+          "AndMore": "+ {count} more",
+          "ModifierQueue": "Queued Modifiers",
+          "ModifierComposer": "Modifier Setup",
+          "EmptyQueue": "No modifiers queued yet. Set up a modifier on the right, then queue it here.",
+          "QueueModifier": "Queue Modifier",
+          "UpdateModifier": "Update Modifier",
+          "CancelEdit": "Cancel Edit"
         },
         "Create": "Add Effect",
         "New": "New Effect",
@@ -310,7 +346,10 @@
         "Melee": "Melee",
         "Range": "Range",
         "Shields": "Shields",
-        "NoShields": "No shields."
+        "NoShields": "No shields.",
+        "Weapons": "Weapons",
+        "MixedWeapons": "Mixed Weapons",
+        "NoWeapons": "No weapons"
       },
       "NPC": {
         "Config": "NPC Configuration",
@@ -458,7 +497,9 @@
     },
     "Common": {
       "Yes": "Yes",
-      "No": "No"
+      "No": "No",
+      "Save": "Save",
+      "Cancel": "Cancel"
     },
     "RollCard": {
       "UnknownActor": "Unknown Actor",
@@ -546,11 +587,12 @@
       "ArmorPenetration": "AP",
       "Range": "Range",
       "AmmoContainer": "Ammo Max",
-      "Ammunition": "Ammo Type",
+      "Ammunition": "Ammunition",
       "NoAmmunition": "No ammunition",
       "Categories": {
         "Melee": "Melee",
-        "Ranged": "Ranged"
+        "Ranged": "Ranged",
+        "Mixed": "Mixed"
       },
       "Delivery": {
         "Label": "Delivery",
@@ -571,7 +613,64 @@
       "ReloadNoAmmunitionSelected": "Select an ammunition item on {weapon} before reloading.",
       "ReloadAmmunitionMissing": "The ammunition selected on {weapon} could not be found on this actor.",
       "ReloadNoAmmunitionAvailable": "No {ammunition} left to reload.",
-      "Reloaded": "Reloaded {weapon} with {amount} {ammunition}."
+      "Reloaded": "Reloaded {weapon} with {amount} {ammunition}.",
+      "MinStrength": "Minimum Strength",
+      "MinStrengthShort": "STR {value}+",
+      "MinStrengthNotMet": "Minimum Strength not met",
+      "MinStrengthWarning": "{weapon} requires Strength {value} to use.",
+      "Hands": {
+        "Label": "Hands",
+        "One": "One-handed",
+        "Two": "Two-handed",
+        "WeaponLabel": "Weapon Hands",
+        "Versatile": "Versatile"
+      },
+      "WeaponAttributes": "Weapon Attributes",
+      "AmmunitionReload": "Ammunition & Reload",
+      "ShotRate": "Shot Rate",
+      "ReloadMethod": {
+        "Label": "Loading Method",
+        "Placeholder": "Select loading method",
+        "None": "None",
+        "Thrown": "Thrown",
+        "Drawn": "Drawn",
+        "Single": "Single",
+        "Hints": {
+          "none": "No ammunition automation.",
+          "thrown": "Using this ranged mode consumes one weapon from the item quantity. Shots stay 0/0.",
+          "drawn": "Using this ranged mode consumes one linked ammunition item directly. Shots stay 0/0.",
+          "single": "Reloading loads one shot from the linked ammunition item. Attacking consumes one loaded shot."
+        }
+      },
+      "Reach": "Reach",
+      "VersatileBonus": "Versatile two-handed bonus",
+      "VersatileBonusShort": "+1 2H",
+      "Elemental": {
+        "Label": "Elemental",
+        "None": "None",
+        "Fire": "Fire",
+        "Cold": "Cold",
+        "Electric": "Electric",
+        "Acid": "Acid",
+        "Corruption": "Corruption",
+        "Radiant": "Radiant",
+        "Necrotic": "Necrotic",
+        "Psychic": "Psychic"
+      },
+      "ReloadCost": {
+        "Label": "Reload Cost",
+        "Free": "Free",
+        "OneAP": "1 AP",
+        "TwoAP": "2 AP",
+        "ThreeAP": "3 AP"
+      },
+      "MeleeDetails": "Melee Details",
+      "RangedDetails": "Ranged Details",
+      "MeleeSkill": "Melee Skill",
+      "RangedSkill": "Ranged Skill",
+      "ParryBonus": "Parry Bonus",
+      "Shots": "Shots",
+      "QuantityDisplay": "Qty {quantity}"
     },
     "Equipment": {
       "Skill": "Skill",
@@ -731,9 +830,7 @@
     "Item": {
       "skill": "Skill",
       "armor": "Armor",
-      "meleeWeapon": "Weapon (Melee)",
-      "rangedWeapon": "Weapon (Ranged)",
-      "weapon": "Weapon (Legacy)",
+      "weapon": "Weapon",
       "ammunition": "Ammunition",
       "equipment": "Equipment",
       "trait": "Trait",

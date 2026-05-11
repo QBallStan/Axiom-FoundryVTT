@@ -4,7 +4,7 @@ const { mergeObject } = foundry.utils;
 import AxiomRollWindow from "../../apps/roll-window.mjs";
 import AxiomEffectBuilder from "../../apps/effect-builder.mjs";
 import { formatAxiomPrice, getStoredCurrencyCoins, prepareCurrencyContext, priceCoinsToValue } from "../../system/currency.mjs";
-import { getWeaponCategory, isMeleeWeaponItem, isRangedWeaponItem, isWeaponItem, isShieldItem, WEAPON_ITEM_TYPES, SHIELD_ITEM_TYPE } from "../../system/items.mjs";
+import { getWeaponCategory, handStateUsesMainHand, handStateUsesOffHand, isEquippedGearState, isHandEquippableItem, isHandGearState, isMeleeWeaponItem, isRangedWeaponItem, isWeaponItem, isShieldItem, WEAPON_ITEM_TYPES, SHIELD_ITEM_TYPE } from "../../system/items.mjs";
 
 const LEGACY_ACTIVE_EFFECT_MODE_TYPES = Object.freeze({
   0: "custom",
@@ -111,6 +111,14 @@ async function enrichHTML(value, relativeTo) {
 }
 
 const COMBAT_GEAR_ITEM_TYPES = ["equipment", "armor", "ammunition", SHIELD_ITEM_TYPE, ...WEAPON_ITEM_TYPES];
+
+function normalizeWeaponReloadMethod(value) {
+  const method = String(value ?? "").trim();
+  if (["none", "thrown", "drawn", "single"].includes(method)) return method;
+  if (method === "free") return "drawn";
+  if (["magazine", "speedloader", "breakAction", "beltFed", "internalMagazine", "revolverCylinder", "muzzle"].includes(method)) return "single";
+  return "none";
+}
 
 const ATTRIBUTE_ORDER = [
   "strength",
@@ -293,17 +301,22 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     return item?.id ? `flags.axiom.skillModifiers.${item.id}` : null;
   }
 
+  _getSkillNameEffectKey(item) {
+    const normalizedName = this._normalizeSkillReference(item?.name);
+    return normalizedName ? `flags.axiom.skillNameModifiers.${normalizedName}` : null;
+  }
+
   _getSkillAdjustedValue(item) {
     let value = Number(item?.system?.level ?? 0);
-    const key = this._getSkillEffectKey(item);
-    if (!key) return value;
+    const keys = [this._getSkillEffectKey(item), this._getSkillNameEffectKey(item)].filter(Boolean);
+    if (!keys.length) return value;
 
-    for (const effect of this.actor.effects ?? []) {
+    for (const { effect } of this._getApplicableEffects()) {
       if (effect.disabled || effect.getFlag?.("axiom", "conditional")) continue;
       if (foundry.utils.getProperty(effect, "flags.axiom.status")) continue;
 
       for (const change of effect.changes ?? []) {
-        if (change.key !== key) continue;
+        if (!keys.includes(change.key)) continue;
         const changeValue = Number(change.value ?? 0);
         if (!Number.isFinite(changeValue)) continue;
 
@@ -398,8 +411,11 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
 
   _prepareEquipmentSummary() {
     const weightItems = this.actor.items.filter(item => COMBAT_GEAR_ITEM_TYPES.includes(item.type));
-    const carriedItems = weightItems.filter(item => ["carried", "equipped"].includes(item.system?.state ?? "carried"));
-    const equippedItems = weightItems.filter(item => (item.system?.state ?? "carried") === "equipped");
+    const carriedItems = weightItems.filter(item => {
+      const state = item.system?.state ?? "carried";
+      return state === "carried" || isEquippedGearState(state);
+    });
+    const equippedItems = weightItems.filter(item => isEquippedGearState(item.system?.state ?? "carried"));
     const storedItems = weightItems.filter(item => (item.system?.state ?? "carried") === "stored");
 
     const totalWeight = carriedItems.reduce((sum, item) => {
@@ -440,7 +456,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       canRoll: Boolean(system.skill),
       state: system.state ?? "carried",
       stateLabel: this._localizeGearState(system.state),
-      stateOptions: this._prepareGearStateOptions(system.state)
+      stateOptions: this._prepareGearStateOptions(system.state, item)
     };
   }
 
@@ -475,14 +491,18 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
 
     const meleeWeapons = weapons.filter(weapon => weapon.category === "melee");
     const rangedWeapons = weapons.filter(weapon => weapon.category === "ranged");
+    const mixedWeapons = weapons.filter(weapon => weapon.category === "mixed");
     const meleeItems = [...meleeWeapons, ...shields].sort((a, b) => a.name.localeCompare(b.name));
 
     return {
       armorSummary: this._prepareEquippedArmorSummary(),
+      weapons,
       meleeWeapons,
       shields,
       meleeItems,
       rangedWeapons,
+      mixedWeapons,
+      hasWeaponsOrShields: Boolean(meleeItems.length || rangedWeapons.length || mixedWeapons.length),
       ammunition,
       armor
     };
@@ -507,6 +527,16 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     const range = Number(system.range ?? 0);
     const ammoContainer = Number(system.ammoContainer ?? 0);
     const ammoLoaded = Math.max(0, Number(system.ammo ?? 0));
+    const loadingMethod = normalizeWeaponReloadMethod(system.reloadMethod);
+    const linkedAmmunition = this.actor.items.get(String(system.ammunition ?? ""));
+    const linkedAmmunitionQuantity = linkedAmmunition?.type === "ammunition" ? Math.max(0, Number(linkedAmmunition.system?.quantity ?? 0)) : null;
+    const weaponQuantity = Math.max(0, Number(system.quantity ?? 0));
+    const versatileDamageBonus = this._getVersatileDamageBonus(system);
+    const baseDamage = Number(system.damage ?? 0);
+    let ammoDisplay = "";
+    if (loadingMethod === "single") ammoDisplay = `${ammoLoaded}/${ammoContainer}`;
+    else if (loadingMethod === "drawn") ammoDisplay = linkedAmmunition ? `${linkedAmmunition.name} ${linkedAmmunitionQuantity}` : game.i18n.localize("AXIOM.Weapon.NoAmmunition");
+    else if (loadingMethod === "thrown") ammoDisplay = game.i18n.format("AXIOM.Weapon.QuantityDisplay", { quantity: weaponQuantity });
 
     return {
       id: item.id,
@@ -516,18 +546,37 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       category,
       description: this._prepareItemDescription(item),
       categoryLabel: this._localizeConfigLabel(CONFIG.AXIOM?.weaponCategories?.[category], category),
-      damage: Number(system.damage ?? 0),
+      isMelee: category === "melee",
+      isRanged: category === "ranged",
+      isMixed: category === "mixed",
+      damage: baseDamage,
+      effectiveDamage: baseDamage + versatileDamageBonus,
+      versatileDamageBonus,
       armorPenetration: Number(system.armorPenetration ?? 0),
       delivery: this._localizeConfigLabel(CONFIG.AXIOM?.damageDelivery?.[system.delivery], system.delivery ?? "kinetic"),
+      elemental: this._localizeConfigLabel(CONFIG.AXIOM?.elementalDamage?.[system.elemental || "none"], system.elemental || ""),
       skill: system.skill ?? "",
+      meleeSkill: system.meleeSkill || system.skill || "Melee",
+      rangedSkill: system.rangedSkill || system.skill || (category === "mixed" ? "Athletics" : "Marksmanship"),
+      reach: Number(system.reach ?? 0),
+      parryBonus: Number(system.parryBonus ?? 0),
       range,
       ammoLoaded,
       ammoContainer,
-      ammoDisplay: `${ammoLoaded}/${ammoContainer}`,
-      canReload: isRangedWeaponItem(item) && ammoContainer > 0,
+      ammoDisplay,
+      loadingMethod,
+      linkedAmmunitionName: linkedAmmunition?.name ?? "",
+      linkedAmmunitionQuantity,
+      showAmmoDisplay: Boolean(ammoDisplay),
+      canReload: (category === "ranged" || category === "mixed") && loadingMethod === "single" && ammoContainer > 0,
       state: system.state ?? "carried",
       stateLabel: this._localizeGearState(system.state),
-      stateOptions: this._prepareGearStateOptions(system.state),
+      stateOptions: this._prepareGearStateOptions(system.state, item),
+      hands: system.hands ?? "one",
+      handsLabel: this._localizeConfigLabel(CONFIG.AXIOM?.weaponHands?.[system.hands ?? "one"], system.hands ?? "one"),
+      minStrength: Number(system.minStrength ?? 0),
+      meetsMinStrength: this._meetsWeaponStrengthRequirement(system),
+      strengthRequirementLabel: this._formatStrengthRequirement(system),
       rangeBands: {
         short: Math.ceil(range / 2),
         medium: range,
@@ -535,6 +584,10 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
         extreme: range * 3
       }
     };
+  }
+
+  _getVersatileDamageBonus(system = {}) {
+    return system.hands === "versatile" && system.state === "bothHands" ? 1 : 0;
   }
 
 
@@ -556,7 +609,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       coverLabel: this._localizeConfigLabel(CONFIG.AXIOM?.coverTypes?.[cover], cover),
       state: system.state ?? "carried",
       stateLabel: this._localizeGearState(system.state),
-      stateOptions: this._prepareGearStateOptions(system.state)
+      stateOptions: this._prepareGearStateOptions(system.state, item)
     };
   }
 
@@ -576,7 +629,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       legs: Number(armor.legs ?? 0),
       state: system.state ?? "carried",
       stateLabel: this._localizeGearState(system.state),
-      stateOptions: this._prepareGearStateOptions(system.state)
+      stateOptions: this._prepareGearStateOptions(system.state, item)
     };
   }
 
@@ -594,17 +647,36 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       price: formatAxiomPrice(system),
       state: system.state ?? "carried",
       stateLabel: this._localizeGearState(system.state),
-      stateOptions: this._prepareGearStateOptions(system.state)
+      stateOptions: this._prepareGearStateOptions(system.state, item)
     };
   }
 
-  _prepareGearStateOptions(selectedState = "carried") {
-    const states = CONFIG.AXIOM?.gearStates ?? {};
+  _prepareGearStateOptions(selectedState = "carried", item = null) {
+    let states = isHandEquippableItem(item) ? (CONFIG.AXIOM?.handGearStates ?? {}) : (CONFIG.AXIOM?.gearStates ?? {});
+    if (isWeaponItem(item) && item.system?.hands === "two") {
+      states = Object.fromEntries(Object.entries(states).filter(([key]) => ["bothHands", "carried", "stored"].includes(key)));
+    }
+
+    const normalizedState = isWeaponItem(item) && item.system?.hands === "two" && ["equipped", "mainHand", "offHand"].includes(selectedState)
+      ? "bothHands"
+      : isHandEquippableItem(item) && selectedState === "equipped" ? "mainHand" : (selectedState ?? "carried");
+
     return Object.entries(states).map(([key, label]) => ({
       key,
       label: game.i18n.localize(label),
-      selected: key === (selectedState ?? "carried")
+      selected: key === normalizedState
     }));
+  }
+
+  _meetsWeaponStrengthRequirement(system = {}) {
+    const minimum = Number(system.minStrength ?? 0);
+    return minimum <= 0 || this._getAttributeValue("strength") >= minimum;
+  }
+
+  _formatStrengthRequirement(system = {}) {
+    const minimum = Number(system.minStrength ?? 0);
+    if (minimum <= 0) return "";
+    return game.i18n.format("AXIOM.Weapon.MinStrengthShort", { value: minimum });
   }
 
   _localizeConfigLabel(label, fallback = "") {
@@ -613,7 +685,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
   }
 
   _localizeGearState(state = "carried") {
-    return this._localizeConfigLabel(CONFIG.AXIOM?.gearStates?.[state], state);
+    return this._localizeConfigLabel(CONFIG.AXIOM?.gearStates?.[state] ?? CONFIG.AXIOM?.handGearStates?.[state], state);
   }
 
   async _prepareEnrichedItemDescriptions() {
@@ -646,6 +718,41 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
   }
 
 
+  _getApplicableEffects() {
+    const ownedItems = Array.from(this.actor.items ?? []);
+    const ownedItemUuids = new Set(ownedItems.map(item => item.uuid).filter(Boolean));
+    const effects = [];
+
+    for (const effect of this.actor.effects ?? []) {
+      if (this._effectOriginIsOwnedItem(effect, ownedItemUuids)) continue;
+      effects.push({
+        id: effect.id,
+        effect,
+        sourceDocument: this.actor,
+        source: effect.origin ? this._formatEffectSource(effect.origin) : game.i18n.localize("AXIOM.Actor.Effects.ManualSource")
+      });
+    }
+
+    for (const item of ownedItems) {
+      for (const effect of item.effects ?? []) {
+        effects.push({
+          id: `${item.id}.${effect.id}`,
+          effect,
+          sourceDocument: item,
+          source: item.name ?? game.i18n.localize("AXIOM.Actor.Effects.ItemSource")
+        });
+      }
+    }
+
+    return effects;
+  }
+
+  _effectOriginIsOwnedItem(effect, ownedItemUuids) {
+    const origin = String(effect?.origin ?? "");
+    if (!origin) return false;
+    return Array.from(ownedItemUuids).some(uuid => origin === uuid || origin.startsWith(`${uuid}.`));
+  }
+
   _prepareEffectTabData() {
     const statuses = Object.values(CONFIG.AXIOM?.statuses ?? {})
       .filter(status => !status.hiddenOnSheet)
@@ -664,16 +771,16 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       };
     });
 
-    const effects = Array.from(this.actor.effects ?? [])
-      .filter(effect => !foundry.utils.getProperty(effect, "flags.axiom.status"))
-      .map(effect => ({
-      id: effect.id,
+    const effects = this._getApplicableEffects()
+      .filter(({ effect }) => !foundry.utils.getProperty(effect, "flags.axiom.status"))
+      .map(({ id, effect, source }) => ({
+      id,
       name: effect.name,
       img: effect.img ?? effect.icon ?? "icons/svg/aura.svg",
       disabled: Boolean(effect.disabled),
       conditional: Boolean(effect.getFlag?.("axiom", "conditional")),
       cssClass: [effect.disabled ? "inactive" : "", effect.getFlag?.("axiom", "conditional") ? "conditional" : ""].filter(Boolean).join(" "),
-      source: effect.origin ? this._formatEffectSource(effect.origin) : game.i18n.localize("AXIOM.Actor.Effects.ManualSource"),
+      source,
       duration: this._formatEffectDuration(effect)
     }));
 
@@ -1029,7 +1136,14 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
 
   _getEffectFromEvent(event) {
     const effectId = event.currentTarget.closest("[data-effect-id]")?.dataset.effectId;
-    return effectId ? this.actor.effects.get(effectId) : null;
+    if (!effectId) return null;
+
+    if (effectId.includes(".")) {
+      const [itemId, itemEffectId] = effectId.split(".");
+      return this.actor.items.get(itemId)?.effects.get(itemEffectId) ?? null;
+    }
+
+    return this.actor.effects.get(effectId) ?? null;
   }
 
   async _onEditEffect(event) {
@@ -1048,7 +1162,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
 
     const effect = this._getEffectFromEvent(event);
     if (!effect) return;
-    await this.actor.deleteEmbeddedDocuments("ActiveEffect", [effect.id]);
+    await effect.delete();
   }
 
 
@@ -1109,7 +1223,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     const item = this._getEquipmentItemFromEvent(event);
     if (!item) return;
 
-    await item.update({ "system.state": event.currentTarget.value });
+    await this._updateItemState(item, event.currentTarget.value);
   }
 
   async _onAdjustItemQuantity(event) {
@@ -1147,8 +1261,8 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     const item = this._getEquipmentItemFromEvent(event);
     if (!item) return;
 
-    const skillId = item.system?.skill;
-    const skill = skillId ? this.actor.items.get(skillId) : null;
+    const skillReference = item.system?.skill;
+    const skill = this._resolveActorSkill(skillReference);
 
     if (!skill) {
       ui.notifications?.warn(game.i18n.localize("AXIOM.Equipment.NoSkillSelectedWarning"));
@@ -1247,7 +1361,31 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     const item = this._getCombatItemFromEvent(event);
     if (!item) return;
 
-    await item.update({ "system.state": event.currentTarget.value });
+    await this._updateItemState(item, event.currentTarget.value);
+  }
+
+  async _updateItemState(item, state) {
+    if (!item) return;
+
+    if (isWeaponItem(item) && item.system?.hands === "two" && isHandGearState(state)) {
+      state = "bothHands";
+    }
+
+    if (isHandEquippableItem(item) && isHandGearState(state)) {
+      const usesMain = handStateUsesMainHand(state);
+      const usesOff = handStateUsesOffHand(state);
+      const conflicts = this.actor.items
+        .filter(other => other.id !== item.id && isHandEquippableItem(other))
+        .filter(other => {
+          const otherState = other.system?.state;
+          return (usesMain && handStateUsesMainHand(otherState)) || (usesOff && handStateUsesOffHand(otherState));
+        })
+        .map(other => ({ _id: other.id, "system.state": "carried" }));
+
+      if (conflicts.length) await this.actor.updateEmbeddedDocuments("Item", conflicts);
+    }
+
+    await item.update({ "system.state": state });
   }
 
   async _onReloadWeapon(event) {
@@ -1256,6 +1394,9 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
 
     const weapon = this._getCombatItemFromEvent(event);
     if (!weapon || !isRangedWeaponItem(weapon)) return;
+
+    const loadingMethod = normalizeWeaponReloadMethod(weapon.system?.reloadMethod);
+    if (loadingMethod !== "single") return;
 
     const ammoContainer = Number(weapon.system?.ammoContainer ?? 0);
     const ammoLoaded = Math.max(0, Number(weapon.system?.ammo ?? 0));
@@ -1285,7 +1426,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       return;
     }
 
-    const amount = Math.min(missing, available);
+    const amount = 1;
     await weapon.update({ "system.ammo": ammoLoaded + amount });
     await ammunition.update({ "system.quantity": available - amount });
 
@@ -1303,11 +1444,27 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     const weapon = this._getCombatItemFromEvent(event);
     if (!weapon) return;
 
-    const skill = this._resolveActorSkill(weapon.system?.skill);
+    const minimumStrength = Number(weapon.system?.minStrength ?? 0);
+    if (minimumStrength > 0 && this._getAttributeValue("strength") < minimumStrength) {
+      ui.notifications?.warn(game.i18n.format("AXIOM.Weapon.MinStrengthWarning", {
+        weapon: weapon.name,
+        value: minimumStrength
+      }));
+      return;
+    }
+
+    const requestedMode = event.currentTarget?.dataset?.weaponMode;
+    const category = getWeaponCategory(weapon);
+    const weaponMode = requestedMode || (category === "ranged" ? "ranged" : "melee");
+    const skillName = weaponMode === "ranged"
+      ? (weapon.system?.rangedSkill || weapon.system?.skill)
+      : (weapon.system?.meleeSkill || weapon.system?.skill);
+
+    const skill = this._resolveActorSkill(skillName);
     if (!skill) {
       ui.notifications?.warn(game.i18n.format("AXIOM.Weapon.NoSkillSelectedWarning", {
         weapon: weapon.name,
-        skill: weapon.system?.skill || game.i18n.localize("AXIOM.Weapon.NoSkill")
+        skill: skillName || game.i18n.localize("AXIOM.Weapon.NoSkill")
       }));
       weapon.sheet?.render(true);
       return;
@@ -1322,6 +1479,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
         testName: `${weapon.name}: ${skill.name}`,
         testType: "weapon",
         sourceType: "item",
+        weaponMode,
         attributeOne: skill.system.attributeOne ?? "strength",
         attributeTwo: skill.system.attributeTwo ?? skill.system.attributeOne ?? "strength",
         skillValue: Number(skill.system.level ?? 0)
@@ -1417,15 +1575,40 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     event.stopPropagation();
 
     const button = event.currentTarget;
-    const row = button.closest(".skill-column")?.querySelector("[data-check-id='custom']");
-    if (!row) return;
+    this._rollAttributeCheck({
+      checkId: button.dataset.preset || this._getAttributeCheckPresetId(button),
+      checkName: button.dataset.checkName || game.i18n.localize("AXIOM.Actor.Skills.AttributeCheck"),
+      attributeOne: button.dataset.attributeOne ?? "strength",
+      attributeTwo: button.dataset.attributeTwo ?? button.dataset.attributeOne ?? "strength"
+    });
+  }
 
-    const selects = row.querySelectorAll("select[data-action='updateAttributeCheckPreview']");
-    if (selects[0]) selects[0].value = button.dataset.attributeOne ?? "strength";
-    if (selects[1]) selects[1].value = button.dataset.attributeTwo ?? "agility";
+  _getAttributeCheckPresetId(button) {
+    const attributeOne = button?.dataset?.attributeOne;
+    const attributeTwo = button?.dataset?.attributeTwo;
+    const label = button?.dataset?.checkName;
 
-    row.dataset.checkName = button.dataset.checkName ?? "";
-    this._updateAttributeCheckPreview(row);
+    return Object.entries(CONFIG.AXIOM?.attributeCheckPresets ?? {}).find(([, preset]) => {
+      const presetLabel = game.i18n.localize(preset.label);
+      return preset.attributeOne === attributeOne && preset.attributeTwo === attributeTwo && (!label || presetLabel === label);
+    })?.[0] ?? "custom";
+  }
+
+  _rollAttributeCheck({ checkId = "custom", checkName = "", attributeOne = "strength", attributeTwo = attributeOne } = {}) {
+    const title = checkName || game.i18n.localize("AXIOM.Actor.Skills.AttributeCheck");
+
+    new AxiomRollWindow({
+      rollData: {
+        actor: this.actor,
+        title,
+        testName: title,
+        testType: "attribute",
+        attributeCheckId: checkId,
+        attributeOne,
+        attributeTwo,
+        skillValue: 30
+      }
+    }).render({ force: true });
   }
 
   _onRollSkill(event) {
@@ -1456,21 +1639,13 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
 
     const row = event.currentTarget.closest("[data-check-id]");
     const selects = row?.querySelectorAll("select[data-action='updateAttributeCheckPreview']") ?? [];
-    const attributeOne = selects[0]?.value ?? "strength";
-    const attributeTwo = selects[1]?.value ?? "agility";
-    const checkName = row?.dataset.checkName || game.i18n.localize("AXIOM.Actor.Skills.AttributeCheck");
 
-    new AxiomRollWindow({
-      rollData: {
-        actor: this.actor,
-        title: checkName,
-        testName: checkName,
-        testType: "attribute",
-        attributeOne,
-        attributeTwo,
-        skillValue: 30
-      }
-    }).render({ force: true });
+    this._rollAttributeCheck({
+      checkId: row?.dataset.checkId ?? "custom",
+      checkName: row?.dataset.checkName || game.i18n.localize("AXIOM.Actor.Skills.AttributeCheck"),
+      attributeOne: selects[0]?.value ?? "strength",
+      attributeTwo: selects[1]?.value ?? "agility"
+    });
   }
 
 

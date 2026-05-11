@@ -1,6 +1,22 @@
 const STATUS_ICON_PATH = "icons/svg";
 const AXIOM_STATUS_ICON_PATH = "systems/axiom/assets/icons/status";
 
+
+const ITEM_GENRE_TAGS = {
+  primitive: "AXIOM.Item.Tags.Primitive",
+  ancient: "AXIOM.Item.Tags.Ancient",
+  medieval: "AXIOM.Item.Tags.Medieval",
+  renaissance: "AXIOM.Item.Tags.Renaissance",
+  industrial: "AXIOM.Item.Tags.Industrial",
+  modern: "AXIOM.Item.Tags.Modern",
+  cyberpunk: "AXIOM.Item.Tags.Cyberpunk",
+  sciFi: "AXIOM.Item.Tags.SciFi",
+  postApocalyptic: "AXIOM.Item.Tags.PostApocalyptic",
+  fantasy: "AXIOM.Item.Tags.Fantasy",
+  horror: "AXIOM.Item.Tags.Horror",
+  universal: "AXIOM.Item.Tags.Universal"
+};
+
 const ATTRIBUTE_CHECK_PRESETS = {
   dodge: {
     label: "AXIOM.Actor.Skills.Presets.Dodge",
@@ -231,6 +247,8 @@ export const AXIOM = {
     decimals: 0
   },
 
+  itemGenreTags: ITEM_GENRE_TAGS,
+
   attributes: {
     strength: "AXIOM.Attributes.Strength",
     agility: "AXIOM.Attributes.Agility",
@@ -252,7 +270,27 @@ export const AXIOM = {
 
   weaponCategories: {
     melee: "AXIOM.Weapon.Categories.Melee",
-    ranged: "AXIOM.Weapon.Categories.Ranged"
+    ranged: "AXIOM.Weapon.Categories.Ranged",
+    mixed: "AXIOM.Weapon.Categories.Mixed"
+  },
+
+  elementalDamage: {
+    none: "AXIOM.Weapon.Elemental.None",
+    fire: "AXIOM.Weapon.Elemental.Fire",
+    cold: "AXIOM.Weapon.Elemental.Cold",
+    electric: "AXIOM.Weapon.Elemental.Electric",
+    acid: "AXIOM.Weapon.Elemental.Acid",
+    corruption: "AXIOM.Weapon.Elemental.Corruption",
+    radiant: "AXIOM.Weapon.Elemental.Radiant",
+    necrotic: "AXIOM.Weapon.Elemental.Necrotic",
+    psychic: "AXIOM.Weapon.Elemental.Psychic"
+  },
+
+  weaponReloadCosts: {
+    0: "AXIOM.Weapon.ReloadCost.Free",
+    1: "AXIOM.Weapon.ReloadCost.OneAP",
+    2: "AXIOM.Weapon.ReloadCost.TwoAP",
+    3: "AXIOM.Weapon.ReloadCost.ThreeAP"
   },
 
   damageDelivery: {
@@ -270,6 +308,27 @@ export const AXIOM = {
     equipped: "AXIOM.Item.State.Equipped",
     carried: "AXIOM.Item.State.Carried",
     stored: "AXIOM.Item.State.Stored"
+  },
+
+  handGearStates: {
+    mainHand: "AXIOM.Item.State.MainHand",
+    offHand: "AXIOM.Item.State.OffHand",
+    bothHands: "AXIOM.Item.State.BothHands",
+    carried: "AXIOM.Item.State.Carried",
+    stored: "AXIOM.Item.State.Stored"
+  },
+
+  weaponHands: {
+    one: "AXIOM.Weapon.Hands.One",
+    two: "AXIOM.Weapon.Hands.Two",
+    versatile: "AXIOM.Weapon.Hands.Versatile"
+  },
+
+  weaponReloadMethods: {
+    none: "AXIOM.Weapon.ReloadMethod.None",
+    thrown: "AXIOM.Weapon.ReloadMethod.Thrown",
+    drawn: "AXIOM.Weapon.ReloadMethod.Drawn",
+    single: "AXIOM.Weapon.ReloadMethod.Single"
   },
 
   traitCategories: {

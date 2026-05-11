@@ -1,5 +1,5 @@
 import AxiomRoll from "./rolls/axiom-roll.mjs";
-import { isMeleeWeaponItem, isRangedWeaponItem, isShieldItem } from "./items.mjs";
+import { isEquippedGearState, isMeleeWeaponItem, isRangedWeaponItem, isShieldItem } from "./items.mjs";
 
 /**
  * Combat helpers for Axiom//Core.
@@ -158,7 +158,9 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const activationKey = `${combat.id}:${combat.round}:${combat.getAxiomPass?.() ?? 1}:${combat.turn}:${combatant.id}`;
     if (combatant.getFlag?.("axiom", this.FLAGS.activationKey) === activationKey) return;
 
-    await this.stepMomentumTowardZero(actor);
+    if ((combat.getAxiomPass?.() ?? 1) === 1) {
+      await this.stepMomentumTowardZero(actor);
+    }
 
     const ap = this.getActionPointCurrent(actor);
     await combatant.setFlag?.("axiom", this.FLAGS.activationStartAp, ap);
@@ -249,7 +251,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
 
     return actor.items
       ?.filter(item => isMeleeWeaponItem(item))
-      .filter(item => (item.system?.state ?? "carried") === "equipped") ?? [];
+      .filter(item => isEquippedGearState(item.system?.state ?? "carried")) ?? [];
   }
 
 
@@ -258,7 +260,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
 
     return actor.items
       ?.filter(item => isShieldItem(item))
-      .filter(item => (item.system?.state ?? "carried") === "equipped") ?? [];
+      .filter(item => isEquippedGearState(item.system?.state ?? "carried")) ?? [];
   }
 
   static getPrimaryShieldBlockSkill(actor) {
@@ -283,9 +285,9 @@ export default class AxiomCombat extends foundry.documents.Combat {
   }
 
   static getPrimaryParrySkill(actor) {
-    const equippedWeapon = this.getEquippedMeleeWeapons(actor).find(weapon => String(weapon.system?.skill ?? "").trim());
+    const equippedWeapon = this.getEquippedMeleeWeapons(actor).find(weapon => String(weapon.system?.meleeSkill || weapon.system?.skill || "").trim());
     if (equippedWeapon) {
-      const skill = this.findActorSkillByName(actor, equippedWeapon.system.skill);
+      const skill = this.findActorSkillByName(actor, equippedWeapon.system.meleeSkill || equippedWeapon.system.skill);
       if (skill) return { skill, weapon: equippedWeapon, source: "weapon" };
     }
 
@@ -400,7 +402,9 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const nextState = foundry.utils.deepClone(state ?? {});
     const attackerActor = game.actors?.get(nextState.actorId) ?? null;
     const weapon = attackerActor?.items?.get(nextState.itemId) ?? null;
-    if (!attackerActor || !weapon || !isRangedWeaponItem(weapon) || !targetToken?.actor) return nextState;
+    if (!attackerActor || !weapon || !targetToken?.actor) return nextState;
+    const attackCategory = nextState.weaponInfo?.category ?? (isRangedWeaponItem(weapon) && !isMeleeWeaponItem(weapon) ? "ranged" : "melee");
+    if (attackCategory !== "ranged") return nextState;
 
     const rangeRow = this.getRangeModifierRow({ attackerActor, weapon, targetToken });
     const rows = Array.isArray(nextState.modifierRows) ? [...nextState.modifierRows] : [];
@@ -586,9 +590,47 @@ export default class AxiomCombat extends foundry.documents.Combat {
     return { state: nextState, combatResult };
   }
 
+  static getOpposedRollUnits(result) {
+    const value = AxiomRoll.normalizeD100(result?.d100 ?? result?.roll?.total ?? result?.roll ?? 100);
+    return value % 10;
+  }
+
+  static getOpposedAttackSuccess(attack) {
+    if (attack?.success !== undefined) return Boolean(attack.success);
+    const d100 = attack?.d100 ?? attack?.roll;
+    const successTarget = Number(attack?.successTarget ?? 0);
+    return AxiomRoll.evaluateResult({ d100, successTarget }).success;
+  }
+
+  static resolveOpposedHits(attack, defense, { unopposed = false } = {}) {
+    if (!this.getOpposedAttackSuccess(attack)) return { attackerWins: false, netHits: 0, stalemate: false };
+
+    const attackHits = Number(attack?.hits ?? 0);
+    if (unopposed || !defense) return { attackerWins: true, netHits: attackHits, stalemate: false };
+
+    const defenseHits = Number(defense?.hits ?? 0);
+    const hitDifference = attackHits - defenseHits;
+    if (hitDifference > 0) return { attackerWins: true, netHits: hitDifference, stalemate: false };
+    if (hitDifference < 0) return { attackerWins: false, netHits: 0, stalemate: false };
+
+    const attackComplication = Boolean(attack?.complication);
+    const defenseComplication = Boolean(defense?.complication);
+    if (attackComplication !== defenseComplication) {
+      return { attackerWins: defenseComplication, netHits: defenseComplication ? 1 : 0, stalemate: false };
+    }
+
+    const attackUnits = this.getOpposedRollUnits(attack);
+    const defenseUnits = this.getOpposedRollUnits(defense);
+    if (attackUnits < defenseUnits) return { attackerWins: true, netHits: 1, stalemate: false };
+    if (attackUnits > defenseUnits) return { attackerWins: false, netHits: 0, stalemate: false };
+
+    return { attackerWins: false, netHits: 0, stalemate: true };
+  }
+
   static resolveAttack({ state, attack, defender = null, defenderToken = null, defense = null, unopposed = false } = {}) {
-    const hitsAttack = Boolean(attack?.success) && (unopposed || Number(attack.hits ?? 0) > Number(defense?.hits ?? -999));
-    const netHits = hitsAttack ? Number(attack.hits ?? 0) - Number(defense?.hits ?? 0) : 0;
+    const opposedResult = this.resolveOpposedHits(attack, defense, { unopposed });
+    const hitsAttack = opposedResult.attackerWins;
+    const netHits = hitsAttack ? opposedResult.netHits : 0;
     const hitLocation = state.isWeaponRoll ? AxiomRoll.getHitLocation(state.d100) : null;
     const damage = hitsAttack
       ? this.calculateDamage({ state, defender, hitLocation, netHits, defense })
@@ -1293,15 +1335,19 @@ export default class AxiomCombat extends foundry.documents.Combat {
       hitLocationLabel: hitLocation?.label ?? "AXIOM.Combat.NotApplicableShort",
       hitLocationText: hitLocation?.labelText ?? game.i18n.localize("AXIOM.Combat.NotApplicableShort"),
       attack: {
+        d100: Number(attack.d100 ?? 100),
         roll: attack.rollDisplay ?? AxiomRoll.formatD100(attack.d100),
         successTarget: Number(attack.successTarget ?? 0),
         hits: Number(attack.hits ?? 0),
+        success: Boolean(attack.success),
         complication: Boolean(attack.complication)
       },
       defense: {
+        d100: defense ? Number(defense.d100 ?? 100) : null,
         roll: defense?.rollDisplay ?? "",
         successTarget: Number(defense?.successTarget ?? 0),
         hits: unopposed ? 0 : Number(defense?.hits ?? 0),
+        success: Boolean(defense?.success),
         complication: Boolean(defense?.complication)
       },
       values: {
@@ -1319,8 +1365,9 @@ export default class AxiomCombat extends foundry.documents.Combat {
   static normalizeCombatResultCard(data = {}) {
     const attackHits = Number(data.attack?.hits ?? 0);
     const defenseHits = data.unopposed ? 0 : Number(data.defense?.hits ?? 0);
-    const netHits = data.unopposed ? attackHits : attackHits - defenseHits;
-    const hitsAttack = Boolean(data.unopposed ? attackHits >= 0 : netHits > 0);
+    const opposedResult = this.resolveOpposedHits(data.attack, data.defense, { unopposed: Boolean(data.unopposed) });
+    const netHits = opposedResult.attackerWins ? opposedResult.netHits : 0;
+    const hitsAttack = opposedResult.attackerWins;
     const baseDamage = Number(data.values?.baseDamage ?? 0);
     const damageModifier = Number(data.values?.damageModifier ?? 0);
     const armorPenetration = Number(data.values?.armorPenetration ?? 0);
@@ -1358,17 +1405,21 @@ export default class AxiomCombat extends foundry.documents.Combat {
       hitLocationLabel: data.hitLocationLabel ?? "",
       hitLocationText: data.hitLocationText ?? "",
       attack: {
+        d100: Number(data.attack?.d100 ?? AxiomRoll.normalizeD100(data.attack?.roll ?? 100)),
         roll: data.attack?.roll ?? "",
         successTarget: Number(data.attack?.successTarget ?? 0),
         hits: attackHits,
         hitsDisplay: AxiomRoll.formatSigned(attackHits),
+        success: this.getOpposedAttackSuccess(data.attack),
         complication: Boolean(data.attack?.complication)
       },
       defense: {
+        d100: data.defense?.d100 ?? (data.defense?.roll ? AxiomRoll.normalizeD100(data.defense.roll) : null),
         roll: data.defense?.roll ?? "",
         successTarget: Number(data.defense?.successTarget ?? 0),
         hits: defenseHits,
         hitsDisplay: AxiomRoll.formatSigned(defenseHits),
+        success: Boolean(data.defense?.success),
         complication: Boolean(data.defense?.complication)
       },
       values: { baseDamage, damageModifier, armorPenetration, armor, shieldArmorBonus, toughness },
@@ -1422,15 +1473,19 @@ export default class AxiomCombat extends foundry.documents.Combat {
       hitLocationLabel: hitLocation?.label ?? existing.hitLocationLabel ?? "AXIOM.Combat.NotApplicableShort",
       hitLocationText: hitLocation?.labelText ?? existing.hitLocationText ?? game.i18n.localize("AXIOM.Combat.NotApplicableShort"),
       attack: {
+        d100: Number(attack?.d100 ?? existing.attack?.d100 ?? AxiomRoll.normalizeD100(existing.attack?.roll ?? 100)),
         roll: attack?.rollDisplay ?? existing.attack?.roll ?? "",
         successTarget: Number(attack?.successTarget ?? existing.attack?.successTarget ?? 0),
         hits: Number(attack?.hits ?? existing.attack?.hits ?? 0),
+        success: Boolean(attack?.success ?? existing.attack?.success ?? this.getOpposedAttackSuccess(existing.attack)),
         complication: Boolean(attack?.complication ?? existing.attack?.complication)
       },
       defense: {
+        d100: defense ? Number(defense.d100 ?? existing.defense?.d100 ?? AxiomRoll.normalizeD100(existing.defense?.roll ?? 100)) : existing.defense?.d100 ?? null,
         roll: defense?.rollDisplay ?? existing.defense?.roll ?? "",
         successTarget: Number(defense?.successTarget ?? existing.defense?.successTarget ?? 0),
         hits: existing.unopposed ? 0 : Number(defense?.hits ?? existing.defense?.hits ?? 0),
+        success: Boolean(defense?.success ?? existing.defense?.success),
         complication: Boolean(defense?.complication ?? existing.defense?.complication)
       },
       values: {

@@ -1,10 +1,22 @@
 import AxiomWeaponBaseData from "./weapon-base.mjs";
 
-export default class AxiomMeleeWeaponData extends AxiomWeaponBaseData {
-  static DEFAULT_ICON = "systems/axiom/assets/icons/items/weapon-melee.svg";
+const fields = foundry.data.fields;
 
+/** Legacy melee weapon model kept so existing worlds load safely. */
+export default class AxiomMeleeWeaponData extends AxiomWeaponBaseData {
+  static DEFAULT_ICON = "systems/axiom/assets/icons/items/weapon.svg";
 
   static defineSchema() {
-    return this.commonWeaponFields({ category: "melee" });
+    return {
+      ...this.commonWeaponFields({ category: "melee" }),
+      reach: new fields.NumberField({ required: true, integer: true, min: 0, initial: 1 }),
+      range: new fields.NumberField({ required: true, integer: true, min: 0, initial: 0 }),
+      ammo: new fields.NumberField({ required: true, integer: true, min: 0, initial: 0 }),
+      ammoContainer: new fields.NumberField({ required: true, integer: true, min: 0, initial: 0 }),
+      ammunition: new fields.StringField({ required: false, blank: true, initial: "" }),
+      shotRate: new fields.NumberField({ required: true, integer: true, min: 0, initial: 0 }),
+      reloadMethod: new fields.StringField({ required: false, blank: true, initial: "none" }),
+      reloadCost: new fields.NumberField({ required: true, integer: true, min: 0, max: 3, initial: 1 })
+    };
   }
 }

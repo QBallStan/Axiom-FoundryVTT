@@ -11,8 +11,6 @@ import AxiomSkillData from "./modules/model/item/skill.mjs";
 import AxiomArmorData from "./modules/model/item/armor.mjs";
 import AxiomShieldData from "./modules/model/item/shield.mjs";
 import AxiomWeaponData from "./modules/model/item/weapon.mjs";
-import AxiomMeleeWeaponData from "./modules/model/item/melee-weapon.mjs";
-import AxiomRangedWeaponData from "./modules/model/item/ranged-weapon.mjs";
 import AxiomAmmunitionData from "./modules/model/item/ammunition.mjs";
 import AxiomEquipmentData from "./modules/model/item/equipment.mjs";
 import AxiomTraitData from "./modules/model/item/trait.mjs";
@@ -22,8 +20,6 @@ import AxiomSkillSheet from "./modules/sheets/item/skill-sheet.mjs";
 import AxiomArmorSheet from "./modules/sheets/item/armor-sheet.mjs";
 import AxiomShieldSheet from "./modules/sheets/item/shield-sheet.mjs";
 import AxiomWeaponSheet from "./modules/sheets/item/weapon-sheet.mjs";
-import AxiomMeleeWeaponSheet from "./modules/sheets/item/melee-weapon-sheet.mjs";
-import AxiomRangedWeaponSheet from "./modules/sheets/item/ranged-weapon-sheet.mjs";
 import AxiomAmmunitionSheet from "./modules/sheets/item/ammunition-sheet.mjs";
 import AxiomEquipmentSheet from "./modules/sheets/item/equipment-sheet.mjs";
 import AxiomTraitSheet from "./modules/sheets/item/trait-sheet.mjs";
@@ -148,8 +144,6 @@ Hooks.once("init", async function () {
   CONFIG.Item.dataModels.armor = AxiomArmorData;
   CONFIG.Item.dataModels.shield = AxiomShieldData;
   CONFIG.Item.dataModels.weapon = AxiomWeaponData;
-  CONFIG.Item.dataModels.meleeWeapon = AxiomMeleeWeaponData;
-  CONFIG.Item.dataModels.rangedWeapon = AxiomRangedWeaponData;
   CONFIG.Item.dataModels.ammunition = AxiomAmmunitionData;
   CONFIG.Item.dataModels.equipment = AxiomEquipmentData;
   CONFIG.Item.dataModels.trait = AxiomTraitData;
@@ -190,19 +184,7 @@ Hooks.once("init", async function () {
   DocumentSheetConfig.registerSheet(Item, "axiom", AxiomWeaponSheet, {
     types: ["weapon"],
     makeDefault: true,
-    label: "Axiom//Core Legacy Weapon Sheet"
-  });
-
-  DocumentSheetConfig.registerSheet(Item, "axiom", AxiomMeleeWeaponSheet, {
-    types: ["meleeWeapon"],
-    makeDefault: true,
-    label: "Axiom//Core Melee Weapon Sheet"
-  });
-
-  DocumentSheetConfig.registerSheet(Item, "axiom", AxiomRangedWeaponSheet, {
-    types: ["rangedWeapon"],
-    makeDefault: true,
-    label: "Axiom//Core Ranged Weapon Sheet"
+    label: "Axiom//Core Weapon Sheet"
   });
 
   DocumentSheetConfig.registerSheet(Item, "axiom", AxiomAmmunitionSheet, {

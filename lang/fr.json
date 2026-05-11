@@ -37,12 +37,34 @@
         "Label": "État",
         "Equipped": "Équipé",
         "Carried": "Porté",
-        "Stored": "Rangé"
+        "Stored": "Rangé",
+        "MainHand": "Main principale",
+        "OffHand": "Main secondaire",
+        "BothHands": "Deux mains"
       },
       "Ammunition": {
         "NoDetails": "Aucun champ spécifique aux munitions pour le moment."
       },
-      "QuantityControlHint": "Clic gauche -1. Clic droit +1. Maintenez Maj pour 5, Maj+Ctrl pour 10."
+      "QuantityControlHint": "Clic gauche -1. Clic droit +1. Maintenez Maj pour 5, Maj+Ctrl pour 10.",
+      "Tags": {
+        "Label": "Tags",
+        "Configure": "Configurer les tags",
+        "Hint": "Sélectionnez tous les tags applicables à cet objet. Ces tags seront utilisés plus tard pour le filtrage.",
+        "Clear": "Effacer les tags",
+        "Primitive": "Primitif",
+        "Ancient": "Antique",
+        "Medieval": "Médiéval",
+        "Renaissance": "Renaissance",
+        "Industrial": "Industriel",
+        "Modern": "Moderne",
+        "NearFuture": "Futur proche",
+        "Cyberpunk": "Cyberpunk",
+        "SciFi": "Science-fiction",
+        "PostApocalyptic": "Post-apocalyptique",
+        "Fantasy": "Fantasy",
+        "Horror": "Horreur",
+        "Universal": "Universel"
+      }
     },
     "Skill": {
       "Level": "Niveau",
@@ -205,7 +227,8 @@
             "Attribute": "Attribut",
             "Skill": "Compétence",
             "Resource": "Ressource",
-            "Custom": "Clé personnalisée"
+            "Custom": "Clé personnalisée",
+            "AttributeCheck": "Test d’attribut"
           },
           "Targets": {
             "GrazingWoundsMax": "Emplacements de blessures superficielles",
@@ -253,7 +276,20 @@
             "Downgrade": "Réduire"
           },
           "Conditional": "Conditionnel",
-          "ConditionalHint": "Les effets conditionnels sont proposés dans les fenêtres de jet pertinentes au lieu de toujours être appliqués."
+          "ConditionalHint": "Les effets conditionnels sont proposés dans les fenêtres de jet pertinentes au lieu de toujours être appliqués.",
+          "NoTargetsAvailable": "Aucune cible disponible",
+          "Modifiers": "Modificateurs",
+          "Modifier": "Modificateur",
+          "AddModifier": "Ajouter un modificateur",
+          "RemoveModifier": "Retirer le modificateur",
+          "DefaultName": "Effet Axiom",
+          "AndMore": "+ {count} autre(s)",
+          "ModifierQueue": "Modificateurs en attente",
+          "ModifierComposer": "Configuration du modificateur",
+          "EmptyQueue": "Aucun modificateur en attente. Configure un modificateur à droite, puis ajoute-le à la liste.",
+          "QueueModifier": "Ajouter à la liste",
+          "UpdateModifier": "Mettre à jour",
+          "CancelEdit": "Annuler la modification"
         },
         "Create": "Ajouter un effet",
         "New": "Nouvel effet",
@@ -310,7 +346,10 @@
         "Melee": "Mêlée",
         "Range": "Distance",
         "Shields": "Boucliers",
-        "NoShields": "Aucun bouclier."
+        "NoShields": "Aucun bouclier.",
+        "Weapons": "Armes",
+        "MixedWeapons": "Armes mixtes",
+        "NoWeapons": "Aucune arme"
       },
       "NPC": {
         "Config": "Configuration PNJ",
@@ -458,7 +497,9 @@
     },
     "Common": {
       "Yes": "Oui",
-      "No": "Non"
+      "No": "Non",
+      "Save": "Enregistrer",
+      "Cancel": "Annuler"
     },
     "RollCard": {
       "UnknownActor": "Acteur inconnu",
@@ -546,11 +587,12 @@
       "ArmorPenetration": "PA",
       "Range": "Portée",
       "AmmoContainer": "Max munitions",
-      "Ammunition": "Type de munition",
+      "Ammunition": "Munitions",
       "NoAmmunition": "Aucune munition",
       "Categories": {
         "Melee": "Mêlée",
-        "Ranged": "Distance"
+        "Ranged": "Distance",
+        "Mixed": "Mixte"
       },
       "Delivery": {
         "Label": "Transmission",
@@ -571,7 +613,64 @@
       "ReloadNoAmmunitionSelected": "Sélectionnez une munition sur {weapon} avant de recharger.",
       "ReloadAmmunitionMissing": "La munition sélectionnée sur {weapon} est introuvable sur cet acteur.",
       "ReloadNoAmmunitionAvailable": "Il ne reste plus de {ammunition} pour recharger.",
-      "Reloaded": "{weapon} rechargé avec {amount} {ammunition}."
+      "Reloaded": "{weapon} rechargé avec {amount} {ammunition}.",
+      "MinStrength": "Force minimale",
+      "MinStrengthShort": "FOR {value}+",
+      "MinStrengthNotMet": "Force minimale non atteinte",
+      "MinStrengthWarning": "{weapon} nécessite Force {value} pour être utilisé.",
+      "Hands": {
+        "Label": "Mains",
+        "One": "À une main",
+        "Two": "À deux mains",
+        "WeaponLabel": "Mains requises",
+        "Versatile": "Polyvalente"
+      },
+      "WeaponAttributes": "Attributs de l’arme",
+      "AmmunitionReload": "Munitions et rechargement",
+      "ShotRate": "Cadence de tir",
+      "ReloadMethod": {
+        "Label": "Méthode de chargement",
+        "Placeholder": "Choisir une méthode de chargement",
+        "None": "Aucune",
+        "Thrown": "Lancée",
+        "Drawn": "Préparée",
+        "Single": "Simple",
+        "Hints": {
+          "none": "Aucune automatisation des munitions.",
+          "thrown": "Utiliser ce mode à distance consomme une arme depuis la quantité de l’objet. Les tirs restent à 0/0.",
+          "drawn": "Utiliser ce mode à distance consomme directement une munition liée. Les tirs restent à 0/0.",
+          "single": "Recharger charge un tir depuis la munition liée. Attaquer consomme un tir chargé."
+        }
+      },
+      "Reach": "Allonge",
+      "VersatileBonus": "Bonus versatile à deux mains",
+      "VersatileBonusShort": "+1 2M",
+      "Elemental": {
+        "Label": "Élément",
+        "None": "Aucun",
+        "Fire": "Feu",
+        "Cold": "Froid",
+        "Electric": "Électrique",
+        "Acid": "Acide",
+        "Corruption": "Corruption",
+        "Radiant": "Radiant",
+        "Necrotic": "Nécrotique",
+        "Psychic": "Psychique"
+      },
+      "ReloadCost": {
+        "Label": "Coût de rechargement",
+        "Free": "Gratuit",
+        "OneAP": "1 PA",
+        "TwoAP": "2 PA",
+        "ThreeAP": "3 PA"
+      },
+      "MeleeDetails": "Détails de mêlée",
+      "RangedDetails": "Détails à distance",
+      "MeleeSkill": "Compétence de mêlée",
+      "RangedSkill": "Compétence à distance",
+      "ParryBonus": "Bonus de parade",
+      "Shots": "Tirs",
+      "QuantityDisplay": "Qté {quantity}"
     },
     "Equipment": {
       "Skill": "Compétence",
@@ -731,9 +830,7 @@
     "Item": {
       "skill": "Compétence",
       "armor": "Armure",
-      "meleeWeapon": "Arme (mêlée)",
-      "rangedWeapon": "Arme (distance)",
-      "weapon": "Arme (héritée)",
+      "weapon": "Arme",
       "ammunition": "Munition",
       "equipment": "Équipement",
       "trait": "Trait",

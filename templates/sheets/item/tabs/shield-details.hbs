@@ -30,7 +30,9 @@
     <label class="field-group">
       <span>{{localize "AXIOM.Item.State.Label"}}</span>
       <select name="system.state">
-        {{selectOptions config.gearStates selected=system.state localize=true}}
+        {{#each shield.stateOptions}}
+          <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+        {{/each}}
       </select>
     </label>
   </div>

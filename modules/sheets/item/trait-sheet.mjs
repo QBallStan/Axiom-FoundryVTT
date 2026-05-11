@@ -12,7 +12,8 @@ export default class AxiomTraitSheet extends AxiomItemSheet {
     sheet: {
       tabs: [
         { id: "description", icon: "fa-solid fa-align-left", label: "AXIOM.Item.Tabs.Description" },
-        { id: "details", icon: "fa-solid fa-sliders", label: "AXIOM.Item.Tabs.Details" }
+        { id: "details", icon: "fa-solid fa-sliders", label: "AXIOM.Item.Tabs.Details" },
+        { id: "effects", icon: "fa-solid fa-bolt", label: "AXIOM.Item.Tabs.Effects" }
       ],
       initial: "description"
     }

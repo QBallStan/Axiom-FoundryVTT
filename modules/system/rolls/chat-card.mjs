@@ -41,10 +41,15 @@ export default class AxiomChatCard {
       damage: Number(state.weaponInfo.damage ?? 0),
       armorPenetration: Number(state.weaponInfo.armorPenetration ?? 0),
       damageModifier: Number(state.weaponInfo.damageModifier ?? 0),
+      versatileDamageBonus: Number(state.weaponInfo.versatileDamageBonus ?? 0),
+      hands: state.weaponInfo.hands ?? "",
+      state: state.weaponInfo.state ?? "",
       delivery: state.weaponInfo.delivery ?? "",
+      reach: Number(state.weaponInfo.reach ?? 0),
       range: Number(state.weaponInfo.range ?? 0),
       ammo: Number(state.weaponInfo.ammo ?? 0),
-      ammoContainer: Number(state.weaponInfo.ammoContainer ?? 0)
+      ammoContainer: Number(state.weaponInfo.ammoContainer ?? 0),
+      reloadMethod: state.weaponInfo.reloadMethod ?? "none"
     } : null;
 
     const combatResult = state.combatResult ? {

@@ -1,84 +1,198 @@
-<section class="tab-section details-tab weapon-details">
-  <input type="hidden" name="system.category" value="{{weapon.category}}" />
+<section class="tab-section details-tab weapon-details {{weapon.category}}-weapon-details">
+  <section class="weapon-section">
+    <h2 class="section-title">{{localize "AXIOM.Weapon.WeaponAttributes"}}</h2>
+    <div class="weapon-section-body">
+      <div class="weapon-category-toggle segmented-control three-way-control">
+        <input id="{{item.id}}-weapon-category-melee" type="radio" name="system.category" value="melee" {{checked (eq weapon.category "melee")}} />
+        <label for="{{item.id}}-weapon-category-melee">{{localize "AXIOM.Weapon.Categories.Melee"}}</label>
+        <input id="{{item.id}}-weapon-category-ranged" type="radio" name="system.category" value="ranged" {{checked (eq weapon.category "ranged")}} />
+        <label for="{{item.id}}-weapon-category-ranged">{{localize "AXIOM.Weapon.Categories.Ranged"}}</label>
+        <input id="{{item.id}}-weapon-category-mixed" type="radio" name="system.category" value="mixed" {{checked (eq weapon.category "mixed")}} />
+        <label for="{{item.id}}-weapon-category-mixed">{{localize "AXIOM.Weapon.Categories.Mixed"}}</label>
+      </div>
 
-  <div class="form-grid compact weapon-grid">
-    <label class="field-group">
-      <span>{{localize "AXIOM.Weapon.Skill"}}</span>
-      <input type="text" name="system.skill" value="{{system.skill}}" list="weapon-skills-{{item.id}}" placeholder="{{localize 'AXIOM.Weapon.SkillPlaceholder'}}" autocomplete="off" />
-      <datalist id="weapon-skills-{{item.id}}">
-        {{#each weapon.skills}}
-          <option value="{{this}}"></option>
-        {{/each}}
-      </datalist>
-    </label>
-
-    <label class="field-group">
-      <span>{{localize "AXIOM.Weapon.Damage"}}</span>
-      <input type="number" name="system.damage" value="{{system.damage}}" min="0" step="1" />
-    </label>
-
-    <label class="field-group">
-      <span>{{localize "AXIOM.Weapon.ArmorPenetration"}}</span>
-      <input type="number" name="system.armorPenetration" value="{{system.armorPenetration}}" min="0" step="1" />
-    </label>
-
-    <label class="field-group">
-      <span>{{localize "AXIOM.Weapon.Delivery.Label"}}</span>
-      <select name="system.delivery">
-        {{selectOptions config.damageDelivery selected=system.delivery localize=true}}
-      </select>
-    </label>
-  </div>
-
-  {{#if weapon.isRanged}}
-    <div class="ranged-weapon-block">
-      <div class="form-grid compact ranged-grid">
-        <label class="field-group">
-          <span>{{localize "AXIOM.Weapon.Range"}}</span>
-          <input type="number" name="system.range" value="{{system.range}}" min="0" step="1" />
+      <div class="form-grid compact weapon-grid unified-weapon-grid">
+        <label class="field-group weapon-state-field">
+          <span>{{localize "AXIOM.Item.State.Label"}}</span>
+          <select name="system.state">
+            {{#each weapon.stateOptions}}
+              <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+            {{/each}}
+          </select>
         </label>
 
-        <label class="field-group">
-          <span>{{localize "AXIOM.Weapon.Ammo"}}</span>
-          <input type="number" name="system.ammo" value="{{system.ammo}}" min="0" step="1" />
+        <label class="field-group weapon-hands-field">
+          <span>{{localize "AXIOM.Weapon.Hands.WeaponLabel"}}</span>
+          <select name="system.hands">
+            {{selectOptions weapon.handsOptions selected=system.hands localize=true}}
+          </select>
         </label>
 
-        <label class="field-group">
-          <span>{{localize "AXIOM.Weapon.AmmoContainer"}}</span>
-          <input type="number" name="system.ammoContainer" value="{{system.ammoContainer}}" min="0" step="1" />
+        <label class="field-group weapon-requirement-field">
+          <span>{{localize "AXIOM.Weapon.MinStrength"}}</span>
+          <input type="number" name="system.minStrength" value="{{system.minStrength}}" min="0" step="1" placeholder="0" />
         </label>
 
-        <label class="field-group ranged-ammo-field">
-          <span>{{localize "AXIOM.Weapon.Ammunition"}}</span>
-          <select name="system.ammunition">
-            <option value="">{{localize "AXIOM.Weapon.NoAmmunition"}}</option>
-            {{selectOptions weapon.ammunition selected=system.ammunition}}
+        <label class="field-group weapon-damage-field compact-number-field">
+          <span>{{localize "AXIOM.Weapon.Damage"}}</span>
+          <input type="number" name="system.damage" value="{{system.damage}}" min="0" step="1" />
+        </label>
+
+        <label class="field-group weapon-ap-field compact-number-field">
+          <span>{{localize "AXIOM.Weapon.ArmorPenetration"}}</span>
+          <input type="number" name="system.armorPenetration" value="{{system.armorPenetration}}" min="0" step="1" />
+        </label>
+
+        <label class="field-group weapon-delivery-field">
+          <span>{{localize "AXIOM.Weapon.Delivery.Label"}}</span>
+          <select name="system.delivery">
+            {{selectOptions config.damageDelivery selected=system.delivery localize=true}}
+          </select>
+        </label>
+
+        <label class="field-group weapon-elemental-field">
+          <span>{{localize "AXIOM.Weapon.Elemental.Label"}}</span>
+          <select name="system.elemental">
+            {{selectOptions config.elementalDamage selected=weapon.elemental localize=true}}
           </select>
         </label>
       </div>
+    </div>
+  </section>
 
-      <div class="range-band-grid">
-        <div class="range-band-card">
-          <span>{{localize "AXIOM.Weapon.RangeBands.Short"}}</span>
-          <strong>{{weapon.rangeBands.short}}m</strong>
-          <small>+10</small>
+  <section class="weapon-section weapon-mode-tabs-section">
+    <nav class="weapon-mode-tabs">
+      {{#if weapon.showMeleeTab}}
+        <button type="button" class="weapon-mode-tab {{#if (eq weapon.activeModeTab "melee")}}active{{/if}}" data-action="selectWeaponModeTab" data-weapon-mode-tab="melee">
+          {{localize "AXIOM.Weapon.Categories.Melee"}}
+        </button>
+      {{/if}}
+      {{#if weapon.showRangedTab}}
+        <button type="button" class="weapon-mode-tab {{#if (eq weapon.activeModeTab "ranged")}}active{{/if}}" data-action="selectWeaponModeTab" data-weapon-mode-tab="ranged">
+          {{localize "AXIOM.Weapon.Categories.Ranged"}}
+        </button>
+      {{/if}}
+    </nav>
+
+    {{#if weapon.showMeleeTab}}
+      <div class="weapon-mode-panel" data-weapon-mode-panel="melee" {{#unless (eq weapon.activeModeTab "melee")}}hidden{{/unless}}>
+        <div class="mode-card-title">
+          <span>{{localize "AXIOM.Weapon.MeleeDetails"}}</span>
         </div>
-        <div class="range-band-card">
-          <span>{{localize "AXIOM.Weapon.RangeBands.Medium"}}</span>
-          <strong>{{weapon.rangeBands.medium}}m</strong>
-          <small>+0</small>
-        </div>
-        <div class="range-band-card">
-          <span>{{localize "AXIOM.Weapon.RangeBands.Long"}}</span>
-          <strong>{{weapon.rangeBands.long}}m</strong>
-          <small>-10</small>
-        </div>
-        <div class="range-band-card">
-          <span>{{localize "AXIOM.Weapon.RangeBands.Extreme"}}</span>
-          <strong>{{weapon.rangeBands.extreme}}m</strong>
-          <small>-30</small>
+        <div class="mode-card-body melee-mode-body">
+          <label class="field-group span-2">
+            <span>{{localize "AXIOM.Weapon.MeleeSkill"}}</span>
+            <input type="text" name="system.meleeSkill" value="{{weapon.meleeSkill}}" list="weapon-skills-{{item.id}}" placeholder="{{localize 'AXIOM.Weapon.SkillPlaceholder'}}" autocomplete="off" />
+          </label>
+
+          <label class="field-group">
+            <span>{{localize "AXIOM.Weapon.Reach"}}</span>
+            <input type="number" name="system.reach" value="{{system.reach}}" min="0" step="1" />
+          </label>
+
+          <label class="field-group">
+            <span>{{localize "AXIOM.Weapon.ParryBonus"}}</span>
+            <input type="number" name="system.parryBonus" value="{{system.parryBonus}}" step="5" />
+          </label>
         </div>
       </div>
-    </div>
-  {{/if}}
+    {{/if}}
+
+    {{#if weapon.showRangedTab}}
+      <div class="weapon-mode-panel" data-weapon-mode-panel="ranged" {{#unless (eq weapon.activeModeTab "ranged")}}hidden{{/unless}}>
+        <div class="mode-card-title">
+          <span>{{localize "AXIOM.Weapon.RangedDetails"}}</span>
+        </div>
+        <div class="mode-card-body ranged-mode-body">
+          <label class="field-group span-2">
+            <span>{{localize "AXIOM.Weapon.RangedSkill"}}</span>
+            <input type="text" name="system.rangedSkill" value="{{weapon.rangedSkill}}" list="weapon-skills-{{item.id}}" placeholder="{{localize 'AXIOM.Weapon.SkillPlaceholder'}}" autocomplete="off" />
+          </label>
+
+          <label class="field-group">
+            <span>{{localize "AXIOM.Weapon.ShotRate"}}</span>
+            <input type="number" name="system.shotRate" value="{{system.shotRate}}" min="0" step="1" placeholder="SR 0" />
+          </label>
+
+          <div class="ranged-range-panel span-3">
+            <label class="field-group range-value-field">
+              <span>{{localize "AXIOM.Weapon.Range"}}</span>
+              <input type="number" name="system.range" value="{{system.range}}" min="0" step="1" />
+            </label>
+
+            <div class="range-band-grid emphasized-bands">
+              <div class="range-band-card">
+                <span>{{localize "AXIOM.Weapon.RangeBands.Short"}}</span>
+                <strong>0-{{weapon.rangeBands.short}}m</strong>
+                <small>+10</small>
+              </div>
+              <div class="range-band-card">
+                <span>{{localize "AXIOM.Weapon.RangeBands.Medium"}}</span>
+                <strong>{{weapon.rangeBands.mediumStart}}-{{weapon.rangeBands.medium}}m</strong>
+                <small>+0</small>
+              </div>
+              <div class="range-band-card">
+                <span>{{localize "AXIOM.Weapon.RangeBands.Long"}}</span>
+                <strong>{{weapon.rangeBands.longStart}}-{{weapon.rangeBands.long}}m</strong>
+                <small>-10</small>
+              </div>
+              <div class="range-band-card">
+                <span>{{localize "AXIOM.Weapon.RangeBands.Extreme"}}</span>
+                <strong>{{weapon.rangeBands.extremeStart}}-{{weapon.rangeBands.extreme}}m</strong>
+                <small>-30</small>
+              </div>
+            </div>
+          </div>
+
+          <label class="field-group span-3">
+            <span>{{localize "AXIOM.Weapon.ReloadMethod.Label"}}</span>
+            <select name="system.reloadMethod">
+              {{selectOptions config.weaponReloadMethods selected=weapon.loadingMethod localize=true}}
+            </select>
+          </label>
+
+          <div class="loading-method-hint span-3">{{localize weapon.loadingHint}}</div>
+
+          {{#if weapon.showShotsField}}
+            <label class="field-group">
+              <span>{{localize "AXIOM.Weapon.Shots"}}</span>
+              <div class="shots-input">
+                <input type="number" name="system.ammo" value="{{system.ammo}}" min="0" step="1" aria-label="{{localize 'AXIOM.Weapon.Ammo'}}" />
+                <b>/</b>
+                <input type="number" name="system.ammoContainer" value="{{system.ammoContainer}}" min="0" step="1" aria-label="{{localize 'AXIOM.Weapon.AmmoContainer'}}" />
+              </div>
+            </label>
+          {{else}}
+            <input type="hidden" name="system.ammo" value="0" />
+            <input type="hidden" name="system.ammoContainer" value="0" />
+          {{/if}}
+
+          {{#if weapon.showAmmunitionField}}
+            <label class="field-group {{#if weapon.showShotsField}}span-2{{else}}span-3{{/if}}">
+              <span>{{localize "AXIOM.Weapon.Ammunition"}}</span>
+              <select name="system.ammunition">
+                <option value="">{{localize "AXIOM.Weapon.NoAmmunition"}}</option>
+                {{selectOptions weapon.ammunition selected=system.ammunition}}
+              </select>
+            </label>
+          {{/if}}
+
+          {{#if weapon.showReloadCostField}}
+            <label class="field-group">
+              <span>{{localize "AXIOM.Weapon.ReloadCost.Label"}}</span>
+              <select name="system.reloadCost">
+                {{selectOptions weapon.reloadCosts selected=system.reloadCost localize=true}}
+              </select>
+            </label>
+          {{/if}}
+        </div>
+      </div>
+    {{/if}}
+
+    <datalist id="weapon-skills-{{item.id}}">
+      {{#each weapon.skills}}
+        <option value="{{this}}"></option>
+      {{/each}}
+    </datalist>
+  </section>
 </section>

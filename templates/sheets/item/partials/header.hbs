@@ -2,13 +2,33 @@
   <img class="item-image" data-action="editImage" data-edit="img" src="{{item.img}}" alt="{{item.name}}" />
 
   <div class="item-header-main header-fields">
-    <input
-      class="item-name name-input"
-      name="name"
-      type="text"
-      value="{{item.name}}"
-      placeholder="{{localize 'AXIOM.Item.NamePlaceholder'}}"
-    />
+    <div class="item-title-row">
+      <input
+        class="item-name name-input"
+        name="name"
+        type="text"
+        value="{{item.name}}"
+        placeholder="{{localize 'AXIOM.Item.NamePlaceholder'}}"
+      />
+
+      <button
+        type="button"
+        class="item-tag-config"
+        data-action="configureGenreTags"
+        data-tooltip="{{localize 'AXIOM.Item.Tags.Configure'}}"
+        aria-label="{{localize 'AXIOM.Item.Tags.Configure'}}"
+      >
+        <i class="fa-solid fa-gear"></i>
+      </button>
+    </div>
+
+    {{#if itemGenre.selected.length}}
+      <div class="item-tag-list" aria-label="{{localize 'AXIOM.Item.Tags.Label'}}">
+        {{#each itemGenre.selected as |tag|}}
+          <span class="item-tag-pill" data-tag="{{tag.value}}">{{tag.label}}</span>
+        {{/each}}
+      </div>
+    {{/if}}
 
     {{#if displayCommonFields}}
     <div class="item-header-fields item-common-grid {{#if currency.isFantasy}}fantasy-currency-grid{{/if}}">

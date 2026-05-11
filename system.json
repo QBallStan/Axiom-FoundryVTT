@@ -2,7 +2,7 @@
   "id": "axiom",
   "title": "Axiom//Core System",
   "description": "The official Axiom//Core system created by PlexiStan",
-  "version": "0.0.1",
+  "version": "0.1.2",
   "authors": [
     {
       "name": "PlexiStan",
@@ -58,12 +58,7 @@
           "description.value"
         ]
       },
-      "meleeWeapon": {
-        "htmlFields": [
-          "description.value"
-        ]
-      },
-      "rangedWeapon": {
+      "weapon": {
         "htmlFields": [
           "description.value"
         ]

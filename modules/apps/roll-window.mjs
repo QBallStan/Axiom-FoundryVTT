@@ -88,6 +88,22 @@ const CALLED_SHOTS = [
   { key: "heldItem", label: "AXIOM.Roll.CalledShots.HeldItem", value: -20, effect: "AXIOM.Roll.CalledShotEffects.HeldItem" }
 ];
 
+
+function normalizeSkillReference(value) {
+  return String(value ?? "")
+    .trim()
+    .toLocaleLowerCase(game.i18n.lang)
+    .replaceAll(/[^\p{L}\p{N}]+/gu, "");
+}
+
+function normalizeWeaponReloadMethod(value) {
+  const method = String(value ?? "").trim();
+  if (["none", "thrown", "drawn", "single"].includes(method)) return method;
+  if (method === "free") return "drawn";
+  if (["magazine", "speedloader", "breakAction", "beltFed", "internalMagazine", "revolverCylinder", "muzzle"].includes(method)) return "single";
+  return "none";
+}
+
 /**
  * Roll setup dialog. It gathers roll inputs, delegates d100 resolution to
  * AxiomRoll, then renders the result as a chat card.
@@ -820,16 +836,22 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
         calledShot: row.calledShot ?? null
       })),
       isWeaponRoll: result.isWeaponRoll,
-      isMeleeWeaponRoll: isMeleeWeaponItem(item),
+      isMeleeWeaponRoll: this._getWeaponRollMode() === "melee",
       weaponInfo: isWeaponItem(item) ? {
-        category: getWeaponCategory(item),
+        category: this._getWeaponRollMode(),
+        itemCategory: getWeaponCategory(item),
         damage: Number(item.system?.damage ?? 0),
         armorPenetration: Number(item.system?.armorPenetration ?? 0),
-        damageModifier: isMeleeWeaponItem(item) ? Number(actor?.system?.subAttributes?.damageModifier ?? 0) : 0,
+        damageModifier: this._getWeaponRollMode() === "melee" ? Number(actor?.system?.subAttributes?.damageModifier ?? 0) + this._getVersatileDamageBonus(item) : 0,
+        versatileDamageBonus: this._getVersatileDamageBonus(item),
+        hands: item.system?.hands ?? "one",
+        state: item.system?.state ?? "carried",
         delivery: item.system?.delivery ?? "",
+        reach: Number(item.system?.reach ?? 0),
         range: Number(item.system?.range ?? 0),
         ammo: Number(item.system?.ammo ?? 0),
-        ammoContainer: Number(item.system?.ammoContainer ?? 0)
+        ammoContainer: Number(item.system?.ammoContainer ?? 0),
+        reloadMethod: normalizeWeaponReloadMethod(item.system?.reloadMethod)
       } : null,
       combatTarget: result.isWeaponRoll ? AxiomCombat.getInitialCombatTargetData() : null,
       combatDefense: this.rollData.combatDefense ?? null,
@@ -844,37 +866,96 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
       speaker: ChatMessage.getSpeaker({ actor })
     });
   }
+  _getVersatileDamageBonus(item) {
+    return this._getWeaponRollMode() === "melee" && item?.system?.hands === "versatile" && item?.system?.state === "bothHands" ? 1 : 0;
+  }
 
+  _getWeaponRollMode() {
+    if (this.rollData.weaponMode === "ranged" || this.rollData.weaponMode === "melee") return this.rollData.weaponMode;
+    const item = this.rollData.item;
+    return isRangedWeaponItem(item) && !isMeleeWeaponItem(item) ? "ranged" : "melee";
+  }
 
 
   _isRangedWeaponRoll() {
-    const item = this.rollData.item;
-    return isRangedWeaponItem(item);
+    return this._getWeaponRollMode() === "ranged";
+  }
+
+  _getLinkedAmmunitionItem(weapon = this.rollData.item) {
+    const actor = this.rollData.actor;
+    const ammunitionId = String(weapon?.system?.ammunition ?? "").trim();
+    if (!actor || !ammunitionId) return null;
+    const ammunition = actor.items?.get?.(ammunitionId) ?? null;
+    return ammunition?.type === "ammunition" ? ammunition : null;
   }
 
   _validateAmmunition() {
     if (!this._isRangedWeaponRoll()) return true;
 
     const weapon = this.rollData.item;
-    const maxAmmo = Number(weapon.system?.ammoContainer ?? 0);
-    if (maxAmmo <= 0) return true;
+    const method = normalizeWeaponReloadMethod(weapon?.system?.reloadMethod);
+    if (method === "none") return true;
 
-    const currentAmmo = Number(weapon.system?.ammo ?? 0);
-    if (currentAmmo > 0) return true;
+    if (method === "thrown") {
+      const quantity = Math.max(0, Number(weapon.system?.quantity ?? 0));
+      if (quantity > 0) return true;
+      ui.notifications?.warn(game.i18n.format("AXIOM.Combat.OutOfAmmo", { weapon: weapon.name }));
+      return false;
+    }
 
-    ui.notifications?.warn(game.i18n.format("AXIOM.Combat.OutOfAmmo", { weapon: weapon.name }));
-    return false;
+    if (method === "drawn") {
+      const ammunition = this._getLinkedAmmunitionItem(weapon);
+      if (!ammunition) {
+        ui.notifications?.warn(game.i18n.format("AXIOM.Weapon.ReloadNoAmmunitionSelected", { weapon: weapon.name }));
+        return false;
+      }
+      const available = Math.max(0, Number(ammunition.system?.quantity ?? 0));
+      if (available > 0) return true;
+      ui.notifications?.warn(game.i18n.format("AXIOM.Weapon.ReloadNoAmmunitionAvailable", { ammunition: ammunition.name }));
+      return false;
+    }
+
+    if (method === "single") {
+      const maxAmmo = Number(weapon.system?.ammoContainer ?? 0);
+      if (maxAmmo <= 0) {
+        ui.notifications?.warn(game.i18n.format("AXIOM.Combat.OutOfAmmo", { weapon: weapon.name }));
+        return false;
+      }
+
+      const currentAmmo = Number(weapon.system?.ammo ?? 0);
+      if (currentAmmo > 0) return true;
+
+      ui.notifications?.warn(game.i18n.format("AXIOM.Combat.OutOfAmmo", { weapon: weapon.name }));
+      return false;
+    }
+
+    return true;
   }
 
   async _spendAmmunition() {
     if (!this._isRangedWeaponRoll()) return;
 
     const weapon = this.rollData.item;
-    const maxAmmo = Number(weapon.system?.ammoContainer ?? 0);
-    if (maxAmmo <= 0) return;
+    const method = normalizeWeaponReloadMethod(weapon?.system?.reloadMethod);
 
-    const currentAmmo = Number(weapon.system?.ammo ?? 0);
-    await weapon.update({ "system.ammo": Math.max(0, currentAmmo - 1) });
+    if (method === "thrown") {
+      const quantity = Math.max(0, Number(weapon.system?.quantity ?? 0));
+      await weapon.update({ "system.quantity": Math.max(0, quantity - 1), "system.ammo": 0, "system.ammoContainer": 0 });
+      return;
+    }
+
+    if (method === "drawn") {
+      const ammunition = this._getLinkedAmmunitionItem(weapon);
+      if (!ammunition) return;
+      const available = Math.max(0, Number(ammunition.system?.quantity ?? 0));
+      await ammunition.update({ "system.quantity": Math.max(0, available - 1) });
+      return;
+    }
+
+    if (method === "single") {
+      const currentAmmo = Number(weapon.system?.ammo ?? 0);
+      await weapon.update({ "system.ammo": Math.max(0, currentAmmo - 1) });
+    }
   }
 
   _serializeTimeframeResult(timeframeResult) {
@@ -1024,13 +1105,38 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
     const actor = this.rollData.actor;
     if (!actor) return [];
 
-    return Array.from(actor.effects ?? [])
-      .filter(effect => !effect.disabled)
-      .filter(effect => !foundry.utils.getProperty(effect, "flags.axiom.status"))
-      .flatMap(effect => this._getRowsForEffect(effect));
+    return this._getApplicableRollEffects(actor)
+      .filter(entry => !entry.effect.disabled)
+      .filter(entry => !foundry.utils.getProperty(entry.effect, "flags.axiom.status"))
+      .flatMap(entry => this._getRowsForEffect(entry.effect, entry));
   }
 
-  _getRowsForEffect(effect) {
+  _getApplicableRollEffects(actor) {
+    const ownedItems = Array.from(actor.items ?? []);
+    const ownedItemUuids = new Set(ownedItems.map(item => item.uuid).filter(Boolean));
+    const effects = [];
+
+    for (const effect of actor.effects ?? []) {
+      if (this._effectOriginIsOwnedItem(effect, ownedItemUuids)) continue;
+      effects.push({ effect, sourceDocument: actor, sourceName: actor.name });
+    }
+
+    for (const item of ownedItems) {
+      for (const effect of item.effects ?? []) {
+        effects.push({ effect, sourceDocument: item, sourceName: item.name });
+      }
+    }
+
+    return effects;
+  }
+
+  _effectOriginIsOwnedItem(effect, ownedItemUuids) {
+    const origin = String(effect?.origin ?? "");
+    if (!origin) return false;
+    return Array.from(ownedItemUuids).some(uuid => origin === uuid || origin.startsWith(`${uuid}.`));
+  }
+
+  _getRowsForEffect(effect, { sourceDocument = null } = {}) {
     const rows = [];
     const conditional = Boolean(effect.getFlag?.("axiom", "conditional"));
 
@@ -1038,8 +1144,9 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
       const value = this._getRollModifierFromEffectChange(change, { conditional });
       if (value === null || value === 0) continue;
 
-      const safeKey = foundry.utils.hash?.(change.key) ?? change.key.replaceAll(/[^a-z0-9]/gi, "");
-      const id = `effect-${effect.id}-${safeKey}`;
+      const rowKey = `${sourceDocument?.uuid ?? effect.parent?.uuid ?? ""}.${effect.id}.${change.key}`;
+      const safeKey = foundry.utils.hash?.(rowKey) ?? rowKey.replaceAll(/[^a-z0-9]/gi, "");
+      const id = `effect-${safeKey}`;
       const existing = (this.rollData.modifierRows ?? []).find(row => row.id === id);
       rows.push({
         id,
@@ -1087,6 +1194,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
     // skipped by AxiomActiveEffect.apply() and can be opted into here.
     if (this._effectKeyMatchesCurrentAttributes(key)) return conditional ? signedValue : null;
     if (this._effectKeyMatchesCurrentSkill(key)) return signedValue;
+    if (this._effectKeyMatchesCurrentAttributeCheck(key)) return signedValue;
     return null;
   }
 
@@ -1104,7 +1212,17 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
   _effectKeyMatchesCurrentSkill(key) {
     const skill = this.rollData.skillItem ?? (this.rollData.item?.type === "skill" ? this.rollData.item : null);
     if (!skill) return false;
-    return key === `flags.axiom.skillModifiers.${skill.id}`;
+
+    const normalizedName = normalizeSkillReference(skill.name);
+    return key === `flags.axiom.skillModifiers.${skill.id}`
+      || (normalizedName && key === `flags.axiom.skillNameModifiers.${normalizedName}`);
+  }
+
+  _effectKeyMatchesCurrentAttributeCheck(key) {
+    if (this.rollData.testType !== "attribute") return false;
+
+    const checkId = String(this.rollData.attributeCheckId ?? "").trim();
+    return Boolean(checkId) && key === `flags.axiom.attributeCheckModifiers.${checkId}`;
   }
 
   _getWoundPenalty() {
@@ -1160,6 +1278,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
   }
 
   _getRangeModifier() {
+    if (!this._isRangedWeaponRoll()) return null;
     const target = Array.from(game.user?.targets ?? [])[0] ?? null;
     return AxiomCombat.getRangeModifier({
       attackerActor: this.rollData.actor,

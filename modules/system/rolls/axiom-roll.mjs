@@ -100,9 +100,7 @@ export default class AxiomRoll {
     const appliedHitModifier = Number(hitModifier ?? 0);
     const hits = baseHits + appliedHitModifier;
 
-    // Fate can turn a near miss into a success by adding Hits, but the universal
-    // 96-00 automatic failure band still holds.
-    const success = automaticSuccess || (!automaticFailure && (rollValue <= target || hits >= 0));
+    const success = automaticSuccess || (!automaticFailure && rollValue <= target);
     const complication = ODD_DOUBLES.has(rollValue);
     const outcome = this.getOutcome({ success, hits });
 
