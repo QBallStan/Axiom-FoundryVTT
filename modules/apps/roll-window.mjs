@@ -229,7 +229,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
     const selectedDifficulty = this.rollData.difficulty ?? "average";
     const difficulty = this._getDifficultyValue(selectedDifficulty);
     const modifiers = this._getModifierTotal();
-    const successTarget = Math.min(120, Math.max(5, basePool + difficulty + modifiers));
+    const successTarget = Math.min(150, Math.max(5, basePool + difficulty + modifiers));
 
     context.roll = {
       title: this.rollData.title ?? game.i18n.localize("AXIOM.Roll.SkillTest"),
@@ -674,7 +674,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
     const basePool = AxiomRoll.calculateBasePool(actor, attributeOne, attributeTwo, skillValue);
     const difficulty = this._getDifficultyValue(this.rollData.difficulty ?? "average");
     const modifiers = this._getModifierTotal();
-    const successTarget = Math.min(120, Math.max(5, basePool + difficulty + modifiers));
+    const successTarget = Math.min(150, Math.max(5, basePool + difficulty + modifiers));
 
     return { basePool, difficulty, modifiers, successTarget };
   }
@@ -1012,7 +1012,8 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
 
     for (let index = rows.length - 1; index >= 0; index -= 1) {
       const row = rows[index];
-      if (row?.automatic && String(row.id ?? "").startsWith("effect-") && !automaticIds.has(row.id)) rows.splice(index, 1);
+      const rowId = String(row?.id ?? "");
+      if (row?.automatic && (rowId.startsWith("auto-") || rowId.startsWith("effect-")) && !automaticIds.has(row.id)) rows.splice(index, 1);
     }
 
     for (const automaticRow of automaticRows) {
@@ -1070,13 +1071,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
         automatic: true,
         locked: true
       },
-      {
-        id: "auto-statuses",
-        label: "AXIOM.Roll.ModifierSources.StatusPenalty",
-        value: this._getStatusPenalty(),
-        automatic: true,
-        locked: true
-      },
+      ...AxiomCombat.getStatusModifierRows(this.rollData.actor),
       ...this._getCombatAutomaticModifierRows(),
       ...this._getEffectModifierRows()
     ];
@@ -1093,6 +1088,9 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
       case "auto-cover": return AxiomCombat.getCoverBonus(this.rollData.actor);
       case "auto-shield-block": return Number(this.rollData.combatDefense?.shield?.blockValue ?? 0);
       default:
+        if (String(id ?? "").startsWith("auto-status-")) {
+          return Number(AxiomCombat.getStatusModifierRows(this.rollData.actor).find(row => row.id === id)?.value ?? 0);
+        }
         if (String(id ?? "").startsWith("effect-")) {
           return Number(this._getEffectModifierRows().find(row => row.id === id)?.value ?? 0);
         }
@@ -1263,16 +1261,9 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
       });
     }
 
-    const sizeModifier = this._getTargetSizeModifier();
-    if (sizeModifier !== 0) {
-      rows.push({
-        id: "auto-target-size",
-        label: "AXIOM.Combat.TargetSize",
-        value: sizeModifier,
-        automatic: true,
-        locked: true
-      });
-    }
+    const target = Array.from(game.user?.targets ?? [])[0] ?? null;
+    const sizeRow = AxiomCombat.getTargetSizeModifierRow(target);
+    if (sizeRow) rows.push(sizeRow);
 
     return rows;
   }
@@ -1294,8 +1285,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
   _getTargetSizeModifier() {
     if (!this._isWeaponRoll()) return 0;
     const target = Array.from(game.user?.targets ?? [])[0] ?? null;
-    const size = Number(target?.actor?.system?.size ?? 0);
-    return Number.isFinite(size) ? size * 5 : 0;
+    return AxiomCombat.getTargetSizeModifier(target);
   }
 
   _getAttributeLabel(key) {

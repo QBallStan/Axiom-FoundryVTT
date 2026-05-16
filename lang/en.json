@@ -228,7 +228,8 @@
             "Skill": "Skill",
             "Resource": "Resource",
             "Custom": "Custom Key",
-            "AttributeCheck": "Attribute Check"
+            "AttributeCheck": "Attribute Check",
+            "SubAttribute": "Sub-Attribute"
           },
           "Targets": {
             "GrazingWoundsMax": "Grazing Wound Slots",
@@ -243,10 +244,13 @@
             "FateMax": "Fate Max",
             "ActionPointsCurrent": "Action Points Current",
             "ActionPointsMax": "Action Points Max",
-            "MomentumCurrent": "Momentum Current",
-            "MomentumMax": "Momentum Max",
             "Size": "Size",
-            "Custom": "Custom"
+            "Custom": "Custom",
+            "Movement": "Movement",
+            "Initiative": "Initiative",
+            "DamageModifier": "Damage Modifier",
+            "Toughness": "Toughness",
+            "CorruptionThreshold": "Corruption Threshold"
           },
           "Title": "Add Axiom Effect",
           "Name": "Effect Name",
@@ -312,7 +316,8 @@
         "Dead": "Dead",
         "LightCover": "Light Cover",
         "MediumCover": "Medium Cover",
-        "HeavyCover": "Heavy Cover"
+        "HeavyCover": "Heavy Cover",
+        "Sprinting": "Sprinting"
       },
       "StatusDescriptions": {
         "Burning": "On fire. At the start of each turn, suffer 2 lethal damage per stack. Burning worsens by 1 stack each turn until extinguished.",
@@ -328,7 +333,8 @@
         "Dead": "Dead.",
         "LightCover": "Partially protected by terrain or obstruction. Adds +10 to defense against ranged fire when cover applies.",
         "MediumCover": "Well protected by terrain or obstruction. Adds +20 to defense against ranged fire when cover applies.",
-        "HeavyCover": "Mostly protected by terrain or obstruction. Adds +30 to defense against ranged fire when cover applies."
+        "HeavyCover": "Mostly protected by terrain or obstruction. Adds +30 to defense against ranged fire when cover applies.",
+        "Sprinting": "Moving at full speed. Each stack applies -5 to tests for the rest of the round, up to 3 stacks."
       },
       "Combat": {
         "EquippedArmor": "Armor",
@@ -568,7 +574,8 @@
         "RightArm": "Right Arm",
         "LeftLeg": "Left Leg",
         "RightLeg": "Right Leg"
-      }
+      },
+      "EditTarget": "Edit target number"
     },
     "Armor": {
       "Locations": {
@@ -807,7 +814,11 @@
       "ForceNext": "Force Next Combatant",
       "SmartAdvanceHint": "Advance using Axiom AP pass rules. If this combatant did not spend AP, they lose 1 AP.",
       "ForceNextHint": "Bypass AP pass filtering and move to the next combatant in initiative order.",
-      "PassLabel": "Pass {pass}"
+      "PassLabel": "Pass {pass}",
+      "Movement": "Movement",
+      "MovementShort": "Mv",
+      "MovementHint": "Left click: spend 1 m. Right click: add 1 m available.",
+      "MovementExceeded": "{name} moved {moved} m but only had {remaining} m remaining."
     },
     "Shield": {
       "Skill": "Skill",
@@ -820,6 +831,22 @@
         "Medium": "Medium",
         "Heavy": "Heavy"
       }
+    },
+    "StatusCard": {
+      "Title": "Start of Turn Statuses",
+      "Badge": "Status",
+      "Stacks": "{stacks} stack(s)",
+      "TakeDamage": "Take Damage",
+      "ApplyBleeding": "Apply Wounds",
+      "Recover": "Recover",
+      "Resolved": "Resolved",
+      "DamageResolved": "{finalDamage} final damage, {wound}",
+      "DamageFormula": "{rawDamage} damage - {effectiveArmor} effective armor ({armor} armor, AP {armorPenetration}) - {toughness} Toughness = {finalDamage}",
+      "BleedingResolved": "{wounds} Grazing Wound(s) applied",
+      "BleedingFormula": "Bleeding {stacks}: 1 Grazing Wound per stack",
+      "StunnedRecovery": "Stunned Recovery",
+      "StunnedResolved": "Recovered {recovered} stack(s)",
+      "StunnedFormula": "Vigor roll {roll} vs {target}"
     }
   },
   "TYPES": {

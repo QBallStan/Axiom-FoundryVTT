@@ -13,7 +13,7 @@ export default class AxiomRoll {
     const d100 = Number(roll.total ?? 0);
     const basePool = this.calculateBasePool(actor, attributeOne, attributeTwo, skillValue);
     const rawSuccessTarget = basePool + Number(difficulty ?? 0) + Number(modifiers ?? 0);
-    const successTarget = Math.min(120, Math.max(5, rawSuccessTarget));
+    const successTarget = Math.min(150, Math.max(5, rawSuccessTarget));
     const result = this.evaluateResult({ d100, successTarget });
 
     return {
@@ -89,6 +89,12 @@ export default class AxiomRoll {
     const number = Number(stringValue);
     if (!Number.isFinite(number)) return 100;
     return Math.min(100, Math.max(1, Math.trunc(number)));
+  }
+
+  static normalizeSuccessTarget(value) {
+    const number = Number(String(value ?? "").trim());
+    if (!Number.isFinite(number)) return 5;
+    return Math.min(150, Math.max(5, Math.trunc(number)));
   }
 
   static evaluateResult({ d100, successTarget, hitModifier = 0 } = {}) {

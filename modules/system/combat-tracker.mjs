@@ -10,12 +10,30 @@ function getActionPointData(actor) {
 
   const current = Number(data.current ?? 0);
   const min = Number(data.min ?? 0);
-  const max = Number(data.max ?? 0);
+  const rawMax = Number(data.max ?? 0);
+  const max = Number.isFinite(rawMax) ? Math.max(0, rawMax) : 0;
+  const safeCurrent = Number.isFinite(current) ? current : 0;
 
   return {
-    current: Number.isFinite(current) ? current : 0,
+    current: Math.min(safeCurrent, max),
     min: Number.isFinite(min) ? min : 0,
     max: Number.isFinite(max) ? max : 0
+  };
+}
+
+
+function getMovementData(actor, combatant = null) {
+  if (!actor) return null;
+
+  const max = Number(actor.system?.subAttributes?.movement ?? 0);
+  const used = Number(combatant?.getFlag?.("axiom", "movementUsed") ?? 0);
+  const safeMax = Number.isFinite(max) ? Math.max(0, Math.trunc(max)) : 0;
+  const safeUsed = Number.isFinite(used) ? used : 0;
+
+  return {
+    used: safeUsed,
+    remaining: Math.round((safeMax - safeUsed) * 10) / 10,
+    max: safeMax
   };
 }
 
@@ -23,6 +41,10 @@ function canUpdateActionPoints(actor) {
   if (!actor) return false;
   if (game.user?.isGM) return true;
   return actor.testUserPermission?.(game.user, "OWNER") ?? false;
+}
+
+function canUpdateMovement(actor) {
+  return canUpdateActionPoints(actor);
 }
 
 const AXIOM_INITIATIVE_ICON = "systems/axiom/assets/icons/d10.svg";
@@ -222,6 +244,62 @@ function buildActionPointTracker(combatant, actor, data) {
   return tracker;
 }
 
+function formatMovementValue(value) {
+  const number = Number(value ?? 0);
+  if (!Number.isFinite(number)) return "0";
+  return Number.isInteger(number) ? String(number) : number.toFixed(1).replace(/\.0$/, "");
+}
+
+function buildMovementTracker(combatant, actor, data) {
+  const tracker = document.createElement("div");
+  tracker.className = `axiom-combatant-movement${data.remaining < 0 ? " over" : ""}`;
+  tracker.dataset.combatantId = combatant.id;
+  tracker.dataset.tooltip = game.i18n.localize("AXIOM.CombatTracker.MovementHint");
+  tracker.setAttribute("role", "button");
+  tracker.setAttribute("tabindex", canUpdateMovement(actor) ? "0" : "-1");
+  tracker.setAttribute("aria-label", game.i18n.localize("AXIOM.CombatTracker.Movement"));
+
+  const label = document.createElement("span");
+  label.className = "axiom-combatant-movement-label";
+  label.textContent = game.i18n.localize("AXIOM.CombatTracker.MovementShort");
+  tracker.append(label);
+
+  const value = document.createElement("span");
+  value.className = "axiom-combatant-movement-value";
+  value.textContent = `${formatMovementValue(data.remaining)}m`;
+  tracker.append(value);
+
+  return tracker;
+}
+
+function buildCombatantResourcesTracker(combatant, actor, actionPointData, movementData) {
+  const tracker = document.createElement("div");
+  tracker.className = "axiom-combatant-resources";
+  tracker.dataset.combatantId = combatant.id;
+
+  const apTracker = buildActionPointTracker(combatant, actor, actionPointData);
+  if (canUpdateActionPoints(actor)) {
+    apTracker.addEventListener("click", adjustCombatantActionPoints);
+    apTracker.addEventListener("contextmenu", adjustCombatantActionPoints);
+    apTracker.addEventListener("dblclick", stopCombatantActionPointEvent);
+    apTracker.addEventListener("keydown", onActionPointKeydown);
+  }
+  tracker.append(apTracker);
+
+  if (movementData) {
+    const movementTracker = buildMovementTracker(combatant, actor, movementData);
+    if (canUpdateMovement(actor)) {
+      movementTracker.addEventListener("click", adjustCombatantMovement);
+      movementTracker.addEventListener("contextmenu", adjustCombatantMovement);
+      movementTracker.addEventListener("dblclick", stopCombatantActionPointEvent);
+      movementTracker.addEventListener("keydown", onMovementKeydown);
+    }
+    tracker.append(movementTracker);
+  }
+
+  return tracker;
+}
+
 function stopCombatantActionPointEvent(event) {
   event.preventDefault();
   event.stopPropagation();
@@ -252,25 +330,46 @@ function onActionPointKeydown(event) {
   adjustCombatantActionPoints(event);
 }
 
-function addActionPointTrackers(root, combat) {
+async function adjustCombatantMovement(event) {
+  stopCombatantActionPointEvent(event);
+
+  const combatantId = event.currentTarget?.dataset?.combatantId;
+  const combatant = game.combat?.combatants?.get?.(combatantId) ?? game.combat?.combatants?.find?.(entry => entry.id === combatantId);
+  const actor = combatant?.actor;
+  if (!combatant || !actor || !canUpdateMovement(actor)) return;
+
+  const data = getMovementData(actor, combatant);
+  if (!data) return;
+
+  // The tracker displays remaining movement, but the stored flag tracks movement spent.
+  // Left click spends 1 m. Right click adds 1 m back, which also supports sprinting
+  // or other effects that increase available movement for the round.
+  const deltaUsed = event.type === "contextmenu" ? -1 : 1;
+  const next = Math.round((data.used + deltaUsed) * 10) / 10;
+  if (next === data.used) return;
+
+  await combatant.setFlag?.("axiom", "movementUsed", next);
+  ui.combat?.render?.();
+}
+
+function onMovementKeydown(event) {
+  if (!["Enter", " "].includes(event.key)) return;
+  adjustCombatantMovement(event);
+}
+
+function addCombatantResourceTrackers(root, combat) {
   if (!combat) return;
 
   for (const combatant of combat.combatants ?? []) {
     const actor = combatant.actor;
-    const data = getActionPointData(actor);
-    if (!actor || !data) continue;
+    const actionPointData = getActionPointData(actor);
+    if (!actor || !actionPointData) continue;
 
     const row = findCombatantRow(root, combatant);
-    if (!row || row.querySelector(".axiom-combatant-ap")) continue;
+    if (!row || row.querySelector(".axiom-combatant-resources")) continue;
 
-    const tracker = buildActionPointTracker(combatant, actor, data);
-    if (canUpdateActionPoints(actor)) {
-      tracker.addEventListener("click", adjustCombatantActionPoints);
-      tracker.addEventListener("contextmenu", adjustCombatantActionPoints);
-      tracker.addEventListener("dblclick", stopCombatantActionPointEvent);
-      tracker.addEventListener("keydown", onActionPointKeydown);
-    }
-
+    const movementData = getMovementData(actor, combatant);
+    const tracker = buildCombatantResourcesTracker(combatant, actor, actionPointData, movementData);
     const insertionPoint = findInsertionPoint(row);
     insertionPoint.insertAdjacentElement("afterend", tracker);
   }
@@ -284,12 +383,26 @@ export function registerAxiomCombatTracker() {
     replaceInitiativeIcons(root);
     updateNativeNextTurnControls(root, game.combat);
     addAxiomCombatControls(root, game.combat);
-    addActionPointTrackers(root, game.combat);
+    addCombatantResourceTrackers(root, game.combat);
   });
 
   Hooks.on("updateActor", (actor, changed) => {
-    if (!foundry.utils.hasProperty(changed, "system.trackers.actionPoints.current")) return;
+    const changedAp = foundry.utils.hasProperty(changed, "system.trackers.actionPoints.current")
+      || foundry.utils.hasProperty(changed, "system.trackers.actionPoints.max")
+      || foundry.utils.hasProperty(changed, "system.statuses.stunned");
+    const changedMovement = foundry.utils.hasProperty(changed, "system.subAttributes.movement")
+      || foundry.utils.hasProperty(changed, "system.attributes.agility")
+      || foundry.utils.hasProperty(changed, "system.statuses.chilled")
+      || foundry.utils.hasProperty(changed, "system.statuses.entangled")
+      || foundry.utils.hasProperty(changed, "system.statuses.stunned");
+    if (!changedAp && !changedMovement) return;
     if (![...(game.combat?.combatants ?? [])].some(combatant => combatant.actor?.id === actor.id)) return;
+    ui.combat?.render?.();
+  });
+
+  Hooks.on("updateCombatant", (combatant, changed) => {
+    if (!foundry.utils.hasProperty(changed, "flags.axiom.movementUsed")) return;
+    if (combatant.parent?.id !== game.combat?.id) return;
     ui.combat?.render?.();
   });
 }

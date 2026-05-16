@@ -33,6 +33,7 @@ import { registerAxiomSettings } from "./modules/system/settings.mjs";
 import AxiomCombat from "./modules/system/combat.mjs";
 import { registerAxiomCombatTracker } from "./modules/system/combat-tracker.mjs";
 import { registerAxiomTokenOverlays } from "./modules/system/token-overlays.mjs";
+import { registerAxiomMovementTracking } from "./modules/system/movement.mjs";
 import { registerAxiomDice } from "./modules/system/dice.mjs";
 
 const { Actor, Item } = foundry.documents;
@@ -249,12 +250,14 @@ registerAxiomStatusHooks();
 registerAxiomTokenHUD();
 registerAxiomCombatTracker();
 registerAxiomTokenOverlays();
+registerAxiomMovementTracking();
 Hooks.on("combatStart", combat => AxiomCombat.onCombatStart(combat));
-Hooks.on("updateCombat", (combat, changed) => {
+Hooks.on("updateCombat", async (combat, changed) => {
   const turnChanged = foundry.utils.hasProperty(changed, "turn");
   const roundChanged = foundry.utils.hasProperty(changed, "round");
   const passChanged = foundry.utils.hasProperty(changed, "flags.axiom.pass");
   if (!turnChanged && !roundChanged && !passChanged) return;
+  if (roundChanged && game.user?.isGM) await combat._resetAllMovementUsed?.();
   AxiomCombat.onCombatTurnStart(combat);
 });
 

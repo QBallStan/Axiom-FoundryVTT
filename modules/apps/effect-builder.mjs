@@ -15,10 +15,16 @@ const RESOURCE_TARGETS = [
   { id: "fateCurrent", label: "AXIOM.Actor.Effects.Builder.Targets.FateCurrent", key: "system.trackers.fate.current" },
   { id: "fateMax", label: "AXIOM.Actor.Effects.Builder.Targets.FateMax", key: "system.trackers.fate.max" },
   { id: "apCurrent", label: "AXIOM.Actor.Effects.Builder.Targets.ActionPointsCurrent", key: "system.trackers.actionPoints.current" },
-  { id: "apMax", label: "AXIOM.Actor.Effects.Builder.Targets.ActionPointsMax", key: "system.trackers.actionPoints.max" },
-  { id: "momentumCurrent", label: "AXIOM.Actor.Effects.Builder.Targets.MomentumCurrent", key: "system.trackers.momentum.current" },
-  { id: "momentumMax", label: "AXIOM.Actor.Effects.Builder.Targets.MomentumMax", key: "system.trackers.momentum.max" },
-  { id: "size", label: "AXIOM.Actor.Effects.Builder.Targets.Size", key: "system.size" }
+  { id: "apMax", label: "AXIOM.Actor.Effects.Builder.Targets.ActionPointsMax", key: "system.trackers.actionPoints.max" }
+];
+
+const SUB_ATTRIBUTE_TARGETS = [
+  { id: "movement", label: "AXIOM.Actor.Effects.Builder.Targets.Movement", key: "system.subAttributes.movement" },
+  { id: "initiative", label: "AXIOM.Actor.Effects.Builder.Targets.Initiative", key: "system.subAttributes.initiative" },
+  { id: "size", label: "AXIOM.Actor.Effects.Builder.Targets.Size", key: "system.size" },
+  { id: "damageModifier", label: "AXIOM.Actor.Effects.Builder.Targets.DamageModifier", key: "system.subAttributes.damageModifier" },
+  { id: "toughness", label: "AXIOM.Actor.Effects.Builder.Targets.Toughness", key: "system.subAttributes.toughness" },
+  { id: "corruptionThreshold", label: "AXIOM.Actor.Effects.Builder.Targets.CorruptionThreshold", key: "system.subAttributes.corruptionThreshold" }
 ];
 
 const WOUND_TARGETS = [
@@ -60,6 +66,7 @@ const TARGET_TYPES = [
   { id: "attribute", label: "AXIOM.Actor.Effects.Builder.TargetTypes.Attribute" },
   { id: "skill", label: "AXIOM.Actor.Effects.Builder.TargetTypes.Skill" },
   { id: "attributeCheck", label: "AXIOM.Actor.Effects.Builder.TargetTypes.AttributeCheck" },
+  { id: "subAttribute", label: "AXIOM.Actor.Effects.Builder.TargetTypes.SubAttribute" },
   { id: "resource", label: "AXIOM.Actor.Effects.Builder.TargetTypes.Resource" },
   { id: "wound", label: "AXIOM.Actor.Effects.Builder.TargetTypes.Wound" },
   { id: "custom", label: "AXIOM.Actor.Effects.Builder.TargetTypes.Custom" }
@@ -71,7 +78,7 @@ function getFilePickerClass() {
 }
 
 function updateEffectIcon(prompt, path) {
-  const value = String(path ?? "icons/svg/aura.svg").trim() || "icons/svg/aura.svg";
+  const value = String(path ?? "systems/axiom/assets/icons/effect.svg").trim() || "systems/axiom/assets/icons/effect.svg";
   const input = prompt.querySelector("[name='icon']");
   const image = prompt.querySelector("[data-effect-icon-preview]");
   if (input) input.value = value;
@@ -82,7 +89,7 @@ function openEffectIconPicker(prompt) {
   const FilePickerClass = getFilePickerClass();
   if (!FilePickerClass) return;
 
-  const current = prompt.querySelector("[name='icon']")?.value || "icons/svg/aura.svg";
+  const current = prompt.querySelector("[name='icon']")?.value || "systems/axiom/assets/icons/effect.svg";
   const picker = new FilePickerClass({
     type: "image",
     current,
@@ -195,6 +202,7 @@ function getTargets(targetGroups, type) {
   if (type === "attribute") return targetGroups.attribute;
   if (type === "skill") return targetGroups.skill;
   if (type === "attributeCheck") return targetGroups.attributeCheck;
+  if (type === "subAttribute") return targetGroups.subAttribute;
   if (type === "resource") return targetGroups.resource;
   if (type === "wound") return targetGroups.wound;
   return [{ id: "custom", label: "AXIOM.Actor.Effects.Builder.Targets.Custom", key: "" }];
@@ -376,6 +384,7 @@ export default class AxiomEffectBuilder {
       attribute: ATTRIBUTE_TARGETS,
       skill: await getSkillTargets(actor),
       attributeCheck: getAttributeCheckTargets(),
+      subAttribute: SUB_ATTRIBUTE_TARGETS,
       resource: RESOURCE_TARGETS,
       wound: WOUND_TARGETS
     };
@@ -462,11 +471,11 @@ export default class AxiomEffectBuilder {
                   class="effect-builder-portrait-image item-image"
                   data-action="selectEffectIcon"
                   data-effect-icon-preview
-                  src="icons/svg/aura.svg"
+                  src="systems/axiom/assets/icons/effect.svg"
                   alt="${escapeHtml(localize("AXIOM.Actor.Effects.Builder.Icon"))}"
                   data-tooltip="${escapeHtml(localize("AXIOM.Actor.Effects.Builder.Icon"))}"
                 >
-                <input type="hidden" name="icon" value="icons/svg/aura.svg">
+                <input type="hidden" name="icon" value="systems/axiom/assets/icons/effect.svg">
               </div>
 
               <div class="form-group">
@@ -576,7 +585,7 @@ export default class AxiomEffectBuilder {
             const durationType = form.elements.durationType.value;
             const durationValue = Math.max(0, Number(form.elements.durationValue.value ?? 0));
             const name = String(form.elements.name.value ?? "").trim() || buildDefaultName({ changes });
-            const icon = String(form.elements.icon.value ?? "").trim() || "icons/svg/aura.svg";
+            const icon = String(form.elements.icon.value ?? "").trim() || "systems/axiom/assets/icons/effect.svg";
             const disabled = Boolean(form.elements.disabled.checked);
             const conditional = Boolean(form.elements.conditional.checked);
             return { changes, durationType, durationValue, name, icon, disabled, conditional };

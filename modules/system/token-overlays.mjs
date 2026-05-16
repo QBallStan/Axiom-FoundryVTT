@@ -51,7 +51,7 @@ export function registerAxiomTokenOverlays() {
     const statusChanged = foundry.utils.hasProperty(
       changed,
       "system.statuses.dead",
-    );
+    ) || foundry.utils.hasProperty(changed, "system.statuses.stunned");
     if (!trackerChanged && !woundsChanged && !statusChanged) return;
 
     if (woundsChanged) void markNpcCriticalWoundsDead(actor);
@@ -112,11 +112,7 @@ export function drawAxiomTokenOverlays(token) {
     min: -5,
     max: 5,
   });
-  const actionPoints = getTrackerData(token.actor, "actionPoints", {
-    current: 0,
-    min: 0,
-    max: 3,
-  });
+  const actionPoints = getActionPointTrackerData(token.actor);
   const badges = getDepletedWoundBadges(token.actor);
 
   const momentumBar = drawMomentumBar(momentum, width, height, token);
@@ -719,6 +715,19 @@ function createText(label, styleData = {}) {
   }
 
   return text;
+}
+
+function getActionPointTrackerData(actor) {
+  const fallback = { current: 0, min: 0, max: 3 };
+  const tracker = actor?.system?.trackers?.actionPoints ?? fallback;
+  const max = finiteNumber(tracker.max, fallback.max);
+  const min = finiteNumber(tracker.min, fallback.min);
+
+  return {
+    current: Math.min(max, Math.max(min, finiteNumber(tracker.current, fallback.current))),
+    min,
+    max,
+  };
 }
 
 function getTrackerData(actor, key, fallback) {

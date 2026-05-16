@@ -1014,7 +1014,7 @@
 .application.sheet.axiom.actor.protagonist .status-track,
 .application.sheet.axiom.actor.npc .status-track {
   display: grid;
-  grid-template-columns: repeat(9, minmax(0, 1fr));
+  grid-template-columns: repeat(10, minmax(0, 1fr));
   gap: 5px;
 }
 .application.sheet.axiom.actor.protagonist .status-cell,
@@ -2185,7 +2185,7 @@
   grid-column: 1 / -1;
 }
 .application.sheet.axiom.actor.npc .status-track {
-  grid-template-columns: repeat(9, minmax(0, 1fr));
+  grid-template-columns: repeat(10, minmax(0, 1fr));
 }
 @media (max-width: 760px) {
   .application.sheet.axiom.actor.npc .npc-config-grid {
@@ -2489,7 +2489,6 @@
   border: 1px solid var(--axiom-border);
   border-radius: 4px;
 }
-
 /* ===== ACTIVE EFFECT CONFIG PATCH ===== */
 .axiom-conditional-effect-field .checkbox {
   display: flex;
@@ -4507,7 +4506,25 @@
   flex-basis: 100%;
   clear: both;
 }
+.combat-sidebar .combat-tracker .token-name {
+  width: 115px;
+  overflow-wrap: break-word;
+  flex: 0;
+}
 /* Combat tracker AP pips */
+#combat-tracker .combatant .axiom-combatant-resources,
+.combat-tracker .combatant .axiom-combatant-resources,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-resources,
+#combat-tracker .combatant-row .axiom-combatant-resources,
+.combat-tracker .combatant-row .axiom-combatant-resources,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-resources {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  width: max-content;
+  margin: 2px 0 0;
+}
 #combat-tracker .combatant .axiom-combatant-ap,
 .combat-tracker .combatant .axiom-combatant-ap,
 .sidebar-tab.combat-sidebar .combatant .axiom-combatant-ap,
@@ -4516,13 +4533,16 @@
 .sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-ap {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 4px;
-  margin: 2px 0 0;
+  width: 100%;
+  margin: 0;
   color: var(--axiom-muted, #a7a198);
   font-size: 10px;
   line-height: 1;
   cursor: pointer;
   user-select: none;
+  padding: 2px 6px;
 }
 #combat-tracker .combatant .axiom-combatant-ap-label,
 .combat-tracker .combatant .axiom-combatant-ap-label,
@@ -5808,6 +5828,93 @@ dialog.axiom-genre-tags-app .axiom-tag-option span {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Combat tracker movement tracker */
+#combat-tracker .combatant .axiom-combatant-movement,
+.combat-tracker .combatant .axiom-combatant-movement,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-movement,
+#combat-tracker .combatant-row .axiom-combatant-movement,
+.combat-tracker .combatant-row .axiom-combatant-movement,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-movement {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  width: 100%;
+  min-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 2px 6px;
+  background: rgba(16, 16, 18, 0.42);
+  border: 1px solid rgba(95, 183, 215, 0.28);
+  border-radius: 4px;
+  color: var(--axiom-muted, #a7a198);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+}
+#combat-tracker .combatant .axiom-combatant-movement-label,
+.combat-tracker .combatant .axiom-combatant-movement-label,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-movement-label,
+#combat-tracker .combatant-row .axiom-combatant-movement-label,
+.combat-tracker .combatant-row .axiom-combatant-movement-label,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-movement-label {
+  color: var(--axiom-blue, #5fb7d7);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+#combat-tracker .combatant .axiom-combatant-movement-value,
+.combat-tracker .combatant .axiom-combatant-movement-value,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-movement-value,
+#combat-tracker .combatant-row .axiom-combatant-movement-value,
+.combat-tracker .combatant-row .axiom-combatant-movement-value,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-movement-value {
+  min-width: 24px;
+  color: var(--axiom-text, #e8e4dc);
+  font-weight: 800;
+  text-align: right;
+}
+#combat-tracker .combatant .axiom-combatant-movement.over,
+.combat-tracker .combatant .axiom-combatant-movement.over,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-movement.over,
+#combat-tracker .combatant-row .axiom-combatant-movement.over,
+.combat-tracker .combatant-row .axiom-combatant-movement.over,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-movement.over {
+  border-color: var(--axiom-accent, #c73a32);
+  box-shadow: 0 0 5px rgba(199, 58, 50, 0.32);
+}
+#combat-tracker .combatant .axiom-combatant-movement.over .axiom-combatant-movement-label,
+.combat-tracker .combatant .axiom-combatant-movement.over .axiom-combatant-movement-label,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-movement.over .axiom-combatant-movement-label,
+#combat-tracker .combatant-row .axiom-combatant-movement.over .axiom-combatant-movement-label,
+.combat-tracker .combatant-row .axiom-combatant-movement.over .axiom-combatant-movement-label,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-movement.over .axiom-combatant-movement-label,
+#combat-tracker .combatant .axiom-combatant-movement.over .axiom-combatant-movement-value,
+.combat-tracker .combatant .axiom-combatant-movement.over .axiom-combatant-movement-value,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-movement.over .axiom-combatant-movement-value,
+#combat-tracker .combatant-row .axiom-combatant-movement.over .axiom-combatant-movement-value,
+.combat-tracker .combatant-row .axiom-combatant-movement.over .axiom-combatant-movement-value,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-movement.over .axiom-combatant-movement-value {
+  color: var(--axiom-accent, #c73a32);
+}
+#combat-tracker .combatant .axiom-combatant-movement:hover,
+.combat-tracker .combatant .axiom-combatant-movement:hover,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-movement:hover,
+#combat-tracker .combatant-row .axiom-combatant-movement:hover,
+.combat-tracker .combatant-row .axiom-combatant-movement:hover,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-movement:hover,
+#combat-tracker .combatant .axiom-combatant-movement:focus,
+.combat-tracker .combatant .axiom-combatant-movement:focus,
+.sidebar-tab.combat-sidebar .combatant .axiom-combatant-movement:focus,
+#combat-tracker .combatant-row .axiom-combatant-movement:focus,
+.combat-tracker .combatant-row .axiom-combatant-movement:focus,
+.sidebar-tab.combat-sidebar .combatant-row .axiom-combatant-movement:focus {
+  border-color: var(--axiom-gold, #d8c69a);
+  color: var(--axiom-gold, #d8c69a);
+}
 /* Foundry wraps chat message content in a themed .chat-message container.
    Roll cards own their full visual frame, so strip the outer message chrome. */
 .chat-message.message.axiom-roll-message {
@@ -6899,4 +7006,103 @@ dialog.axiom-genre-tags-app .axiom-tag-option span {
   padding: 0;
   margin: 0;
   background: transparent;
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+  padding: 7px 8px;
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-row:last-child {
+  margin-bottom: 0;
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-row.resolved {
+  border-color: rgba(216, 198, 154, 0.45);
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-main {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-main strong {
+  display: block;
+  color: var(--axiom-text);
+  font-size: 12px;
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-main span {
+  color: var(--axiom-muted);
+  font-size: 11px;
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-icon {
+  display: grid;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 1px solid rgba(216, 198, 154, 0.25);
+  border-radius: 5px;
+  background: var(--axiom-panel-3);
+  color: var(--axiom-accent);
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-button {
+  min-width: 88px;
+  padding: 4px 8px;
+  border: 1px solid rgba(216, 198, 154, 0.35);
+  border-radius: 5px;
+  background: #121216;
+  color: var(--axiom-gold);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-button:hover,
+.axiom-chat-card.axiom-status-card .axiom-status-card-button:focus {
+  border-color: rgba(216, 198, 154, 0.65);
+  background: #1d1d23;
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-resolution {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(216, 198, 154, 0.18);
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-resolution strong,
+.axiom-chat-card.axiom-status-card .axiom-status-card-resolution span {
+  display: block;
+  font-size: 11px;
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-resolution strong {
+  color: var(--axiom-gold);
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-resolution span {
+  color: var(--axiom-muted);
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-result {
+  padding: 8px;
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+  text-align: center;
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-result span,
+.axiom-chat-card.axiom-status-card .axiom-status-card-result em {
+  display: block;
+  color: var(--axiom-muted);
+  font-size: 11px;
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-result strong {
+  display: block;
+  color: var(--axiom-gold);
+  font-family: "Roboto Mono", Consolas, monospace;
+  font-size: 28px;
+  line-height: 1;
+}
+.axiom-chat-card.axiom-status-card .axiom-status-card-result.failure strong {
+  color: var(--axiom-accent);
 }

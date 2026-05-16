@@ -13,8 +13,12 @@ export default class AxiomCombat extends foundry.documents.Combat {
   static FLAGS = {
     activationStartAp: "activationStartAp",
     activationKey: "activationKey",
-    pass: "pass"
+    pass: "pass",
+    movementUsed: "movementUsed",
+    movementWarningRound: "movementWarningRound"
   };
+
+  static _turnStartLocks = new Set();
 
   async nextTurn() {
     if (!this.started || !game.user?.isGM) return super.nextTurn();
@@ -52,6 +56,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
     if (wraps) {
       updateData.round = Math.max(1, Number(this.round ?? 0) + 1);
       await this._restoreAllActionPoints();
+      await this._resetAllMovementUsed();
     }
 
     await this.update(updateData);
@@ -109,6 +114,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
 
   async _startNextAxiomRound() {
     await this._restoreAllActionPoints();
+    await this._resetAllMovementUsed();
 
     const firstTurn = (this.turns ?? []).findIndex(combatant => AxiomCombat.getActionPointCurrent(combatant?.actor) > 0);
     const nextRound = Math.max(1, Number(this.round ?? 0) + 1);
@@ -126,9 +132,21 @@ export default class AxiomCombat extends foundry.documents.Combat {
       const tracker = AxiomCombat.getActionPointTracker(actor);
       if (!actor || !tracker) continue;
 
-      const max = Number(tracker.max ?? 0);
+      const max = AxiomCombat.getEffectiveActionPointMax(actor);
       if (!Number.isFinite(max)) continue;
       updates.push(actor.update({ "system.trackers.actionPoints.current": Math.max(0, max) }));
+    }
+    await Promise.all(updates);
+  }
+
+  async _resetAllMovementUsed() {
+    const updates = [];
+    for (const combatant of this.combatants ?? []) {
+      if (!combatant) continue;
+      updates.push(combatant.update({
+        [`flags.axiom.${AxiomCombat.FLAGS.movementUsed}`]: 0,
+        [`flags.axiom.${AxiomCombat.FLAGS.movementWarningRound}`]: null
+      }));
     }
     await Promise.all(updates);
   }
@@ -137,11 +155,36 @@ export default class AxiomCombat extends foundry.documents.Combat {
     return actor?.system?.trackers?.actionPoints ?? null;
   }
 
+  static getStatusStacks(actor, statusId) {
+    const value = Number(actor?.system?.statuses?.[statusId] ?? actor?.getAxiomStatusValue?.(statusId) ?? 0);
+    return Number.isFinite(value) ? Math.max(0, value) : 0;
+  }
+
+  static getEffectiveActionPointMax(actor) {
+    const tracker = this.getActionPointTracker(actor);
+    if (!tracker) return 0;
+
+    const rawMax = Number(tracker.max ?? 0);
+    return Number.isFinite(rawMax) ? Math.max(0, rawMax) : 0;
+  }
+
   static getActionPointCurrent(actor) {
     const tracker = this.getActionPointTracker(actor);
     if (!tracker) return 0;
     const current = Number(tracker.current ?? 0);
-    return Number.isFinite(current) ? current : 0;
+    const value = Number.isFinite(current) ? current : 0;
+    return Math.min(value, this.getEffectiveActionPointMax(actor));
+  }
+
+  static async clampActionPointsToEffectiveMax(actor) {
+    const tracker = this.getActionPointTracker(actor);
+    if (!actor || !tracker) return;
+
+    const current = Number(tracker.current ?? 0);
+    const effectiveMax = this.getEffectiveActionPointMax(actor);
+    if (!Number.isFinite(current) || current <= effectiveMax) return;
+
+    await actor.update({ "system.trackers.actionPoints.current": effectiveMax });
   }
 
   static getMomentumTracker(actor) {
@@ -155,22 +198,127 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const actor = combatant?.actor;
     if (!combatant || !actor) return;
 
-    const activationKey = `${combat.id}:${combat.round}:${combat.getAxiomPass?.() ?? 1}:${combat.turn}:${combatant.id}`;
+    const pass = combat.getAxiomPass?.() ?? 1;
+    const activationKey = `${combat.id}:${combat.round}:${pass}:${combat.turn}:${combatant.id}`;
     if (combatant.getFlag?.("axiom", this.FLAGS.activationKey) === activationKey) return;
+    if (this._turnStartLocks.has(activationKey)) return;
 
-    if ((combat.getAxiomPass?.() ?? 1) === 1) {
-      await this.stepMomentumTowardZero(actor);
+    this._turnStartLocks.add(activationKey);
+    try {
+      // Store the activation key before resolving status automation. The updateCombat
+      // hook and direct turn advancement can both reach this method in the same tick.
+      // Setting the key early prevents duplicate start-of-turn chat cards.
+      await combatant.setFlag?.("axiom", this.FLAGS.activationKey, activationKey);
+
+      if (pass === 1) {
+        await this.stepMomentumTowardZero(actor);
+        await this.resolveStartOfTurnStatuses(combat, combatant, actor);
+      }
+
+      await this.clampActionPointsToEffectiveMax(actor);
+
+      const ap = this.getActionPointCurrent(actor);
+      await combatant.setFlag?.("axiom", this.FLAGS.activationStartAp, ap);
+      ui.combat?.render?.();
+    } finally {
+      this._turnStartLocks.delete(activationKey);
     }
+  }
 
-    const ap = this.getActionPointCurrent(actor);
-    await combatant.setFlag?.("axiom", this.FLAGS.activationStartAp, ap);
-    await combatant.setFlag?.("axiom", this.FLAGS.activationKey, activationKey);
-    ui.combat?.render?.();
+  static async resolveStartOfTurnStatuses(combat, combatant, actor) {
+    if (!actor || !combatant) return;
+
+    const round = Number(combat?.round ?? 0) || 0;
+    const statusKey = `${combat?.id ?? ""}:${round}:${combatant.id}`;
+    const lastKey = combatant.getFlag?.("axiom", "statusTurnKey");
+    if (lastKey === statusKey) return;
+
+    await combatant.setFlag?.("axiom", "statusTurnKey", statusKey);
+
+    const chilled = this.getStatusStacks(actor, "chilled");
+    if (chilled > 0) await actor.removeStatus?.("chilled", 1);
+
+    if (this.getStatusStacks(actor, "sprinting") > 0) await actor.clearStatus?.("sprinting");
+
+    const statusesWithCards = ["burning", "bleeding", "stunned", "corroding"]
+      .map(statusId => ({ statusId, stacks: this.getStatusStacks(actor, statusId), status: CONFIG.AXIOM?.statuses?.[statusId] }))
+      .filter(entry => entry.status && entry.stacks > 0);
+
+    if (statusesWithCards.length) await this.createStartOfTurnStatusCard({ combat, combatant, actor, statuses: statusesWithCards });
+  }
+
+  static async createStartOfTurnStatusCard({ combat, combatant, actor, statuses } = {}) {
+    const rows = statuses.map(({ statusId, stacks, status }) => this.renderStartOfTurnStatusRow(statusId, stacks, status)).join("");
+    if (!rows) return null;
+
+    const content = `
+      <article class="axiom-chat-card roll-card axiom-status-card" data-actor-id="${actor.id}" data-combatant-id="${combatant.id}">
+        <header class="card-header">
+          <div class="card-title">
+            <strong>${game.i18n.localize("AXIOM.StatusCard.Title")}</strong>
+            <span>${foundry.utils.escapeHTML(actor.name ?? combatant.name ?? "")}</span>
+          </div>
+          <div class="card-badge">${game.i18n.localize("AXIOM.StatusCard.Badge")}</div>
+        </header>
+        <section class="card-body">
+          ${rows}
+        </section>
+      </article>
+    `;
+
+    return ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor }),
+      content,
+      style: CONST.CHAT_MESSAGE_STYLES?.OTHER,
+      flags: {
+        axiom: {
+          statusCard: true,
+          actorId: actor.id,
+          combatId: combat?.id ?? "",
+          combatantId: combatant.id,
+          round: Number(combat?.round ?? 0) || 0
+        }
+      }
+    });
+  }
+
+  static renderStartOfTurnStatusRow(statusId, stacks, status) {
+    const label = game.i18n.localize(status.label);
+    const stackLabel = game.i18n.format("AXIOM.StatusCard.Stacks", { stacks });
+    const actionLabel = this.getStatusCardActionLabel(statusId);
+    const icon = status.icon ? `<i class="${status.icon}"></i>` : "";
+    const button = actionLabel
+      ? `<button type="button" class="axiom-status-card-button" data-action="resolveStatus" data-status-id="${statusId}">${actionLabel}</button>`
+      : "";
+
+    return `
+      <div class="axiom-status-card-row" data-status-id="${statusId}">
+        <div class="axiom-status-card-main">
+          <span class="axiom-status-card-icon">${icon}</span>
+          <div>
+            <strong>${label}</strong>
+            <span>${stackLabel}</span>
+          </div>
+        </div>
+        ${button}
+      </div>
+    `;
+  }
+
+  static getStatusCardActionLabel(statusId) {
+    switch (statusId) {
+      case "burning": return game.i18n.localize("AXIOM.StatusCard.TakeDamage");
+      case "bleeding": return game.i18n.localize("AXIOM.StatusCard.ApplyBleeding");
+      case "stunned": return game.i18n.localize("AXIOM.StatusCard.Recover");
+      case "corroding": return game.i18n.localize("AXIOM.StatusCard.TakeDamage");
+      default: return "";
+    }
   }
 
   static async onCombatStart(combat) {
     if (!game.user?.isGM || !combat) return;
     await combat._restoreAllActionPoints?.();
+    await combat._resetAllMovementUsed?.();
     await this.onCombatTurnStart(combat);
   }
 
@@ -207,8 +355,6 @@ export default class AxiomCombat extends foundry.documents.Combat {
     extreme: -30,
     outOfRange: -40
   };
-
-  static STATUS_TEST_PENALTY_IDS = ["fatigue", "chilled", "entangled"];
 
   static getDodgeSkillName() {
     return this._getConfiguredSkillName(this.SETTINGS.dodgeSkillName, "Dodge");
@@ -398,23 +544,50 @@ export default class AxiomCombat extends foundry.documents.Combat {
     };
   }
 
+  static getTargetSizeModifier(targetToken) {
+    const size = Number(targetToken?.actor?.system?.size ?? 0);
+    return Number.isFinite(size) ? size * 5 : 0;
+  }
+
+  static getTargetSizeModifierRow(targetToken) {
+    const modifier = this.getTargetSizeModifier(targetToken);
+    if (modifier === 0) return null;
+
+    return {
+      id: "auto-target-size",
+      label: "AXIOM.Combat.TargetSize",
+      value: modifier,
+      active: true,
+      automatic: true,
+      locked: true,
+      targetSize: Number(targetToken?.actor?.system?.size ?? 0)
+    };
+  }
+
+  static _upsertAutomaticTargetModifier(rows, row, id) {
+    const existingIndex = rows.findIndex(existing => existing.id === id);
+
+    if (row) {
+      if (existingIndex >= 0) rows[existingIndex] = { ...rows[existingIndex], ...row, active: rows[existingIndex].active !== false };
+      else rows.push(row);
+    } else if (existingIndex >= 0 && rows[existingIndex].locked) {
+      rows.splice(existingIndex, 1);
+    }
+  }
+
   static applyTargetBasedAttackModifiers(state, targetToken) {
     const nextState = foundry.utils.deepClone(state ?? {});
     const attackerActor = game.actors?.get(nextState.actorId) ?? null;
     const weapon = attackerActor?.items?.get(nextState.itemId) ?? null;
     if (!attackerActor || !weapon || !targetToken?.actor) return nextState;
+
     const attackCategory = nextState.weaponInfo?.category ?? (isRangedWeaponItem(weapon) && !isMeleeWeaponItem(weapon) ? "ranged" : "melee");
-    if (attackCategory !== "ranged") return nextState;
-
-    const rangeRow = this.getRangeModifierRow({ attackerActor, weapon, targetToken });
     const rows = Array.isArray(nextState.modifierRows) ? [...nextState.modifierRows] : [];
-    const existingIndex = rows.findIndex(row => row.id === "auto-range");
 
-    if (rangeRow) {
-      if (existingIndex >= 0) rows[existingIndex] = { ...rows[existingIndex], ...rangeRow, active: rows[existingIndex].active !== false };
-      else rows.push(rangeRow);
-    } else if (existingIndex >= 0 && rows[existingIndex].locked) {
-      rows.splice(existingIndex, 1);
+    this._upsertAutomaticTargetModifier(rows, this.getTargetSizeModifierRow(targetToken), "auto-target-size");
+
+    if (attackCategory === "ranged") {
+      this._upsertAutomaticTargetModifier(rows, this.getRangeModifierRow({ attackerActor, weapon, targetToken }), "auto-range");
     }
 
     nextState.modifierRows = rows;
@@ -466,19 +639,37 @@ export default class AxiomCombat extends foundry.documents.Combat {
     return Number(actor?.system?.trackers?.momentum?.current ?? 0) * 5;
   }
 
+  static getStatusModifierRows(actor) {
+    if (!actor) return [];
+
+    return Object.values(CONFIG.AXIOM?.statuses ?? {})
+      .map(status => {
+        const perStack = Number(status.rollModifierPerStack ?? 0);
+        if (!Number.isFinite(perStack) || perStack === 0) return null;
+
+        const stacks = Number(actor.system?.statuses?.[status.id] ?? actor.getAxiomStatusValue?.(status.id) ?? 0);
+        if (!Number.isFinite(stacks) || stacks <= 0) return null;
+
+        return {
+          id: `auto-status-${status.id}`,
+          label: status.label,
+          value: perStack * stacks,
+          automatic: true,
+          locked: true
+        };
+      })
+      .filter(Boolean);
+  }
+
   static getStatusTestPenalty(actor) {
-    if (!actor) return 0;
-    return this.STATUS_TEST_PENALTY_IDS.reduce((total, statusId) => {
-      const value = Number(actor.system?.statuses?.[statusId] ?? actor.getAxiomStatusValue?.(statusId) ?? 0);
-      return total - (value * 5);
-    }, 0);
+    return this.getStatusModifierRows(actor).reduce((total, row) => total + Number(row.value ?? 0), 0);
   }
 
   static buildAutomaticModifierRows(actor, { includeCover = false } = {}) {
     const rows = [
       { id: "auto-wounds", label: "AXIOM.Roll.ModifierSources.WoundPenalty", value: this.getWoundPenalty(actor), automatic: true, locked: true },
       { id: "auto-momentum", label: "AXIOM.Roll.ModifierSources.Momentum", value: this.getMomentumModifier(actor), automatic: true, locked: true },
-      { id: "auto-statuses", label: "AXIOM.Roll.ModifierSources.StatusPenalty", value: this.getStatusTestPenalty(actor), automatic: true, locked: true }
+      ...this.getStatusModifierRows(actor)
     ];
 
     if (includeCover) {
@@ -499,7 +690,9 @@ export default class AxiomCombat extends foundry.documents.Combat {
   static getAttackData(state) {
     const rows = Array.isArray(state.modifierRows) ? state.modifierRows : [];
     const activeModifierTotal = rows.reduce((sum, row) => row.active === false ? sum : sum + Number(row.value ?? 0), 0);
-    const successTarget = Math.min(120, Math.max(5, Number(state.basePool ?? 0) + Number(state.difficulty ?? 0) + activeModifierTotal));
+    const calculatedSuccessTarget = AxiomRoll.normalizeSuccessTarget(Number(state.basePool ?? 0) + Number(state.difficulty ?? 0) + activeModifierTotal);
+    const hasManualSuccessTarget = state.manualSuccessTarget !== null && state.manualSuccessTarget !== undefined && state.manualSuccessTarget !== "";
+    const successTarget = hasManualSuccessTarget ? AxiomRoll.normalizeSuccessTarget(state.manualSuccessTarget) : calculatedSuccessTarget;
     const result = AxiomRoll.evaluateResult({ d100: state.d100, successTarget, hitModifier: Number(state.fateHitBonus ?? 0) });
     return { ...result, successTarget, activeModifierTotal };
   }
@@ -560,7 +753,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
       });
     }
     const modifierTotal = modifierRows.reduce((sum, row) => sum + Number(row.value ?? 0), 0);
-    const successTarget = Math.min(120, Math.max(5, parts.basePool + modifierTotal));
+    const successTarget = Math.min(150, Math.max(5, parts.basePool + modifierTotal));
     const result = AxiomRoll.evaluateResult({ d100: roll.total, successTarget });
     const attack = this.getAttackData(state);
     const blockShield = defenseType === "block" ? this.getPrimaryShieldBlockSkill(defender)?.shield : null;
@@ -901,7 +1094,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
         actorId: defenderToken?.actor?.id ?? "",
         name: defenderToken?.actor?.name ?? game.i18n.localize("AXIOM.Combat.NarrativeTarget")
       },
-      attack: this.serializeAttackForOpposition(attackState, attack)
+      attack: this.serializeAttackForOpposition(effectiveAttackState, attack)
     });
   }
 
@@ -1075,23 +1268,32 @@ export default class AxiomCombat extends foundry.documents.Combat {
   static async createOpposedTestCard({ attackMessage, attackState, defenderToken, assignedAfterRoll = false } = {}) {
     if (!attackMessage || !attackState || !defenderToken?.actor) return null;
 
-    const attack = this.getAttackData(attackState);
+    const ChatCard = game.axiom?.chat?.AxiomChatCard;
+    let effectiveAttackState = ChatCard ? ChatCard.normalizeState(attackState) : foundry.utils.deepClone(attackState);
+    effectiveAttackState.combatTarget = this.serializeCombatTarget(defenderToken, { assignedAfterRoll });
+    effectiveAttackState = this.applyTargetBasedAttackModifiers(effectiveAttackState, defenderToken);
+
+    if (ChatCard) {
+      await ChatCard.replaceMessageState(attackMessage, effectiveAttackState, { refreshLinkedResults: false });
+    }
+
+    const attack = this.getAttackData(effectiveAttackState);
     const data = this.normalizeOpposedData({
       id: foundry.utils.randomID(),
       attackMessageId: attackMessage.id,
       assignedAfterRoll,
-      attackType: attackState.weaponInfo?.category ?? "melee",
+      attackType: effectiveAttackState.weaponInfo?.category ?? "melee",
       attacker: {
-        actorId: attackState.actorId ?? "",
-        name: attackState.actorName ?? game.i18n.localize("AXIOM.RollCard.UnknownActor")
+        actorId: effectiveAttackState.actorId ?? "",
+        name: effectiveAttackState.actorName ?? game.i18n.localize("AXIOM.RollCard.UnknownActor")
       },
       weapon: {
-        itemId: attackState.itemId ?? "",
-        name: attackState.title ?? "",
-        damage: Number(attackState.weaponInfo?.damage ?? 0),
-        armorPenetration: Number(attackState.weaponInfo?.armorPenetration ?? 0),
-        damageModifier: Number(attackState.weaponInfo?.damageModifier ?? 0),
-        delivery: attackState.weaponInfo?.delivery ?? "kinetic"
+        itemId: effectiveAttackState.itemId ?? "",
+        name: effectiveAttackState.title ?? "",
+        damage: Number(effectiveAttackState.weaponInfo?.damage ?? 0),
+        armorPenetration: Number(effectiveAttackState.weaponInfo?.armorPenetration ?? 0),
+        damageModifier: Number(effectiveAttackState.weaponInfo?.damageModifier ?? 0),
+        delivery: effectiveAttackState.weaponInfo?.delivery ?? "kinetic"
       },
       defender: {
         tokenId: defenderToken.id,
@@ -1230,7 +1432,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
       locked: true
     });
     const modifierTotal = modifierRows.reduce((sum, row) => sum + Number(row.value ?? 0), 0);
-    const successTarget = Math.min(120, Math.max(5, parts.basePool + modifierTotal));
+    const successTarget = Math.min(150, Math.max(5, parts.basePool + modifierTotal));
     const result = AxiomRoll.evaluateResult({ d100: roll.total, successTarget });
 
     const defenseState = {
@@ -1559,6 +1761,13 @@ export default class AxiomCombat extends foundry.documents.Combat {
       });
       result.querySelector("[data-action='applyCombatResultWound']")?.addEventListener("click", event => this._onApplyCombatResultWound(event, message));
     }
+
+    const statusCard = element.querySelector?.(".axiom-chat-card.axiom-status-card");
+    if (statusCard) {
+      statusCard.querySelectorAll("[data-action='resolveStatus']").forEach(button => {
+        button.addEventListener("click", event => this._onResolveStatusCardAction(event, message));
+      });
+    }
   }
 
   static async _onCombatResultFieldChange(event, message) {
@@ -1582,6 +1791,139 @@ export default class AxiomCombat extends foundry.documents.Combat {
       woundApplied: true,
       appliedWound: { severity: applied.severity, slot: applied.slot, label: `AXIOM.Combat.Wounds.${applied.severity}` }
     });
+  }
+
+  static async _onResolveStatusCardAction(event, message) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!game.user?.isGM) return;
+
+    const button = event.currentTarget;
+    const statusId = button?.dataset?.statusId;
+    const actorId = message.getFlag?.("axiom", "actorId") ?? message.speaker?.actor;
+    const actor = actorId ? game.actors?.get(actorId) : null;
+    if (!actor || !statusId) return;
+
+    let result = null;
+    if (["burning", "corroding"].includes(statusId)) result = await this.resolveOngoingDamageStatus(actor, statusId);
+    else if (statusId === "bleeding") result = await this.resolveBleedingStatus(actor);
+    else if (statusId === "stunned") result = await this.resolveStunnedRecovery(actor);
+
+    if (!result) return;
+    await this.updateStatusCardRow(message, statusId, result);
+  }
+
+  static async resolveOngoingDamageStatus(actor, statusId) {
+    const stacks = this.getStatusStacks(actor, statusId);
+    if (stacks <= 0) return null;
+
+    const rawDamage = stacks * 2;
+    const armorPenetration = stacks * 2;
+    const armor = this.getArmorAtLocation(actor, "torso");
+    const effectiveArmor = Math.max(0, armor - armorPenetration);
+    const toughness = Number(actor.system?.subAttributes?.toughness ?? 0);
+    const finalDamage = Math.max(0, rawDamage - effectiveArmor - toughness);
+    const woundSeverity = this.getWoundSeverity(finalDamage);
+    let applied = null;
+
+    if (woundSeverity) {
+      applied = await this.applyWound({
+        defenderActorId: actor.id,
+        damage: { woundSeverity }
+      });
+    }
+
+    await actor.addStatus?.(statusId, 1);
+
+    return {
+      label: game.i18n.format("AXIOM.StatusCard.DamageResolved", {
+        finalDamage,
+        wound: woundSeverity ? game.i18n.localize(`AXIOM.Combat.Wounds.${applied?.severity ?? woundSeverity}`) : game.i18n.localize("AXIOM.Combat.NoWound")
+      }),
+      details: game.i18n.format("AXIOM.StatusCard.DamageFormula", {
+        rawDamage,
+        armor,
+        armorPenetration,
+        effectiveArmor,
+        toughness,
+        finalDamage
+      })
+    };
+  }
+
+  static async resolveBleedingStatus(actor) {
+    const stacks = this.getStatusStacks(actor, "bleeding");
+    if (stacks <= 0) return null;
+
+    let appliedCount = 0;
+    for (let index = 0; index < stacks; index += 1) {
+      const applied = await this.applyWound({ defenderActorId: actor.id, damage: { woundSeverity: "grazing" } });
+      if (applied) appliedCount += 1;
+    }
+
+    return {
+      label: game.i18n.format("AXIOM.StatusCard.BleedingResolved", { wounds: appliedCount }),
+      details: game.i18n.format("AXIOM.StatusCard.BleedingFormula", { stacks })
+    };
+  }
+
+  static async resolveStunnedRecovery(actor) {
+    const stacks = this.getStatusStacks(actor, "stunned");
+    if (stacks <= 0) return null;
+
+    const d100 = (await new Roll("1d100").evaluate()).total;
+    const basePool = AxiomRoll.calculateBasePool(actor, "fortitude", "resolve", 30);
+    const successTarget = AxiomRoll.normalizeSuccessTarget(basePool);
+    const result = AxiomRoll.evaluateResult({ d100, successTarget });
+    const recovered = Math.max(0, Number(result.hits ?? 0));
+    if (recovered > 0) await actor.removeStatus?.("stunned", recovered);
+    await this.clampActionPointsToEffectiveMax(actor);
+
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor }),
+      content: `
+        <article class="axiom-chat-card roll-card axiom-status-card axiom-status-recovery-card">
+          <header class="card-header">
+            <div class="card-title">
+              <strong>${game.i18n.localize("AXIOM.StatusCard.StunnedRecovery")}</strong>
+              <span>${foundry.utils.escapeHTML(actor.name ?? "")}</span>
+            </div>
+            <div class="card-badge">${AxiomRoll.formatD100(d100)} / ${successTarget}</div>
+          </header>
+          <section class="card-body">
+            <div class="axiom-status-card-result ${result.success ? "success" : "failure"}">
+              <span>${game.i18n.localize("AXIOM.RollCard.Hits")}</span>
+              <strong>${AxiomRoll.formatSigned(result.hits)}</strong>
+              <em>${game.i18n.localize(result.outcomeTierLabel)}</em>
+            </div>
+          </section>
+        </article>
+      `,
+      style: CONST.CHAT_MESSAGE_STYLES?.OTHER
+    });
+
+    return {
+      label: game.i18n.format("AXIOM.StatusCard.StunnedResolved", { recovered }),
+      details: game.i18n.format("AXIOM.StatusCard.StunnedFormula", { roll: AxiomRoll.formatD100(d100), target: successTarget })
+    };
+  }
+
+  static async updateStatusCardRow(message, statusId, result) {
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = message.content ?? "";
+    const row = wrapper.querySelector(`.axiom-status-card-row[data-status-id="${statusId}"]`);
+    if (!row) return;
+
+    row.classList.add("resolved");
+    const button = row.querySelector("button");
+    if (button) button.remove();
+
+    const note = document.createElement("div");
+    note.className = "axiom-status-card-resolution";
+    note.innerHTML = `<strong>${foundry.utils.escapeHTML(result.label ?? game.i18n.localize("AXIOM.StatusCard.Resolved"))}</strong>${result.details ? `<span>${foundry.utils.escapeHTML(result.details)}</span>` : ""}`;
+    row.append(note);
+
+    await message.update({ content: wrapper.innerHTML });
   }
 
   static _getConfiguredSkillName(settingKey, fallback) {

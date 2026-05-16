@@ -499,7 +499,7 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
     const effects = Array.from(this.item.effects ?? []).map(effect => ({
       id: effect.id,
       name: effect.name,
-      img: effect.img ?? effect.icon ?? "icons/svg/aura.svg",
+      img: effect.img ?? effect.icon ?? "systems/axiom/assets/icons/effect.svg",
       disabled: Boolean(effect.disabled)
     }));
 

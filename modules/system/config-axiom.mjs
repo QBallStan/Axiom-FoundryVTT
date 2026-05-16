@@ -94,7 +94,11 @@ const STATUSES = {
     icon: "fa-solid fa-star",
     category: "control",
     max: 3,
-    numbered: true
+    numbered: true,
+    changes: [
+      { key: "system.trackers.actionPoints.max", type: "subtract", value: 1, perStack: true },
+      { key: "system.subAttributes.movement", type: "multiply", value: 0.5 }
+    ]
   },
   chilled: {
     id: "chilled",
@@ -104,7 +108,12 @@ const STATUSES = {
     icon: "fa-solid fa-snowflake",
     category: "control",
     max: 4,
-    numbered: true
+    numbered: true,
+    rollModifierPerStack: -5,
+    changes: [
+      { key: "flags.axiom.rollModifiers.all", type: "add", value: -5, perStack: true },
+      { key: "system.subAttributes.movement", type: "subtract", value: 1, perStack: true }
+    ]
   },
   corroding: {
     id: "corroding",
@@ -124,7 +133,12 @@ const STATUSES = {
     icon: "fa-solid fa-link",
     category: "control",
     max: null,
-    numbered: true
+    numbered: true,
+    rollModifierPerStack: -5,
+    changes: [
+      { key: "flags.axiom.rollModifiers.all", type: "add", value: -5, perStack: true },
+      { key: "system.subAttributes.movement", type: "override", value: 0 }
+    ]
   },
   fatigue: {
     id: "fatigue",
@@ -134,7 +148,25 @@ const STATUSES = {
     icon: "fa-solid fa-bed",
     category: "control",
     max: 5,
-    numbered: true
+    numbered: true,
+    rollModifierPerStack: -5,
+    changes: [
+      { key: "flags.axiom.rollModifiers.all", type: "add", value: -5, perStack: true }
+    ]
+  },
+  sprinting: {
+    id: "sprinting",
+    label: "AXIOM.Actor.Statuses.Sprinting",
+    description: "AXIOM.Actor.StatusDescriptions.Sprinting",
+    img: `${AXIOM_STATUS_ICON_PATH}/sprint.svg`,
+    icon: "fa-solid fa-person-running",
+    category: "movement",
+    max: 3,
+    numbered: true,
+    rollModifierPerStack: -5,
+    changes: [
+      { key: "flags.axiom.rollModifiers.all", type: "add", value: -5, perStack: true }
+    ]
   },
   prone: {
     id: "prone",
@@ -218,19 +250,20 @@ const STATUSES = {
   }
 };
 
-function toStatusEffect(status) {
+function toStatusEffect(status, value = 1) {
   const effect = {
     id: status.id,
     name: status.label,
     description: status.description,
     img: status.img,
     statuses: [status.id],
+    changes: getStatusEffectChanges(status, value),
     flags: {
       axiom: {
         status: true,
         id: status.id,
         category: status.category,
-        value: status.numbered ? 1 : null,
+        value: status.numbered ? value : null,
         max: status.max,
         numbered: status.numbered
       }
@@ -239,6 +272,33 @@ function toStatusEffect(status) {
 
   if (status.overlay) effect.flags.core = { overlay: true };
   return effect;
+}
+
+export function getStatusEffectChanges(status, value = 1) {
+  const stacks = Math.max(1, Number(value) || 1);
+  return (status.changes ?? []).map(change => {
+    const type = String(change.type ?? "add").toLowerCase();
+    const baseValue = Number(change.value ?? 0);
+    const scaledValue = change.perStack ? baseValue * stacks : baseValue;
+    return {
+      key: change.key,
+      type,
+      value: String(scaledValue),
+      priority: Number(change.priority ?? getStatusEffectChangePriority(type))
+    };
+  });
+}
+
+function getStatusEffectChangePriority(type) {
+  switch (String(type ?? "add").toLowerCase()) {
+    case "multiply": return 10;
+    case "add":
+    case "subtract": return 20;
+    case "downgrade": return 30;
+    case "upgrade": return 40;
+    case "override": return 50;
+    default: return 20;
+  }
 }
 
 export const AXIOM = {

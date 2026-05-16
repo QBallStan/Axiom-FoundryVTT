@@ -66,9 +66,29 @@
         <em class="outcome-tier">{{localize card.outcomeTierLabel}}</em>
       </div>
 
-      <div class="result-side">
-        <span>{{localize "AXIOM.RollCard.Target"}}</span>
-        <strong>{{card.successTarget}}</strong>
+      <div class="result-side editable-roll-side editable-target-side">
+        <div class="roll-label-row">
+          <span>{{localize "AXIOM.RollCard.Target"}}</span>
+          <button
+            class="roll-edit-button"
+            type="button"
+            data-action="enableTargetEdit"
+            aria-label="{{localize 'AXIOM.RollCard.EditTarget'}}"
+            data-tooltip="{{localize 'AXIOM.RollCard.EditTarget'}}"
+          >
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+        </div>
+        <input
+          class="roll-value-input target-value-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="3"
+          value="{{card.targetInputValue}}"
+          data-action="editTargetValue"
+          aria-label="{{localize 'AXIOM.RollCard.EditTarget'}}"
+          readonly
+        />
       </div>
     </div>
 

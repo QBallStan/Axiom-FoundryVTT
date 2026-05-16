@@ -228,7 +228,8 @@
             "Skill": "Compétence",
             "Resource": "Ressource",
             "Custom": "Clé personnalisée",
-            "AttributeCheck": "Test d’attribut"
+            "AttributeCheck": "Test d’attribut",
+            "SubAttribute": "Sous-attribut"
           },
           "Targets": {
             "GrazingWoundsMax": "Emplacements de blessures superficielles",
@@ -243,10 +244,13 @@
             "FateMax": "Fate maximum",
             "ActionPointsCurrent": "Points d’action actuels",
             "ActionPointsMax": "Points d’action maximum",
-            "MomentumCurrent": "Momentum actuel",
-            "MomentumMax": "Momentum maximum",
             "Size": "Taille",
-            "Custom": "Personnalisé"
+            "Custom": "Personnalisé",
+            "Movement": "Mouvement",
+            "Initiative": "Initiative",
+            "DamageModifier": "Modificateur de dégâts",
+            "Toughness": "Robustesse",
+            "CorruptionThreshold": "Seuil de corruption"
           },
           "Title": "Ajouter un effet Axiom",
           "Name": "Nom de l’effet",
@@ -312,7 +316,8 @@
         "Dead": "Mort",
         "LightCover": "Couvert léger",
         "MediumCover": "Couvert moyen",
-        "HeavyCover": "Couvert lourd"
+        "HeavyCover": "Couvert lourd",
+        "Sprinting": "Sprint"
       },
       "StatusDescriptions": {
         "Burning": "En feu. Au début de chaque tour, subit 2 dégâts létaux par cumul. La Brûlure augmente de 1 cumul par tour jusqu’à extinction.",
@@ -328,7 +333,8 @@
         "Dead": "Mort.",
         "LightCover": "Partiellement protégé par le terrain ou un obstacle. Ajoute +10 à la défense contre les tirs à distance lorsque le couvert s’applique.",
         "MediumCover": "Bien protégé par le terrain ou un obstacle. Ajoute +20 à la défense contre les tirs à distance lorsque le couvert s’applique.",
-        "HeavyCover": "Presque entièrement protégé par le terrain ou un obstacle. Ajoute +30 à la défense contre les tirs à distance lorsque le couvert s’applique."
+        "HeavyCover": "Presque entièrement protégé par le terrain ou un obstacle. Ajoute +30 à la défense contre les tirs à distance lorsque le couvert s’applique.",
+        "Sprinting": "Déplacement à pleine vitesse. Chaque cumul impose -5 aux tests jusqu’à la fin du round, jusqu’à 3 cumuls."
       },
       "Combat": {
         "EquippedArmor": "Armure",
@@ -568,7 +574,8 @@
         "RightArm": "Bras droit",
         "LeftLeg": "Jambe gauche",
         "RightLeg": "Jambe droite"
-      }
+      },
+      "EditTarget": "Modifier le nombre cible"
     },
     "Armor": {
       "Locations": {
@@ -807,7 +814,11 @@
       "ForceNext": "Forcer le combattant suivant",
       "SmartAdvanceHint": "Avance selon les règles de passes et de PA d’Axiom. Si ce combattant n’a pas dépensé de PA, il perd 1 PA.",
       "ForceNextHint": "Ignore le filtrage des passes par PA et passe au combattant suivant dans l’ordre d’initiative.",
-      "PassLabel": "Passe {pass}"
+      "PassLabel": "Passe {pass}",
+      "Movement": "Mouvement",
+      "MovementShort": "Mvt",
+      "MovementHint": "Clic gauche : dépenser 1 m. Clic droit : ajouter 1 m disponible.",
+      "MovementExceeded": "{name} s’est déplacé de {moved} m mais n’avait plus que {remaining} m disponible."
     },
     "Shield": {
       "Skill": "Compétence",
@@ -820,6 +831,22 @@
         "Medium": "Moyen",
         "Heavy": "Lourd"
       }
+    },
+    "StatusCard": {
+      "Title": "États de début de tour",
+      "Badge": "État",
+      "Stacks": "{stacks} cumul(s)",
+      "TakeDamage": "Subir les dégâts",
+      "ApplyBleeding": "Appliquer les blessures",
+      "Recover": "Récupérer",
+      "Resolved": "Résolu",
+      "DamageResolved": "{finalDamage} dégâts finaux, {wound}",
+      "DamageFormula": "{rawDamage} dégâts - {effectiveArmor} armure effective ({armor} armure, PA {armorPenetration}) - {toughness} Résistance = {finalDamage}",
+      "BleedingResolved": "{wounds} Blessure(s) superficielle(s) appliquée(s)",
+      "BleedingFormula": "Saignement {stacks} : 1 blessure superficielle par cumul",
+      "StunnedRecovery": "Récupération Sonné",
+      "StunnedResolved": "{recovered} cumul(s) récupéré(s)",
+      "StunnedFormula": "Jet de Vigueur {roll} contre {target}"
     }
   },
   "TYPES": {

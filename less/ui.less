@@ -165,22 +165,40 @@
   clear: both;
 }
 
+.combat-sidebar .combat-tracker .token-name {
+  width: 115px;
+  overflow-wrap: break-word;
+  flex: 0;
+}
+
 /* Combat tracker AP pips */
 #combat-tracker,
 .combat-tracker,
 .sidebar-tab.combat-sidebar {
   .combatant,
   .combatant-row {
+    .axiom-combatant-resources {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+      width: max-content;
+      margin: 2px 0 0;
+    }
+
     .axiom-combatant-ap {
       display: flex;
       align-items: center;
+      justify-content: flex-start;
       gap: 4px;
-      margin: 2px 0 0;
+      width: 100%;
+      margin: 0;
       color: var(--axiom-muted, #a7a198);
       font-size: 10px;
       line-height: 1;
       cursor: pointer;
       user-select: none;
+      padding: 2px 6px;
     }
 
     .axiom-combatant-ap-label {
@@ -2223,5 +2241,65 @@ dialog.axiom-genre-tags-app {
   .axiom-tag-option span {
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+}
+
+/* Combat tracker movement tracker */
+#combat-tracker,
+.combat-tracker,
+.sidebar-tab.combat-sidebar {
+  .combatant,
+  .combatant-row {
+    .axiom-combatant-movement {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 5px;
+      width: 100%;
+      min-width: 100%;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 2px 6px;
+      background: rgba(16, 16, 18, 0.42);
+      border: 1px solid rgba(95, 183, 215, 0.28);
+      border-radius: 4px;
+      color: var(--axiom-muted, #a7a198);
+      font-family: "Roboto Mono", Consolas, monospace;
+      font-size: 10px;
+      line-height: 1;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .axiom-combatant-movement-label {
+      color: var(--axiom-blue, #5fb7d7);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .axiom-combatant-movement-value {
+      min-width: 24px;
+      color: var(--axiom-text, #e8e4dc);
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .axiom-combatant-movement.over {
+      border-color: var(--axiom-accent, #c73a32);
+      box-shadow: 0 0 5px rgba(199, 58, 50, 0.32);
+    }
+
+    .axiom-combatant-movement.over .axiom-combatant-movement-label,
+    .axiom-combatant-movement.over .axiom-combatant-movement-value {
+      color: var(--axiom-accent, #c73a32);
+    }
+
+    .axiom-combatant-movement:hover,
+    .axiom-combatant-movement:focus {
+      border-color: var(--axiom-gold, #d8c69a);
+      color: var(--axiom-gold, #d8c69a);
+    }
   }
 }

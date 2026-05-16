@@ -1,3 +1,5 @@
+import { getStatusEffectChanges } from "../system/config-axiom.mjs";
+
 const { Actor } = foundry.documents;
 
 export default class AxiomActor extends Actor {
@@ -26,6 +28,25 @@ export default class AxiomActor extends Actor {
     if (!bar1) tokenUpdates["prototypeToken.bar1.attribute"] = "trackers.momentum";
     if (!bar2) tokenUpdates["prototypeToken.bar2.attribute"] = "trackers.actionPoints";
 
+    const tokenDispositions = globalThis.CONST?.TOKEN_DISPOSITIONS ?? {};
+    const hasExplicitActorLink = foundry.utils.getProperty(data, "prototypeToken.actorLink") !== undefined;
+    const hasExplicitDisposition = foundry.utils.getProperty(data, "prototypeToken.disposition") !== undefined;
+    const hasExplicitLockRotation = foundry.utils.getProperty(data, "prototypeToken.lockRotation") !== undefined;
+
+    if (this.type === "protagonist" && !hasExplicitActorLink) {
+      tokenUpdates["prototypeToken.actorLink"] = true;
+    }
+
+    if (!hasExplicitDisposition) {
+      if (this.type === "protagonist") {
+        tokenUpdates["prototypeToken.disposition"] = tokenDispositions.FRIENDLY ?? 1;
+      } else if (this.type === "npc") {
+        tokenUpdates["prototypeToken.disposition"] = tokenDispositions.HOSTILE ?? -1;
+      }
+    }
+
+    if (!hasExplicitLockRotation) tokenUpdates["prototypeToken.lockRotation"] = true;
+
     if (!Object.hasOwn(tokenUpdates, "prototypeToken.displayBars")) {
       const displayBars = foundry.utils.getProperty(data, "prototypeToken.displayBars")
         ?? foundry.utils.getProperty(this, "prototypeToken.displayBars");
@@ -39,6 +60,11 @@ export default class AxiomActor extends Actor {
 
   prepareData() {
     super.prepareData();
+
+    // Derived sub-attributes are formulas, so native Active Effects applied earlier
+    // can be overwritten by the calculation pass. Re-run only that calculation
+    // after Foundry has finished applying actor and transferred item effects.
+    this.system?.computeDerivedSubAttributes?.();
   }
 
 
@@ -308,6 +334,7 @@ export default class AxiomActor extends Actor {
       description: game.i18n.localize(status.description),
       img: status.img,
       statuses: [status.id],
+      changes: getStatusEffectChanges(status, value),
       "flags.axiom.status": true,
       "flags.axiom.id": status.id,
       "flags.axiom.category": status.category,

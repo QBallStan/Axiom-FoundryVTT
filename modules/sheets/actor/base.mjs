@@ -776,7 +776,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       .map(({ id, effect, source }) => ({
       id,
       name: effect.name,
-      img: effect.img ?? effect.icon ?? "icons/svg/aura.svg",
+      img: effect.img ?? effect.icon ?? "systems/axiom/assets/icons/effect.svg",
       disabled: Boolean(effect.disabled),
       conditional: Boolean(effect.getFlag?.("axiom", "conditional")),
       cssClass: [effect.disabled ? "inactive" : "", effect.getFlag?.("axiom", "conditional") ? "conditional" : ""].filter(Boolean).join(" "),
@@ -824,11 +824,14 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       return { key, label, base, adv, mod, max, total };
     };
 
+
     const readTracker = (key, fallback) => {
       const data = trackers[key] ?? fallback;
-      const current = Number(data.current ?? fallback.current);
+      const rawCurrent = Number(data.current ?? fallback.current);
       const min = Number(data.min ?? fallback.min);
-      const max = Number(data.max ?? fallback.max);
+      const rawMax = Number(data.max ?? fallback.max);
+      const max = Number.isFinite(rawMax) ? rawMax : fallback.max;
+      const current = Math.min(Number.isFinite(rawCurrent) ? rawCurrent : fallback.current, max);
 
       return {
         current,
@@ -1059,6 +1062,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
 
 
 
+
   async _onAdjustTracker(event) {
     event.preventDefault();
     event.stopPropagation();
@@ -1071,7 +1075,8 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
 
     const current = Number(data.current ?? 0);
     const min = Number(data.min ?? 0);
-    const max = Number(data.max ?? 0);
+    const rawMax = Number(data.max ?? 0);
+    const max = Number.isFinite(rawMax) ? rawMax : 0;
     const direction = event.type === "contextmenu" ? 1 : -1;
     const next = Math.min(max, Math.max(min, current + direction));
 

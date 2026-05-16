@@ -72,6 +72,9 @@ export default class AxiomChatCard {
       d100: AxiomRoll.normalizeD100(state.d100 ?? 1),
       basePool: Number(state.basePool ?? 0),
       difficulty: Number(state.difficulty ?? 0),
+      manualSuccessTarget: state.manualSuccessTarget === null || state.manualSuccessTarget === undefined || state.manualSuccessTarget === ""
+        ? null
+        : AxiomRoll.normalizeSuccessTarget(state.manualSuccessTarget),
       modifierRows,
       timeframeOnly: Boolean(state.timeframeOnly),
       timeframe,
@@ -114,7 +117,9 @@ export default class AxiomChatCard {
 
     const activeModifierTotal = normalized.modifierRows.reduce((sum, row) => row.active === false ? sum : sum + Number(row.value ?? 0), 0);
     const rawSuccessTarget = normalized.basePool + normalized.difficulty + activeModifierTotal;
-    const successTarget = Math.min(120, Math.max(5, rawSuccessTarget));
+    const calculatedSuccessTarget = AxiomRoll.normalizeSuccessTarget(rawSuccessTarget);
+    const hasManualSuccessTarget = normalized.manualSuccessTarget !== null && normalized.manualSuccessTarget !== undefined;
+    const successTarget = hasManualSuccessTarget ? normalized.manualSuccessTarget : calculatedSuccessTarget;
     const result = AxiomRoll.evaluateResult({ d100: normalized.d100, successTarget, hitModifier: normalized.fateHitBonus });
 
     const modifierRows = normalized.modifierRows.map(row => ({
@@ -156,6 +161,10 @@ export default class AxiomChatCard {
       ...result,
       rollDisplay: AxiomRoll.formatD100(normalized.d100),
       rollInputValue: normalized.d100 === 100 ? "00" : String(normalized.d100).padStart(2, "0"),
+      targetInputValue: String(successTarget),
+      hasManualSuccessTarget,
+      calculatedSuccessTarget,
+      manualSuccessTargetDisplay: hasManualSuccessTarget ? String(successTarget) : "",
       timeframeLabel: normalized.timeframe?.label ?? "",
       timeframeFormula: normalized.timeframe?.formulaLabel ?? "",
       timeframeDie: normalized.timeframe?.die ?? 0,
@@ -229,7 +238,8 @@ export default class AxiomChatCard {
     const card = element.querySelector?.(".axiom-chat-card.roll-card");
     if (!card) return;
 
-    card.querySelector("[data-action='enableRollEdit']")?.addEventListener("click", event => this._onEnableRollEdit(event));
+    card.querySelector("[data-action='enableRollEdit']")?.addEventListener("click", event => this._onEnableInlineEdit(event, "editRollValue"));
+    card.querySelector("[data-action='enableTargetEdit']")?.addEventListener("click", event => this._onEnableInlineEdit(event, "editTargetValue"));
 
     const rollInput = card.querySelector("[data-action='editRollValue']");
     rollInput?.addEventListener("change", event => this._onEditRollValue(event, message));
@@ -239,6 +249,18 @@ export default class AxiomChatCard {
       event.currentTarget.blur();
     });
     rollInput?.addEventListener("blur", event => {
+      event.currentTarget.readOnly = true;
+      event.currentTarget.closest(".editable-roll-side")?.classList.remove("editing");
+    });
+
+    const targetInput = card.querySelector("[data-action='editTargetValue']");
+    targetInput?.addEventListener("change", event => this._onEditTargetValue(event, message));
+    targetInput?.addEventListener("keydown", event => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      event.currentTarget.blur();
+    });
+    targetInput?.addEventListener("blur", event => {
       event.currentTarget.readOnly = true;
       event.currentTarget.closest(".editable-roll-side")?.classList.remove("editing");
     });
@@ -273,12 +295,12 @@ export default class AxiomChatCard {
     element.classList.add("axiom-initiative-message");
   }
 
-  static _onEnableRollEdit(event) {
+  static _onEnableInlineEdit(event, action) {
     event.preventDefault();
     event.stopPropagation();
 
     const side = event.currentTarget.closest(".editable-roll-side");
-    const input = side?.querySelector("[data-action='editRollValue']");
+    const input = side?.querySelector(`[data-action='${action}']`);
     if (!input) return;
 
     side.classList.add("editing");
@@ -292,6 +314,13 @@ export default class AxiomChatCard {
     const value = AxiomRoll.normalizeD100(event.currentTarget.value);
     const detailsOpen = Boolean(event.currentTarget.closest(".axiom-chat-card.roll-card")?.querySelector("details.breakdown")?.open);
     await this.updateMessageState(message, { d100: value, detailsOpen, combatResult: null });
+  }
+
+  static async _onEditTargetValue(event, message) {
+    event.preventDefault();
+    const value = AxiomRoll.normalizeSuccessTarget(event.currentTarget.value);
+    const detailsOpen = Boolean(event.currentTarget.closest(".axiom-chat-card.roll-card")?.querySelector("details.breakdown")?.open);
+    await this.updateMessageState(message, { manualSuccessTarget: value, detailsOpen, combatResult: null });
   }
 
   static async _onToggleModifier(event, message) {

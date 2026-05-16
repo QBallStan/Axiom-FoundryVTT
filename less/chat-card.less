@@ -1142,3 +1142,109 @@
   margin: 0;
   background: transparent;
 }
+
+.axiom-chat-card.axiom-status-card {
+  .axiom-status-card-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+    padding: 7px 8px;
+    background: var(--axiom-panel);
+    border: 1px solid var(--axiom-border);
+    border-radius: 6px;
+
+    &:last-child { margin-bottom: 0; }
+    &.resolved { border-color: rgba(216, 198, 154, 0.45); }
+  }
+
+  .axiom-status-card-main {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    min-width: 0;
+
+    strong {
+      display: block;
+      color: var(--axiom-text);
+      font-size: 12px;
+    }
+
+    span {
+      color: var(--axiom-muted);
+      font-size: 11px;
+    }
+  }
+
+  .axiom-status-card-icon {
+    display: grid;
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+    place-items: center;
+    border: 1px solid rgba(216, 198, 154, 0.25);
+    border-radius: 5px;
+    background: var(--axiom-panel-3);
+    color: var(--axiom-accent);
+  }
+
+  .axiom-status-card-button {
+    min-width: 88px;
+    padding: 4px 8px;
+    border: 1px solid rgba(216, 198, 154, 0.35);
+    border-radius: 5px;
+    background: #121216;
+    color: var(--axiom-gold);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+
+    &:hover,
+    &:focus {
+      border-color: rgba(216, 198, 154, 0.65);
+      background: #1d1d23;
+    }
+  }
+
+  .axiom-status-card-resolution {
+    grid-column: 1 / -1;
+    margin-top: 2px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(216, 198, 154, 0.18);
+
+    strong,
+    span {
+      display: block;
+      font-size: 11px;
+    }
+
+    strong { color: var(--axiom-gold); }
+    span { color: var(--axiom-muted); }
+  }
+
+  .axiom-status-card-result {
+    padding: 8px;
+    background: var(--axiom-panel);
+    border: 1px solid var(--axiom-border);
+    border-radius: 6px;
+    text-align: center;
+
+    span,
+    em {
+      display: block;
+      color: var(--axiom-muted);
+      font-size: 11px;
+    }
+
+    strong {
+      display: block;
+      color: var(--axiom-gold);
+      font-family: "Roboto Mono", Consolas, monospace;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    &.failure strong { color: var(--axiom-accent); }
+  }
+}
