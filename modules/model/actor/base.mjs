@@ -18,6 +18,13 @@ export default class AxiomActorBaseData extends foundry.abstract.TypeDataModel {
         initial: 0,
       }),
       trackers: new fields.EmbeddedDataField(AxiomTrackersModel),
+      combat: new fields.SchemaField({
+        multipleAttackPenalty: new fields.NumberField({
+          required: true,
+          integer: true,
+          initial: -20,
+        }),
+      }),
       wounds: new fields.EmbeddedDataField(AxiomWoundsModel),
       subAttributes: new fields.SchemaField({
         movement: new fields.NumberField({
@@ -66,6 +73,7 @@ export default class AxiomActorBaseData extends foundry.abstract.TypeDataModel {
         entangled: new fields.NumberField({ required: true, integer: true, min: 0, initial: 0 }),
         fatigue: new fields.NumberField({ required: true, integer: true, min: 0, max: 5, initial: 0 }),
         sprinting: new fields.NumberField({ required: true, integer: true, min: 0, max: 3, initial: 0 }),
+        distracted: new fields.NumberField({ required: true, integer: true, min: 0, max: 4, initial: 0 }),
         prone: new fields.NumberField({ required: true, integer: true, min: 0, max: 1, initial: 0 }),
         fear: new fields.NumberField({ required: true, integer: true, min: 0, max: 1, initial: 0 }),
         lightCover: new fields.NumberField({ required: true, integer: true, min: 0, max: 1, initial: 0 }),
@@ -85,6 +93,7 @@ export default class AxiomActorBaseData extends foundry.abstract.TypeDataModel {
     this.wounds.compute();
     this.computeDerivedSubAttributes();
     this.computeDerivedTrackers();
+    this.computeDerivedCombat();
   }
 
   computeDerivedSubAttributes() {
@@ -117,18 +126,56 @@ export default class AxiomActorBaseData extends foundry.abstract.TypeDataModel {
     );
   }
 
+  computeDerivedCombat() {
+    const combat = this.combat;
+    if (!combat) return;
+
+    const sourcePenalty = foundry.utils.getProperty(this.parent?._source, "system.combat.multipleAttackPenalty");
+    const rawPenalty = Number(sourcePenalty ?? combat.multipleAttackPenalty ?? -20);
+    const basePenalty = Number.isFinite(rawPenalty) ? rawPenalty : -20;
+    combat.multipleAttackPenalty = this.applyDerivedActiveEffects(basePenalty, "system.combat.multipleAttackPenalty");
+  }
+
   computeDerivedTrackers() {
+    const fate = this.trackers?.fate;
+    if (fate) {
+      const current = Number(fate.current ?? fate.value ?? 0);
+      const rawMax = Number(fate.max ?? 0);
+      const max = Number.isFinite(rawMax) ? Math.max(0, rawMax) : 0;
+      fate.max = max;
+      if (Number.isFinite(current)) fate.current = Math.min(Math.max(Number(fate.min ?? 0), current), max);
+      fate.value = fate.current;
+    }
+
     const actionPoints = this.trackers?.actionPoints;
-    if (!actionPoints) return;
+    if (actionPoints) {
+      const sourceMax = foundry.utils.getProperty(this.parent?._source, "system.trackers.actionPoints.max");
+      const rawMax = Number(sourceMax ?? actionPoints.max ?? 0);
+      const baseMax = Number.isFinite(rawMax) ? Math.max(0, rawMax) : 0;
+      const effectiveMax = this.applyDerivedActiveEffects(baseMax, "system.trackers.actionPoints.max");
+      actionPoints.max = baseMax > 0 ? Math.max(1, effectiveMax) : Math.max(0, effectiveMax);
 
-    const sourceMax = foundry.utils.getProperty(this.parent?._source, "system.trackers.actionPoints.max");
-    const rawMax = Number(sourceMax ?? actionPoints.max ?? 0);
-    const baseMax = Number.isFinite(rawMax) ? Math.max(0, rawMax) : 0;
-    const effectiveMax = this.applyDerivedActiveEffects(baseMax, "system.trackers.actionPoints.max");
-    actionPoints.max = baseMax > 0 ? Math.max(1, effectiveMax) : Math.max(0, effectiveMax);
+      const current = Number(actionPoints.current ?? actionPoints.value ?? 0);
+      if (Number.isFinite(current)) actionPoints.current = Math.min(current, actionPoints.max);
+      actionPoints.value = actionPoints.current;
+    }
 
-    const current = Number(actionPoints.current ?? 0);
-    if (Number.isFinite(current)) actionPoints.current = Math.min(current, actionPoints.max);
+    const momentum = this.trackers?.momentum;
+    if (momentum) {
+      const defaultMax = this.parent?.type === "npc" ? 1 : 3;
+      const sourceMax = foundry.utils.getProperty(this.parent?._source, "system.trackers.momentum.max");
+      const storedMax = Number(sourceMax ?? momentum.max ?? defaultMax);
+      // Older sheets stored Momentum as -5 to +5. Treat that legacy max as the
+      // new default unless the actor has been explicitly customized.
+      const baseMax = Number.isFinite(storedMax) && storedMax !== 5 ? Math.max(0, storedMax) : defaultMax;
+      const effectiveMax = this.applyDerivedActiveEffects(baseMax, "system.trackers.momentum.max");
+      momentum.min = 0;
+      momentum.max = Math.max(0, effectiveMax);
+
+      const current = Number(momentum.current ?? momentum.value ?? 0);
+      if (Number.isFinite(current)) momentum.current = Math.min(Math.max(0, current), momentum.max);
+      momentum.value = momentum.current;
+    }
   }
 
   applyDerivedActiveEffects(baseValue, key) {

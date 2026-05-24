@@ -27,6 +27,12 @@ const SUB_ATTRIBUTE_TARGETS = [
   { id: "corruptionThreshold", label: "AXIOM.Actor.Effects.Builder.Targets.CorruptionThreshold", key: "system.subAttributes.corruptionThreshold" }
 ];
 
+
+const COMBAT_TARGETS = [
+  { id: "multipleAttackPenalty", label: "AXIOM.Actor.Effects.Builder.Targets.MultipleAttackPenalty", key: "system.combat.multipleAttackPenalty" },
+  { id: "momentumMax", label: "AXIOM.Actor.Effects.Builder.Targets.MomentumMax", key: "system.trackers.momentum.max" }
+];
+
 const WOUND_TARGETS = [
   { id: "grazingMax", label: "AXIOM.Actor.Effects.Builder.Targets.GrazingWoundsMax", key: "system.wounds.grazing.max" },
   { id: "minorMax", label: "AXIOM.Actor.Effects.Builder.Targets.MinorWoundsMax", key: "system.wounds.minor.max" },
@@ -69,6 +75,7 @@ const TARGET_TYPES = [
   { id: "subAttribute", label: "AXIOM.Actor.Effects.Builder.TargetTypes.SubAttribute" },
   { id: "resource", label: "AXIOM.Actor.Effects.Builder.TargetTypes.Resource" },
   { id: "wound", label: "AXIOM.Actor.Effects.Builder.TargetTypes.Wound" },
+  { id: "combat", label: "AXIOM.Actor.Effects.Builder.TargetTypes.Combat" },
   { id: "custom", label: "AXIOM.Actor.Effects.Builder.TargetTypes.Custom" }
 ];
 
@@ -205,6 +212,7 @@ function getTargets(targetGroups, type) {
   if (type === "subAttribute") return targetGroups.subAttribute;
   if (type === "resource") return targetGroups.resource;
   if (type === "wound") return targetGroups.wound;
+  if (type === "combat") return targetGroups.combat;
   return [{ id: "custom", label: "AXIOM.Actor.Effects.Builder.Targets.Custom", key: "" }];
 }
 
@@ -386,7 +394,8 @@ export default class AxiomEffectBuilder {
       attributeCheck: getAttributeCheckTargets(),
       subAttribute: SUB_ATTRIBUTE_TARGETS,
       resource: RESOURCE_TARGETS,
-      wound: WOUND_TARGETS
+      wound: WOUND_TARGETS,
+      combat: COMBAT_TARGETS
     };
 
     const onPromptChange = event => {

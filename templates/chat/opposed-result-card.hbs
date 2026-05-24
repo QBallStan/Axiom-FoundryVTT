@@ -1,0 +1,18 @@
+<article class="axiom-chat-card opposed-result-card {{card.outcomeCss}}" data-opposed-result-id="{{card.id}}">
+  <section class="card-body">
+    <div class="opposed-result-focus {{card.outcomeCss}}">
+      <span>{{localize "AXIOM.Combat.Winner"}}</span>
+      <strong>{{card.winnerName}}</strong>
+      <em>{{localize "AXIOM.Combat.NetHits"}} {{card.netHitsDisplay}}</em>
+      {{#if card.momentumGain}}
+        <small class="opposed-result-momentum">
+          {{#if card.momentumGain.gained}}
+            {{localize "AXIOM.Combat.Momentum.GainedBy" actor=card.momentumGain.actorName}}
+          {{else}}
+            {{localize "AXIOM.Combat.Momentum.CappedBy" actor=card.momentumGain.actorName}}
+          {{/if}}
+        </small>
+      {{/if}}
+    </div>
+  </section>
+</article>

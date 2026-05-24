@@ -46,24 +46,41 @@
         "NoDetails": "No ammunition-specific fields yet."
       },
       "QuantityControlHint": "Left click -1. Right click +1. Hold Shift for 5, Shift+Ctrl for 10.",
-      "Tags": {
-        "Label": "Tags",
-        "Configure": "Configure Tags",
-        "Hint": "Select every tag that applies to this item. These tags are stored for later filtering.",
-        "Clear": "Clear Tags",
-        "Primitive": "Primitive",
-        "Ancient": "Ancient",
-        "Medieval": "Medieval",
-        "Renaissance": "Renaissance",
-        "Industrial": "Industrial",
-        "Modern": "Modern",
-        "NearFuture": "Near-Future",
-        "Cyberpunk": "Cyberpunk",
-        "SciFi": "Sci-Fi",
-        "PostApocalyptic": "Post-Apocalyptic",
-        "Fantasy": "Fantasy",
-        "Horror": "Horror",
-        "Universal": "Universal"
+      "TechLevel": {
+        "Label": "TL",
+        "Option": "TL {level} - {name}",
+        "Names": {
+          "0": "Primitive",
+          "1": "Bronze Age",
+          "2": "Iron Age",
+          "3": "Medieval",
+          "4": "Renaissance",
+          "5": "Industrial",
+          "6": "Mechanized",
+          "7": "Atomic",
+          "8": "Digital",
+          "9": "Near-Future",
+          "10": "Interplanetary",
+          "11": "Stellar",
+          "12": "Ultra-Tech"
+        },
+        "Descriptions": {
+          "0": "Stone, bone, wood, fire, hides, simple tools, oral tradition, no formal industry.",
+          "1": "Agriculture, cities, writing, bronze tools and weapons, wheeled vehicles, sailboats, early organized states.",
+          "2": "Iron tools and weapons, coinage, roads, empires, siege engines, large-scale administration.",
+          "3": "Steel weapons, castles, guilds, universities, windmills, heavy horses, mail and plate armor, early firearms in late TL3.",
+          "4": "Printing, advanced navigation, global trade, clockwork, muskets, pikes, naval artillery, scientific instruments.",
+          "5": "Steam power, railroads, telegraph, factories, mass production, early repeating firearms, ironclads, vaccines.",
+          "6": "Automobiles, aircraft, radio, telephones, smokeless powder, automatic weapons, tanks, antibiotics.",
+          "7": "Nuclear power, mainframe computers, television, jet aircraft, satellites, guided weapons, organ transplants.",
+          "8": "Personal computers, global networks, smartphones, drones, advanced batteries, biotechnology, smart weapons.",
+          "9": "Advanced AI, augmented reality, robotics, cybernetics, smart materials, combat drones, tissue engineering.",
+          "10": "Routine orbital industry, fusion or equivalent power, fast interplanetary travel, habitats, advanced energy weapons.",
+          "11": "Interstellar travel, mature AI, artificial bodies, portable fusion, advanced nanotech, living machines.",
+          "12": "Matter fabrication, extreme biotech, self-repairing materials, post-human tech, near post-scarcity infrastructure."
+        },
+        "Configure": "Configure Tech Level",
+        "Hint": "Choose the item's technology level."
       }
     },
     "Skill": {
@@ -79,7 +96,9 @@
         "Melee": "Melee",
         "Marksmanship": "Marksmanship",
         "Athletics": "Athletics"
-      }
+      },
+      "LevelShort": "Lv",
+      "TargetShort": "ST"
     },
     "Actor": {
       "Skills": {
@@ -103,6 +122,14 @@
           "Grip": "Grip",
           "MemoryAcademic": "Memory (Academic)",
           "MemoryStreetwise": "Memory (Streetwise)"
+        },
+        "Sort": {
+          "Label": "Sort skills",
+          "Alphabetical": "Sort alphabetically",
+          "LevelHigh": "Sort by highest level",
+          "LevelLow": "Sort by lowest level",
+          "TargetHigh": "Sort by highest Success Target",
+          "TargetLow": "Sort by lowest Success Target"
         }
       },
       "Tabs": {
@@ -229,7 +256,8 @@
             "Resource": "Resource",
             "Custom": "Custom Key",
             "AttributeCheck": "Attribute Check",
-            "SubAttribute": "Sub-Attribute"
+            "SubAttribute": "Sub-Attribute",
+            "Combat": "Combat"
           },
           "Targets": {
             "GrazingWoundsMax": "Grazing Wound Slots",
@@ -250,7 +278,8 @@
             "Initiative": "Initiative",
             "DamageModifier": "Damage Modifier",
             "Toughness": "Toughness",
-            "CorruptionThreshold": "Corruption Threshold"
+            "CorruptionThreshold": "Corruption Threshold",
+            "MultipleAttackPenalty": "Multiple Attack Penalty"
           },
           "Title": "Add Axiom Effect",
           "Name": "Effect Name",
@@ -317,7 +346,8 @@
         "LightCover": "Light Cover",
         "MediumCover": "Medium Cover",
         "HeavyCover": "Heavy Cover",
-        "Sprinting": "Sprinting"
+        "Sprinting": "Sprinting",
+        "Distracted": "Distracted"
       },
       "StatusDescriptions": {
         "Burning": "On fire. At the start of each turn, suffer 2 lethal damage per stack. Burning worsens by 1 stack each turn until extinguished.",
@@ -334,12 +364,13 @@
         "LightCover": "Partially protected by terrain or obstruction. Adds +10 to defense against ranged fire when cover applies.",
         "MediumCover": "Well protected by terrain or obstruction. Adds +20 to defense against ranged fire when cover applies.",
         "HeavyCover": "Mostly protected by terrain or obstruction. Adds +30 to defense against ranged fire when cover applies.",
-        "Sprinting": "Moving at full speed. Each stack applies -5 to tests for the rest of the round, up to 3 stacks."
+        "Sprinting": "Moving at full speed. Each stack applies -5 to tests for the rest of the round, up to 3 stacks.",
+        "Distracted": "Thrown off by confusion, disorientation, sensory overload, feints, suppressive pressure, or sudden disruption. Each stack applies -5 to all tests. At the start of the character’s next turn, all stacks are removed unless the source persists."
       },
       "Combat": {
         "EquippedArmor": "Armor",
-        "MeleeWeapons": "Melee Weapons",
-        "RangedWeapons": "Ranged Weapons",
+        "MeleeWeapons": "Melee",
+        "RangedWeapons": "Ranged",
         "Ammunition": "Ammunition",
         "Armor": "Armor",
         "Attack": "Attack",
@@ -354,7 +385,7 @@
         "Shields": "Shields",
         "NoShields": "No shields.",
         "Weapons": "Weapons",
-        "MixedWeapons": "Mixed Weapons",
+        "MixedWeapons": "Mixed",
         "NoWeapons": "No weapons"
       },
       "NPC": {
@@ -370,6 +401,9 @@
         "Morale": "Morale",
         "Treasure": "Treasure",
         "GmNotes": "GM Notes"
+      },
+      "Config": {
+        "Title": "Character Configuration"
       }
     },
     "Roll": {
@@ -403,15 +437,18 @@
         "Custom": "Custom Modifier",
         "Equipment": "Equipment",
         "StatusPenalty": "Status Penalties",
-        "ConditionalEffect": "Conditional Effect"
+        "ConditionalEffect": "Conditional Effect",
+        "MultipleAttacks": "Multiple Attacks"
       },
       "Timeframes": {
         "None": "No Timeframe",
         "Seconds": "1d6 Seconds",
         "CombatRounds": "1d6 Combat Rounds",
         "TenSeconds": "1d6 × 10 Seconds",
+        "ThirtySeconds": "1d6 × 30 Seconds",
         "Minutes": "1d6 Minutes",
         "TenMinutes": "1d6 × 10 Minutes",
+        "ThirtyMinutes": "1d6 × 30 Minutes",
         "Hours": "1d6 Hours",
         "FourHours": "1d6 × 4 Hours",
         "TenHours": "1d6 × 10 Hours",
@@ -575,7 +612,12 @@
         "LeftLeg": "Left Leg",
         "RightLeg": "Right Leg"
       },
-      "EditTarget": "Edit target number"
+      "EditTarget": "Edit target number",
+      "Oppose": "Oppose",
+      "OpposedWaiting": "Opposing",
+      "SelectOneOpposingToken": "Select exactly one token to oppose this roll.",
+      "OpposingTokenHasNoActor": "The selected opposing token has no actor.",
+      "OpposedRollArmed": "The next roll from {actor} will oppose this roll."
     },
     "Armor": {
       "Locations": {
@@ -610,7 +652,8 @@
         "Short": "Short",
         "Medium": "Medium",
         "Long": "Long",
-        "Extreme": "Extreme"
+        "Extreme": "Extreme",
+        "Close": "Close"
       },
       "Ammo": "Ammo",
       "SkillPlaceholder": "Enter skill name or choose from actor skills",
@@ -677,7 +720,15 @@
       "RangedSkill": "Ranged Skill",
       "ParryBonus": "Parry Bonus",
       "Shots": "Shots",
-      "QuantityDisplay": "Qty {quantity}"
+      "QuantityDisplay": "Qty {quantity}",
+      "StrengthBasedRange": "Strength-based range",
+      "StrengthRangeModifier": "STR modifier",
+      "RangeFormula": {
+        "Fixed": "Effective Range: {range}m",
+        "Strength": "Effective Range: STR {modifier} = {range}m"
+      },
+      "StrengthBasedRangeShort": "STR-base range",
+      "StrengthRangeModifierShort": "STR mod"
     },
     "Equipment": {
       "Skill": "Skill",
@@ -746,11 +797,14 @@
         "medium": "Medium Range",
         "long": "Long Range",
         "extreme": "Extreme Range",
-        "outOfRange": "Beyond Extreme Range"
+        "outOfRange": "Beyond Extreme Range",
+        "close": "Close Range"
       },
       "AssignOpponent": "Assign Opponent",
+      "OpposedResult": "Opposed Result",
       "OpposedTest": "Opposed Test",
       "Pending": "Pending",
+      "Resolved": "Resolved",
       "MeleeAttack": "Melee Attack",
       "RangedAttack": "Ranged Attack",
       "Attacker": "Attacker",
@@ -765,7 +819,23 @@
       "SelectOrTargetDefender": "Select or target one defender before resolving combat.",
       "CalculatedFinalDamage": "Calculated Final Damage",
       "ManualFinalDamage": "Manual Final Damage",
-      "OutOfAmmo": "Out of ammo: {weapon}."
+      "OutOfAmmo": "Out of ammo: {weapon}.",
+      "Winner": "Winner",
+      "NoVictor": "No Victor",
+      "Result": "Result",
+      "Resolution": "Resolution",
+      "OpposedMargin": "Margin",
+      "AttackerWins": "Attacker Wins",
+      "DefenderWins": "Defender Wins",
+      "OpposedStalemate": "Stalemate",
+      "UnopposedSuccess": "Unopposed Success",
+      "UnopposedFailure": "Unopposed Failure",
+      "TieBreakerHits": "Hits Compared",
+      "TieBreakerUnits": "Units Digit",
+      "TieBreakerComplication": "Complication Tie-Break",
+      "TieBreakerStalemate": "Exact Tie",
+      "TieBreakerUnopposed": "Attack Roll",
+      "TieBreakerUnopposedFailure": "Attack Failed"
     },
     "Currency": {
       "DefaultName": "Credits",
@@ -868,5 +938,27 @@
   "AXIOM.Combat.BlockWith": "Block with {shield}",
   "AXIOM.Roll.ModifierSources.ShieldBlock": "Shield Block",
   "AXIOM.Shield.NoSkillSelectedWarning": "{shield} uses {skill}, but that skill could not be found on this actor.",
-  "AXIOM.Combat.NoShieldAvailable": "{actor} has no equipped shield."
+  "AXIOM.Combat.NoShieldAvailable": "{actor} has no equipped shield.",
+  "Combat": {
+    "Momentum": {
+      "PressTheAdvantage": "Press the Advantage",
+      "Counterattack": "Counterattack",
+      "AvoidOpenings": "Avoid Openings",
+      "Insufficient": "Not enough Momentum.",
+      "Gained": "Momentum +1",
+      "Capped": "Momentum maxed",
+      "PressTheAdvantageModifier": "Press the Advantage (+10)",
+      "GainedBy": "{actor} gains +1 Momentum.",
+      "CappedBy": "{actor} is already at maximum Momentum."
+    }
+  },
+  "Actor": {
+    "Effects": {
+      "Builder": {
+        "Targets": {
+          "MomentumMax": "Momentum Max"
+        }
+      }
+    }
+  }
 }

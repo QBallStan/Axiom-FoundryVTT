@@ -1,11 +1,20 @@
 <section class="tab-section skills-tab">
   <div class="skills-layout">
     <section class="skill-column">
-      <h2 class="section-title"><i class="fa-solid fa-list-check"></i> {{localize "AXIOM.Actor.Skills.Core"}}</h2>
+      <div class="section-title-row skill-section-header">
+        <h2 class="section-title"><i class="fa-solid fa-list-check"></i> {{localize "AXIOM.Actor.Skills.Core"}}</h2>
+        <div class="skill-sort-actions" aria-label="{{localize 'AXIOM.Actor.Skills.Sort.Label'}}">
+          <button class="skill-sort-button" type="button" data-action="sortSkills" data-sort="nameAsc" title="{{localize 'AXIOM.Actor.Skills.Sort.Alphabetical'}}" aria-label="{{localize 'AXIOM.Actor.Skills.Sort.Alphabetical'}}"><i class="fa-solid fa-arrow-down-a-z"></i></button>
+          <button class="skill-sort-button" type="button" data-action="sortSkills" data-sort="levelDesc" title="{{localize 'AXIOM.Actor.Skills.Sort.LevelHigh'}}" aria-label="{{localize 'AXIOM.Actor.Skills.Sort.LevelHigh'}}"><i class="fa-solid fa-arrow-down-wide-short"></i><span>{{localize 'AXIOM.Skill.LevelShort'}}</span></button>
+          <button class="skill-sort-button" type="button" data-action="sortSkills" data-sort="levelAsc" title="{{localize 'AXIOM.Actor.Skills.Sort.LevelLow'}}" aria-label="{{localize 'AXIOM.Actor.Skills.Sort.LevelLow'}}"><i class="fa-solid fa-arrow-up-short-wide"></i><span>{{localize 'AXIOM.Skill.LevelShort'}}</span></button>
+          <button class="skill-sort-button" type="button" data-action="sortSkills" data-sort="totalDesc" title="{{localize 'AXIOM.Actor.Skills.Sort.TargetHigh'}}" aria-label="{{localize 'AXIOM.Actor.Skills.Sort.TargetHigh'}}"><i class="fa-solid fa-arrow-down-wide-short"></i><span>{{localize 'AXIOM.Skill.TargetShort'}}</span></button>
+          <button class="skill-sort-button" type="button" data-action="sortSkills" data-sort="totalAsc" title="{{localize 'AXIOM.Actor.Skills.Sort.TargetLow'}}" aria-label="{{localize 'AXIOM.Actor.Skills.Sort.TargetLow'}}"><i class="fa-solid fa-arrow-up-short-wide"></i><span>{{localize 'AXIOM.Skill.TargetShort'}}</span></button>
+        </div>
+      </div>
 
-      <div class="skill-list">
+      <div class="skill-list skill-scroll-list" data-sortable-skills>
         {{#each skillTab.core}}
-          <div class="skill-row" data-skill-id="{{id}}">
+          <div class="skill-row" data-skill-id="{{id}}" data-skill-name="{{name}}" data-skill-level="{{level}}" data-skill-total="{{total}}">
             <div class="skill-main">
               <span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span>
               <span class="skill-attributes">{{attributesLabel}}</span>
@@ -86,11 +95,20 @@
         {{/each}}
       </div>
 
-      <h2 class="section-title expertise-title"><i class="fa-solid fa-star"></i> {{localize "AXIOM.Actor.Skills.Expertise"}}</h2>
+      <div class="section-title-row skill-section-header expertise-title">
+        <h2 class="section-title"><i class="fa-solid fa-star"></i> {{localize "AXIOM.Actor.Skills.Expertise"}}</h2>
+        <div class="skill-sort-actions" aria-label="{{localize 'AXIOM.Actor.Skills.Sort.Label'}}">
+          <button class="skill-sort-button" type="button" data-action="sortSkills" data-sort="nameAsc" title="{{localize 'AXIOM.Actor.Skills.Sort.Alphabetical'}}" aria-label="{{localize 'AXIOM.Actor.Skills.Sort.Alphabetical'}}"><i class="fa-solid fa-arrow-down-a-z"></i></button>
+          <button class="skill-sort-button" type="button" data-action="sortSkills" data-sort="levelDesc" title="{{localize 'AXIOM.Actor.Skills.Sort.LevelHigh'}}" aria-label="{{localize 'AXIOM.Actor.Skills.Sort.LevelHigh'}}"><i class="fa-solid fa-arrow-down-wide-short"></i><span>{{localize 'AXIOM.Skill.LevelShort'}}</span></button>
+          <button class="skill-sort-button" type="button" data-action="sortSkills" data-sort="levelAsc" title="{{localize 'AXIOM.Actor.Skills.Sort.LevelLow'}}" aria-label="{{localize 'AXIOM.Actor.Skills.Sort.LevelLow'}}"><i class="fa-solid fa-arrow-up-short-wide"></i><span>{{localize 'AXIOM.Skill.LevelShort'}}</span></button>
+          <button class="skill-sort-button" type="button" data-action="sortSkills" data-sort="totalDesc" title="{{localize 'AXIOM.Actor.Skills.Sort.TargetHigh'}}" aria-label="{{localize 'AXIOM.Actor.Skills.Sort.TargetHigh'}}"><i class="fa-solid fa-arrow-down-wide-short"></i><span>{{localize 'AXIOM.Skill.TargetShort'}}</span></button>
+          <button class="skill-sort-button" type="button" data-action="sortSkills" data-sort="totalAsc" title="{{localize 'AXIOM.Actor.Skills.Sort.TargetLow'}}" aria-label="{{localize 'AXIOM.Actor.Skills.Sort.TargetLow'}}"><i class="fa-solid fa-arrow-up-short-wide"></i><span>{{localize 'AXIOM.Skill.TargetShort'}}</span></button>
+        </div>
+      </div>
 
-      <div class="skill-list">
+      <div class="skill-list skill-scroll-list expertise-skill-list" data-sortable-skills>
         {{#each skillTab.expertise}}
-          <div class="skill-row" data-skill-id="{{id}}">
+          <div class="skill-row" data-skill-id="{{id}}" data-skill-name="{{name}}" data-skill-level="{{level}}" data-skill-total="{{total}}">
             <div class="skill-main">
               <span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span>
               <span class="skill-attributes">{{attributesLabel}}</span>

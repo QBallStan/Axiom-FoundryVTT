@@ -1,7 +1,7 @@
 import AxiomRoll from "../system/rolls/axiom-roll.mjs";
 import AxiomChatCard from "../system/rolls/chat-card.mjs";
 import AxiomCombat from "../system/combat.mjs";
-import { getWeaponCategory, isMeleeWeaponItem, isRangedWeaponItem, isWeaponItem } from "../system/items.mjs";
+import { getWeaponCategory, getWeaponRange, isMeleeWeaponItem, isRangedWeaponItem, isWeaponItem } from "../system/items.mjs";
 
 const { ApplicationV2, DialogV2, HandlebarsApplicationMixin } = foundry.applications.api;
 const { mergeObject } = foundry.utils;
@@ -29,8 +29,10 @@ const TIMEFRAMES = [
   { key: "seconds", label: "AXIOM.Roll.Timeframes.Seconds", formulaLabel: "1d6 Seconds", multiplier: 1, unit: "AXIOM.Roll.TimeframeUnits.Seconds" },
   { key: "combatRounds", label: "AXIOM.Roll.Timeframes.CombatRounds", formulaLabel: "1d6 Combat Rounds", multiplier: 1, unit: "AXIOM.Roll.TimeframeUnits.CombatRounds" },
   { key: "tenSeconds", label: "AXIOM.Roll.Timeframes.TenSeconds", formulaLabel: "1d6 × 10 Seconds", multiplier: 10, unit: "AXIOM.Roll.TimeframeUnits.Seconds" },
+  { key: "thirtySeconds", label: "AXIOM.Roll.Timeframes.ThirtySeconds", formulaLabel: "1d6 × 30 Seconds", multiplier: 30, unit: "AXIOM.Roll.TimeframeUnits.Seconds" },
   { key: "minutes", label: "AXIOM.Roll.Timeframes.Minutes", formulaLabel: "1d6 Minutes", multiplier: 1, unit: "AXIOM.Roll.TimeframeUnits.Minutes" },
   { key: "tenMinutes", label: "AXIOM.Roll.Timeframes.TenMinutes", formulaLabel: "1d6 × 10 Minutes", multiplier: 10, unit: "AXIOM.Roll.TimeframeUnits.Minutes" },
+  { key: "thirtyMinutes", label: "AXIOM.Roll.Timeframes.ThirtyMinutes", formulaLabel: "1d6 × 30 Minutes", multiplier: 30, unit: "AXIOM.Roll.TimeframeUnits.Minutes" },
   { key: "hours", label: "AXIOM.Roll.Timeframes.Hours", formulaLabel: "1d6 Hours", multiplier: 1, unit: "AXIOM.Roll.TimeframeUnits.Hours" },
   { key: "fourHours", label: "AXIOM.Roll.Timeframes.FourHours", formulaLabel: "1d6 × 4 Hours", multiplier: 4, unit: "AXIOM.Roll.TimeframeUnits.Hours" },
   { key: "tenHours", label: "AXIOM.Roll.Timeframes.TenHours", formulaLabel: "1d6 × 10 Hours", multiplier: 10, unit: "AXIOM.Roll.TimeframeUnits.Hours" },
@@ -153,6 +155,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
     const testType = this.rollData.testType ?? "skill";
     const sourceType = this.rollData.sourceType ?? "";
 
+    if (testType === "defense" || sourceType === "combat-defense") return 0;
     if (sourceType === "item" || testType === "item" || testType === "weapon") return 2;
     if (item && item.type !== "skill") return 2;
     if (testType === "skill" || item?.type === "skill") return 1;
@@ -775,6 +778,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
 
     if (!this._validateActionPointCost()) return;
     if (!this._validateAmmunition()) return;
+    if (!await this._spendMomentumForRoll()) return;
     const difficultyKey = this.rollData.difficulty ?? "average";
     const timeframeKey = this.rollData.timeframe ?? "none";
     let timeframeResult = this._getStoredTimeframeResult(timeframeKey);
@@ -803,6 +807,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
     const message = await this._createChatCard(result);
     await this._spendAmmunition();
     await this._spendActionPoints();
+    if (this._isWeaponRoll()) await AxiomCombat.registerWeaponAttack(this.rollData.actor);
 
     if (this.rollData.combatDefense) {
       await AxiomCombat.waitForDiceAnimation(message);
@@ -848,7 +853,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
         state: item.system?.state ?? "carried",
         delivery: item.system?.delivery ?? "",
         reach: Number(item.system?.reach ?? 0),
-        range: Number(item.system?.range ?? 0),
+        range: getWeaponRange(item, actor),
         ammo: Number(item.system?.ammo ?? 0),
         ammoContainer: Number(item.system?.ammoContainer ?? 0),
         reloadMethod: normalizeWeaponReloadMethod(item.system?.reloadMethod)
@@ -1013,7 +1018,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
     for (let index = rows.length - 1; index >= 0; index -= 1) {
       const row = rows[index];
       const rowId = String(row?.id ?? "");
-      if (row?.automatic && (rowId.startsWith("auto-") || rowId.startsWith("effect-")) && !automaticIds.has(row.id)) rows.splice(index, 1);
+      if (row?.automatic && (rowId.startsWith("auto-") || rowId.startsWith("effect-") || rowId.startsWith("momentum-")) && !automaticIds.has(row.id)) rows.splice(index, 1);
     }
 
     for (const automaticRow of automaticRows) {
@@ -1058,13 +1063,6 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
         locked: true
       },
       {
-        id: "auto-momentum",
-        label: "AXIOM.Roll.ModifierSources.Momentum",
-        value: this._getMomentumModifier(),
-        automatic: true,
-        locked: true
-      },
-      {
         id: "auto-equipment",
         label: "AXIOM.Roll.ModifierSources.Equipment",
         value: this._getEquipmentModifier(),
@@ -1073,6 +1071,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
       },
       ...AxiomCombat.getStatusModifierRows(this.rollData.actor),
       ...this._getCombatAutomaticModifierRows(),
+      ...(this._getPressAdvantageRow() ? [this._getPressAdvantageRow()] : []),
       ...this._getEffectModifierRows()
     ];
   }
@@ -1080,10 +1079,10 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
   _getAutomaticModifierValue(id) {
     switch (id) {
       case "auto-wounds": return this._getWoundPenalty();
-      case "auto-momentum": return this._getMomentumModifier();
-      case "auto-equipment": return this._getEquipmentModifier();
+            case "auto-equipment": return this._getEquipmentModifier();
       case "auto-statuses": return this._getStatusPenalty();
       case "auto-range": return this._getRangeModifierValue();
+      case "auto-multiple-attacks": return this._getMultipleAttackPenalty();
       case "auto-target-size": return this._getTargetSizeModifier();
       case "auto-cover": return AxiomCombat.getCoverBonus(this.rollData.actor);
       case "auto-shield-block": return Number(this.rollData.combatDefense?.shield?.blockValue ?? 0);
@@ -1234,8 +1233,43 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
   }
 
   _getMomentumModifier() {
-    const momentum = Number(this.rollData.actor?.system?.trackers?.momentum?.current ?? 0);
-    return momentum * 5;
+    return 0;
+  }
+
+  _isCombatRoll() {
+    const sourceType = this.rollData.sourceType ?? "";
+    const testType = this.rollData.testType ?? "";
+    return this._isWeaponRoll() || sourceType === "combat-defense" || testType === "defense" || Boolean(this.rollData.combatDefense);
+  }
+
+  _getPressAdvantageRow() {
+    if (!this._isCombatRoll()) return null;
+    if (!AxiomCombat.canSpendMomentum(this.rollData.actor, 1)) return null;
+    const existing = (this.rollData.modifierRows ?? []).find(row => row.id === "momentum-press-advantage");
+    return {
+      id: "momentum-press-advantage",
+      label: "AXIOM.Combat.Momentum.PressTheAdvantageModifier",
+      value: 10,
+      active: existing?.active === true,
+      automatic: true,
+      locked: true,
+      conditional: true,
+      spendMomentum: 1
+    };
+  }
+
+  async _spendMomentumForRoll() {
+    const rows = this.rollData.modifierRows ?? [];
+    const rollSpend = rows.reduce((total, row) => row.active === false ? total : total + Number(row.spendMomentum ?? 0), 0);
+    const counterattackSpend = this.rollData.combatDefense?.defenseType === "counterattack" ? 1 : 0;
+    const cost = rollSpend + counterattackSpend;
+    if (cost <= 0) return true;
+    if (AxiomCombat.canSpendMomentum(this.rollData.actor, cost)) {
+      await AxiomCombat.spendMomentum(this.rollData.actor, cost);
+      return true;
+    }
+    ui.notifications?.warn(game.i18n.localize("AXIOM.Combat.Momentum.Insufficient"));
+    return false;
   }
 
   _getEquipmentModifier() {
@@ -1261,6 +1295,19 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
       });
     }
 
+    const multipleAttackPenalty = this._getMultipleAttackPenalty();
+    if (multipleAttackPenalty !== 0) {
+      rows.push({
+        id: "auto-multiple-attacks",
+        label: "AXIOM.Roll.ModifierSources.MultipleAttacks",
+        value: multipleAttackPenalty,
+        active: true,
+        automatic: true,
+        locked: true,
+        conditional: true
+      });
+    }
+
     const target = Array.from(game.user?.targets ?? [])[0] ?? null;
     const sizeRow = AxiomCombat.getTargetSizeModifierRow(target);
     if (sizeRow) rows.push(sizeRow);
@@ -1280,6 +1327,11 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
 
   _getRangeModifierValue() {
     return Number(this._getRangeModifier()?.modifier ?? 0);
+  }
+
+  _getMultipleAttackPenalty() {
+    if (!this._isWeaponRoll()) return 0;
+    return AxiomCombat.getMultipleAttackPenalty(this.rollData.actor);
   }
 
   _getTargetSizeModifier() {

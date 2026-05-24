@@ -1,5 +1,5 @@
 <header class="sheet-header">
-  <div class="sheet-top">
+  <div class="sheet-top protagonist-sheet-top">
     <input
       class="name-input"
       name="name"
@@ -7,7 +7,27 @@
       value="{{actor.name}}"
       placeholder="{{localize 'AXIOM.Actor.NamePlaceholder'}}"
     />
+    {{#if isGM}}
+      <button class="actor-config-button" type="button" data-action="toggleActorConfig" title="{{localize 'AXIOM.Actor.Config.Title'}}">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+    {{/if}}
   </div>
+
+  {{#if isGM}}
+  <section class="actor-config-panel" data-actor-config-panel hidden>
+    <h3 class="section-title"><i class="fa-solid fa-sliders"></i> {{localize "AXIOM.Actor.Config.Title"}}</h3>
+    <div class="actor-config-grid">
+      <label><span>{{localize "AXIOM.Actor.NPC.GrazingSlots"}}</span><input type="number" name="system.wounds.grazing.max" value="{{system.wounds.grazing.max}}" min="0" max="5" step="1" /></label>
+      <label><span>{{localize "AXIOM.Actor.NPC.MinorSlots"}}</span><input type="number" name="system.wounds.minor.max" value="{{system.wounds.minor.max}}" min="0" max="5" step="1" /></label>
+      <label><span>{{localize "AXIOM.Actor.NPC.MajorSlots"}}</span><input type="number" name="system.wounds.major.max" value="{{system.wounds.major.max}}" min="0" max="5" step="1" /></label>
+      <label><span>{{localize "AXIOM.Actor.NPC.CriticalSlots"}}</span><input type="number" name="system.wounds.critical.max" value="{{system.wounds.critical.max}}" min="0" max="5" step="1" /></label>
+      <label><span>{{localize "AXIOM.Actor.NPC.ActionPoints"}}</span><input type="number" name="system.trackers.actionPoints.max" value="{{system.trackers.actionPoints.max}}" min="0" max="6" step="1" /></label>
+      <label><span>{{localize "AXIOM.Actor.Trackers.Fate"}}</span><input type="number" name="system.trackers.fate.max" value="{{system.trackers.fate.max}}" min="0" max="6" step="1" /></label>
+      <label><span>{{localize "AXIOM.Actor.Main.Size"}}</span><input type="number" name="system.size" value="{{system.size}}" min="-5" max="8" step="1" /></label>
+    </div>
+  </section>
+  {{/if}}
 
   <div class="identity-row">
     <div class="portrait">
@@ -112,6 +132,7 @@
         </section>
         <section class="panel tracker">
           <h3 class="tracker-title"><i class="fa-solid fa-gauge-high"></i> {{localize "AXIOM.Actor.Trackers.Momentum"}}</h3>
+          <div class="momentum-current-value">{{mock.trackers.momentum.current}}</div>
           <div class="momentum-line">
             <span>{{mock.trackers.momentum.min}}</span>
             <input
@@ -121,9 +142,8 @@
               max="{{mock.trackers.momentum.max}}"
               value="{{mock.trackers.momentum.current}}"
             />
-            <span>+{{mock.trackers.momentum.max}}</span>
+            <span>{{mock.trackers.momentum.max}}</span>
           </div>
-          <div class="momentum-value">{{mock.trackers.momentum.current}}</div>
         </section>
       </aside>
     </div>

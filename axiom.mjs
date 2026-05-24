@@ -114,6 +114,66 @@ async function migrateWorldActiveEffectChangeTypes() {
   for (const document of documents) await migrateActiveEffectChangeTypes(document);
 }
 
+function shouldUpdateAxiomBar(attribute, desired, legacyAlternates = []) {
+  if (!attribute) return true;
+  if (attribute === desired) return false;
+  return legacyAlternates.includes(attribute);
+}
+
+async function migrateTrackerResourceBars() {
+  if (!game.user?.isGM) return;
+
+  const actorUpdates = [];
+  for (const actor of game.actors ?? []) {
+    if (!["protagonist", "npc"].includes(actor.type)) continue;
+
+    const update = {};
+    for (const tracker of ["fate", "actionPoints", "momentum"]) {
+      const current = foundry.utils.getProperty(actor._source, `system.trackers.${tracker}.current`);
+      const value = foundry.utils.getProperty(actor._source, `system.trackers.${tracker}.value`);
+      if (current !== undefined && value !== current) {
+        update[`system.trackers.${tracker}.value`] = current;
+      }
+    }
+
+    const bar1 = actor.prototypeToken?.bar1?.attribute;
+    const bar2 = actor.prototypeToken?.bar2?.attribute;
+    if (shouldUpdateAxiomBar(bar1, "trackers.actionPoints", ["trackers.momentum", "trackers.actionPoints.current"])) {
+      update["prototypeToken.bar1"] = { attribute: "trackers.actionPoints" };
+    }
+    if (shouldUpdateAxiomBar(bar2, "trackers.momentum", ["trackers.actionPoints", "trackers.momentum.current"])) {
+      update["prototypeToken.bar2"] = { attribute: "trackers.momentum" };
+    }
+
+    if (Object.keys(update).length) actorUpdates.push(actor.update(update, { render: false }));
+  }
+
+  await Promise.all(actorUpdates);
+
+  const sceneUpdates = [];
+  for (const scene of game.scenes ?? []) {
+    const tokenUpdates = [];
+    for (const token of scene.tokens ?? []) {
+      const actor = token.actor;
+      if (!["protagonist", "npc"].includes(actor?.type)) continue;
+
+      const update = { _id: token.id };
+      const bar1 = token.bar1?.attribute;
+      const bar2 = token.bar2?.attribute;
+      if (shouldUpdateAxiomBar(bar1, "trackers.actionPoints", ["trackers.momentum", "trackers.actionPoints.current"])) {
+        update.bar1 = { attribute: "trackers.actionPoints" };
+      }
+      if (shouldUpdateAxiomBar(bar2, "trackers.momentum", ["trackers.actionPoints", "trackers.momentum.current"])) {
+        update.bar2 = { attribute: "trackers.momentum" };
+      }
+      if (Object.keys(update).length > 1) tokenUpdates.push(update);
+    }
+    if (tokenUpdates.length) sceneUpdates.push(scene.updateEmbeddedDocuments("Token", tokenUpdates, { render: false }));
+  }
+
+  await Promise.all(sceneUpdates);
+}
+
 Hooks.once("init", async function () {
   console.log("AXIOM//CORE | Initializing system");
 
@@ -126,7 +186,8 @@ Hooks.once("init", async function () {
     applications: { AxiomRollWindow },
     rolls: { AxiomRoll },
     chat: { AxiomChatCard },
-    combat: AxiomCombat
+    combat: AxiomCombat,
+    pendingOpposedRoll: null
   };
   CONFIG.AXIOM = AXIOM;
   configureAxiomStatusEffects(AXIOM);
@@ -217,6 +278,7 @@ Hooks.once("ready", async function () {
   configureAxiomStatusEffects(AXIOM);
   patchAxiomTokenStatusStackNumbers();
   await migrateWorldActiveEffectChangeTypes();
+  await migrateTrackerResourceBars();
   console.log("AXIOM//CORE | Ready");
 });
 
@@ -252,6 +314,8 @@ registerAxiomCombatTracker();
 registerAxiomTokenOverlays();
 registerAxiomMovementTracking();
 Hooks.on("combatStart", combat => AxiomCombat.onCombatStart(combat));
+Hooks.on("preDeleteCombat", combat => AxiomCombat.onCombatEnd(combat));
+Hooks.on("deleteCombat", combat => AxiomCombat.onCombatEnd(combat));
 Hooks.on("updateCombat", async (combat, changed) => {
   const turnChanged = foundry.utils.hasProperty(changed, "turn");
   const roundChanged = foundry.utils.hasProperty(changed, "round");
@@ -275,6 +339,7 @@ async function preloadTemplates() {
     "systems/axiom/templates/apps/roll-window.hbs",
     "systems/axiom/templates/chat/roll-card.hbs",
     "systems/axiom/templates/chat/opposed-test-card.hbs",
+    "systems/axiom/templates/chat/opposed-result-card.hbs",
     "systems/axiom/templates/chat/combat-result-card.hbs",
     "systems/axiom/templates/sheets/item/partials/header.hbs",
     "systems/axiom/templates/sheets/item/partials/tabs.hbs",

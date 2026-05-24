@@ -11,6 +11,8 @@ export default class AxiomMeleeWeaponData extends AxiomWeaponBaseData {
       ...this.commonWeaponFields({ category: "melee" }),
       reach: new fields.NumberField({ required: true, integer: true, min: 0, initial: 1 }),
       range: new fields.NumberField({ required: true, integer: true, min: 0, initial: 0 }),
+      strengthBasedRange: new fields.BooleanField({ required: true, initial: false }),
+      strengthRangeModifier: new fields.NumberField({ required: true, integer: true, initial: 0 }),
       ammo: new fields.NumberField({ required: true, integer: true, min: 0, initial: 0 }),
       ammoContainer: new fields.NumberField({ required: true, integer: true, min: 0, initial: 0 }),
       ammunition: new fields.StringField({ required: false, blank: true, initial: "" }),

@@ -1,18 +1,21 @@
 const WOUND_ORDER = ["grazing", "minor", "major", "critical"];
-const AXIOM_BAR_NAME = "axiom-token-bars";
+const AXIOM_OVERLAY_NAME = "axiom-token-overlays";
+const AXIOM_TOKEN_BAR_PATCH = Symbol.for("axiom.tokenBars.patch");
+const PENDING_NPC_DEATH_MARKS = new Set();
 
 const COLORS = {
   black: 0x040506,
   border: 0xe0d4b8,
   text: 0xf1e8ce,
   marker: 0xf7f0dd,
-  goldTop: 0xf3e9cc,
-  goldMid: 0xc5af78,
-  goldBottom: 0x7b6740,
+  goldTop: 0xfff2c0,
+  goldMid: 0xd8a537,
+  goldBottom: 0x7a4e12,
   empty: 0xe0d4b8,
-  grazing: 0x2fbf71,
-  minor: 0xf0d34d,
-  major: 0xf08a2a,
+  woundOutline: 0x160807,
+  grazing: 0xd6a935,
+  minor: 0xe26d28,
+  major: 0xa4492c,
   critical: 0xb51e24,
 };
 
@@ -27,7 +30,7 @@ const MOMENTUM_GRADIENT = [
 ];
 
 export function registerAxiomTokenOverlays() {
-  patchAxiomTokenBarDrawing();
+  patchAxiomTokenBars();
 
   Hooks.on("refreshToken", (token) => drawAxiomTokenOverlays(token));
   Hooks.on("drawToken", (token) => drawAxiomTokenOverlays(token));
@@ -36,57 +39,43 @@ export function registerAxiomTokenOverlays() {
     refreshTokenDocumentOverlay(tokenDocument),
   );
   Hooks.on("canvasReady", () => {
-    registerMomentumCanvasPointerHandler();
+    patchAxiomTokenBars();
     refreshSceneTokenOverlays();
+    refreshSceneTokenBars();
   });
 
   Hooks.on("updateActor", (actor, changed) => {
     if (!isAxiomActor(actor)) return;
 
-    const trackerChanged = foundry.utils.hasProperty(
-      changed,
-      "system.trackers",
-    );
     const woundsChanged = foundry.utils.hasProperty(changed, "system.wounds");
     const statusChanged = foundry.utils.hasProperty(
       changed,
       "system.statuses.dead",
     ) || foundry.utils.hasProperty(changed, "system.statuses.stunned");
-    if (!trackerChanged && !woundsChanged && !statusChanged) return;
+    const trackerChanged = foundry.utils.hasProperty(changed, "system.trackers.actionPoints")
+      || foundry.utils.hasProperty(changed, "system.trackers.momentum");
+    if (!woundsChanged && !statusChanged && !trackerChanged) return;
 
     if (woundsChanged) void markNpcCriticalWoundsDead(actor);
     refreshActorTokenOverlays(actor);
+    if (trackerChanged) refreshActorTokenBars(actor);
   });
-}
-
-function patchAxiomTokenBarDrawing() {
-  const TokenClass = foundry.canvas?.placeables?.Token ?? globalThis.Token;
-  if (!TokenClass?.prototype || TokenClass.prototype._axiomTokenBarsPatched)
-    return;
-
-  const originalDrawBars = TokenClass.prototype.drawBars;
-  if (typeof originalDrawBars !== "function") return;
-
-  TokenClass.prototype._axiomTokenBarsPatched = true;
-  TokenClass.prototype.drawBars = function (...args) {
-    const result = originalDrawBars.apply(this, args);
-    if (isAxiomActor(this.actor)) drawAxiomTokenOverlays(this);
-    return result;
-  };
 }
 
 export function drawAxiomTokenOverlays(token) {
   if (!token?.actor || !isAxiomActor(token.actor)) return;
-  const bars = token.bars;
-  if (!bars) return;
 
-  clearContainer(bars);
-  bars.name = AXIOM_BAR_NAME;
-  bars.visible = true;
-  bars.sortableChildren = true;
-  bars.interactive = true;
-  bars.interactiveChildren = true;
-  bars.eventMode = "static";
+  const overlay = getOrCreateAxiomOverlayContainer(token);
+  if (!overlay) return;
+
+  clearContainer(overlay);
+  overlay.visible = shouldDrawPrivateTokenOverlay(token);
+  overlay.sortableChildren = true;
+  overlay.interactive = false;
+  overlay.interactiveChildren = false;
+  overlay.eventMode = "none";
+
+  if (!overlay.visible) return;
 
   if (token.actor.type === "npc") void markNpcCriticalWoundsDead(token.actor);
 
@@ -100,33 +89,248 @@ export function drawAxiomTokenOverlays(token) {
   );
   if (width <= 0 || height <= 0) return;
 
-  bars.hitArea = new PIXI.Rectangle(
-    Math.round(-width * 0.15),
-    Math.round(-height * 0.35),
-    Math.round(width * 1.3),
-    Math.round(height * 1.7),
+  const wounds = getTakenWoundCounts(token.actor);
+  const woundTracker = drawWoundTracker(wounds, width, height);
+  if (woundTracker) overlay.addChild(woundTracker);
+}
+
+function patchAxiomTokenBars() {
+  const TokenClass = foundry?.canvas?.placeables?.Token ?? globalThis.Token;
+  const prototype = TokenClass?.prototype;
+  if (!prototype?.drawBars || prototype[AXIOM_TOKEN_BAR_PATCH]) return;
+
+  const baseDrawBars = prototype.drawBars;
+  prototype.drawBars = function axiomDrawBars(...args) {
+    if (!isAxiomActor(this.actor)) return baseDrawBars.apply(this, args);
+
+    drawAxiomTokenResourcePips(this);
+    return this;
+  };
+
+  prototype[AXIOM_TOKEN_BAR_PATCH] = true;
+}
+
+function drawAxiomTokenResourcePips(token) {
+  const bars = getOrCreateBarsContainer(token);
+  if (!bars) return;
+
+  clearContainer(bars);
+  bars.visible = shouldDrawPrivateTokenOverlay(token) && shouldDrawResourcePips(token);
+  bars.eventMode = "none";
+  bars.interactive = false;
+  bars.interactiveChildren = false;
+
+  if (!bars.visible) return;
+
+  const width = finiteNumber(
+    token.w ?? token.bounds?.width ?? token.document?.width,
+    0,
+  );
+  const height = finiteNumber(
+    token.h ?? token.bounds?.height ?? token.document?.height,
+    0,
+  );
+  if (width <= 0 || height <= 0) return;
+
+  const rows = [
+    {
+      attribute: token.document?.bar1?.attribute,
+      key: "actionPoints",
+      position: "bottom",
+    },
+    {
+      attribute: token.document?.bar2?.attribute,
+      key: "momentum",
+      position: "top",
+    },
+  ];
+
+  for (const row of rows) {
+    const key = getTrackerKeyFromBarAttribute(row.attribute);
+    if (!key || key !== row.key) continue;
+
+    const tracker = getTrackerData(token.actor, key, { current: 0, min: 0, max: key === "momentum" ? 3 : 3 });
+    const pips = drawResourcePipRow(key, tracker, width, height, row.position);
+    if (pips) bars.addChild(pips);
+  }
+}
+
+function getOrCreateBarsContainer(token) {
+  if (token?.bars && !token.bars.destroyed) return token.bars;
+  if (!globalThis.PIXI?.Container || typeof token?.addChild !== "function") return null;
+
+  const bars = new PIXI.Container();
+  bars.name = "bars";
+  bars.zIndex = 900;
+  token.sortableChildren = true;
+  token.bars = token.addChild(bars);
+  return token.bars;
+}
+
+function shouldDrawPrivateTokenOverlay(token) {
+  return Boolean(token?.isOwner || token?.actor?.isOwner || game.user?.isGM);
+}
+
+function shouldDrawResourcePips(token) {
+  const modes = globalThis.CONST?.TOKEN_DISPLAY_MODES ?? {};
+  const mode = token?.document?.displayBars;
+
+  if (mode === modes.NONE || mode === 0) return false;
+  if (mode === modes.HOVER) return Boolean(token?.hover);
+  if (mode === modes.OWNER_HOVER) return Boolean(token?.hover);
+
+  return true;
+}
+
+function getTrackerKeyFromBarAttribute(attribute) {
+  if (attribute === "trackers.actionPoints") return "actionPoints";
+  if (attribute === "trackers.momentum") return "momentum";
+  return null;
+}
+
+function drawResourcePipRow(key, data, tokenWidth, tokenHeight, position) {
+  const current = Math.max(0, Math.floor(finiteNumber(data.current ?? data.value, 0)));
+  if (current <= 0) return null;
+
+  return key === "momentum"
+    ? drawMomentumPipRow(current, tokenWidth, tokenHeight, position)
+    : drawActionPointPipRow(current, tokenWidth, tokenHeight, position);
+}
+
+function drawMomentumPipRow(current, tokenWidth, tokenHeight, position) {
+  const tickWidth = Math.round(clamp(tokenWidth * 0.096, 13, 18));
+  const tickHeight = Math.round(clamp(tokenHeight * 0.024, 3, 5));
+  const gap = Math.round(clamp(tokenWidth * 0.028, 4, 6));
+  const width = current * tickWidth + Math.max(0, current - 1) * gap;
+
+  const container = new PIXI.Container();
+  container.name = "axiom-momentum-pips";
+  container.zIndex = 10;
+  container.x = Math.round((tokenWidth - width) / 2);
+  container.y = position === "bottom"
+    ? Math.round(tokenHeight + clamp(tokenHeight * 0.036, 5, 8))
+    : Math.round(-tickHeight - clamp(tokenHeight * 0.036, 5, 8));
+
+  for (let index = 0; index < current; index += 1) {
+    const pip = drawResourceTick(tickWidth, tickHeight, COLORS.goldMid);
+    pip.x = Math.round(index * (tickWidth + gap));
+    pip.y = 0;
+    container.addChild(pip);
+  }
+
+  return container;
+}
+
+function drawActionPointPipRow(current, tokenWidth, tokenHeight, position) {
+  const tickWidth = Math.round(clamp(tokenWidth * 0.124, 16, 22));
+  const tickHeight = Math.round(clamp(tokenHeight * 0.027, 4, 5));
+  const gap = Math.round(clamp(tokenWidth * 0.03, 4, 6));
+  const width = current * tickWidth + Math.max(0, current - 1) * gap;
+
+  const container = new PIXI.Container();
+  container.name = "axiom-action-point-pips";
+  container.zIndex = 20;
+  container.x = Math.round((tokenWidth - width) / 2);
+  container.y = position === "bottom"
+    ? Math.round(tokenHeight + clamp(tokenHeight * 0.04, 6, 9))
+    : Math.round(-tickHeight - clamp(tokenHeight * 0.04, 6, 9));
+
+  for (let index = 0; index < current; index += 1) {
+    const pip = drawResourceTick(tickWidth, tickHeight, 0xff2a2a);
+    pip.x = Math.round(index * (tickWidth + gap));
+    pip.y = 0;
+    container.addChild(pip);
+  }
+
+  return container;
+}
+
+function drawResourceTick(width, height, color) {
+  return drawRoundedRectGraphic(
+    0,
+    0,
+    width,
+    height,
+    Math.ceil(height / 2),
+    color,
+    0.96,
+    0x050506,
+    0.9,
+    1,
+  );
+}
+
+function drawDiamondPip(size) {
+  const container = new PIXI.Container();
+  const half = size / 2;
+  container.addChild(
+    drawPolygon(
+      [[half, 0], [size, half], [half, size], [0, half]],
+      COLORS.goldMid,
+      0.96,
+      0x231f16,
+      0.98,
+      Math.max(1, Math.round(size * 0.11)),
+    ),
   );
 
-  const momentum = getTrackerData(token.actor, "momentum", {
-    current: 0,
-    min: -5,
-    max: 5,
+  const shine = drawPolygon(
+    [[half, 1], [size - 1, half], [half, half], [1, half]],
+    COLORS.goldTop,
+    0.28,
+    0x000000,
+    0,
+    0,
+  );
+  container.addChild(shine);
+  return container;
+}
+
+function drawActionPointChevron(fontSize) {
+  const glyph = createText(">", {
+    fontFamily: "Arial",
+    fontSize,
+    fontWeight: "900",
+    fill: "#f3d67a",
+    stroke: "#231f16",
+    strokeThickness: Math.max(2, Math.round(fontSize * 0.08)),
+    lineJoin: "round",
   });
-  const actionPoints = getActionPointTrackerData(token.actor);
-  const badges = getDepletedWoundBadges(token.actor);
 
-  const momentumBar = drawMomentumBar(momentum, width, height, token);
-  if (momentumBar) bars.addChild(momentumBar);
+  const container = new PIXI.Container();
+  container.name = "axiom-action-point-chevron";
+  if (!glyph) return container;
 
-  const actionPointBar = drawActionPointBar(actionPoints, width, height);
-  if (actionPointBar) bars.addChild(actionPointBar);
+  glyph.anchor?.set?.(0.5, 0.5);
+  glyph.x = Math.round(fontSize * 0.24);
+  glyph.y = Math.round(fontSize * 0.48);
+  glyph.eventMode = "none";
+  container.addChild(glyph);
+  return container;
+}
 
-  const woundBadges = drawWoundBadges(badges, width, height);
-  if (woundBadges) bars.addChild(woundBadges);
+function getOrCreateAxiomOverlayContainer(token) {
+  if (!token) return null;
+
+  let overlay = token.getChildByName?.(AXIOM_OVERLAY_NAME);
+  if (overlay) return overlay;
+
+  if (!globalThis.PIXI?.Container || typeof token.addChild !== "function") return null;
+
+  overlay = new PIXI.Container();
+  overlay.name = AXIOM_OVERLAY_NAME;
+  overlay.zIndex = 1000;
+  token.sortableChildren = true;
+  token.addChild(overlay);
+  return overlay;
 }
 
 function clearAxiomTokenBars(token) {
-  if (token?.bars) clearContainer(token.bars);
+  const overlay = token?.getChildByName?.(AXIOM_OVERLAY_NAME);
+  if (overlay) {
+    clearContainer(overlay);
+    overlay.destroy?.({ children: true });
+  }
 }
 
 function clearContainer(container) {
@@ -141,9 +345,19 @@ function refreshActorTokenOverlays(actor) {
     drawAxiomTokenOverlays(token);
 }
 
+function refreshActorTokenBars(actor) {
+  for (const token of actor?.getActiveTokens?.(false, false) ?? []) {
+    if (typeof token.drawBars === "function") token.drawBars();
+    else drawAxiomTokenResourcePips(token);
+  }
+}
+
 function refreshTokenDocumentOverlay(tokenDocument) {
   const token = canvas?.tokens?.get?.(tokenDocument?.id);
-  if (token) drawAxiomTokenOverlays(token);
+  if (!token) return;
+  drawAxiomTokenOverlays(token);
+  if (typeof token.drawBars === "function") token.drawBars();
+  else drawAxiomTokenResourcePips(token);
 }
 
 function refreshSceneTokenOverlays() {
@@ -151,13 +365,30 @@ function refreshSceneTokenOverlays() {
     drawAxiomTokenOverlays(token);
 }
 
+function refreshSceneTokenBars() {
+  for (const token of canvas?.tokens?.placeables ?? []) {
+    if (!isAxiomActor(token.actor)) continue;
+    if (typeof token.drawBars === "function") token.drawBars();
+    else drawAxiomTokenResourcePips(token);
+  }
+}
+
 async function markNpcCriticalWoundsDead(actor) {
   if (!game.user?.isGM || actor?.type !== "npc") return;
   if (!isWoundTrackDepleted(actor.system?.wounds?.critical)) return;
-  if (actor.system?.statuses?.dead) return;
+  if (actor.system?.statuses?.dead || actor.getAxiomStatusEffect?.("dead")) return;
 
-  await actor.update({ "system.statuses.dead": 1 }, { render: false });
-  await actor.addStatus?.("dead", 1);
+  const key = actor.uuid ?? actor.id;
+  if (PENDING_NPC_DEATH_MARKS.has(key)) return;
+
+  PENDING_NPC_DEATH_MARKS.add(key);
+  try {
+    if (!actor.system?.statuses?.dead && !actor.getAxiomStatusEffect?.("dead")) {
+      await actor.addStatus?.("dead", 1);
+    }
+  } finally {
+    PENDING_NPC_DEATH_MARKS.delete(key);
+  }
 }
 
 function drawMomentumBar(data, tokenWidth, tokenHeight, token) {
@@ -387,11 +618,11 @@ function getMomentumButtonHit(event) {
   for (const token of tokens) {
     if (!isAxiomActor(token.actor)) continue;
 
-    const bars = token.bars;
-    if (!bars) continue;
+    const overlay = token.getChildByName?.(AXIOM_OVERLAY_NAME);
+    if (!overlay) continue;
 
     for (const name of ["axiom-momentum-plus", "axiom-momentum-minus"]) {
-      const button = bars
+      const button = overlay
         .getChildByName?.("axiom-momentum-bar")
         ?.getChildByName?.(name);
       const step = finiteNumber(button?.axiomMomentumStep, 0);
@@ -466,56 +697,77 @@ function drawActionPointBar(data, tokenWidth, tokenHeight) {
   return container;
 }
 
-function drawWoundBadges(badges, tokenWidth, tokenHeight) {
-  if (!badges.length) return null;
+function drawWoundTracker(wounds, tokenWidth, tokenHeight) {
+  const entries = WOUND_ORDER
+    .map((severity) => ({ severity, count: Math.max(0, Math.floor(finiteNumber(wounds[severity], 0))) }))
+    .filter((entry) => entry.count > 0);
+  if (!entries.length) return null;
 
-  const size = Math.round(clamp(tokenHeight * 0.09, 11, 18));
-  const gap = Math.round(clamp(tokenHeight * 0.026, 3, 5));
+  const gap = Math.round(clamp(tokenHeight * 0.031, 4, 6));
+  const scale = clamp(tokenHeight / 164, 0.78, 1.24);
+  const rows = entries.map(({ severity, count }) => drawWoundTrackerRow(severity, count, scale));
+  const totalHeight = rows.reduce((sum, row) => sum + row.axiomHeight, 0)
+    + Math.max(0, rows.length - 1) * gap;
+
   const container = new PIXI.Container();
-  container.name = "axiom-wound-badges";
-  container.zIndex = 20;
-  container.x = Math.round(tokenWidth - 15);
-  container.y = Math.round(
-    (tokenHeight - (badges.length * size + (badges.length - 1) * gap)) / 2,
-  );
+  container.name = "axiom-wound-tracker";
+  container.zIndex = 30;
+  container.x = Math.round(tokenWidth + clamp(tokenWidth * 0.062, 8, 13));
+  container.y = Math.round((tokenHeight - totalHeight) / 2);
 
-  badges.forEach((severity, index) => {
-    const badge = drawWoundBadge(severity, size);
-    badge.y = index * (size + gap);
-    container.addChild(badge);
-  });
+  let y = 0;
+  for (const row of rows) {
+    row.y = y;
+    container.addChild(row);
+    y += row.axiomHeight + gap;
+  }
 
   return container;
 }
 
-function drawWoundBadge(severity, size) {
-  const color = COLORS[severity] ?? COLORS.grazing;
-  const container = new PIXI.Container();
-  container.name = `axiom-wound-${severity}`;
+function drawWoundTrackerRow(severity, count, scale) {
+  const sizes = {
+    grazing: { width: 4, height: 11 },
+    minor: { width: 5, height: 13 },
+    major: { width: 6, height: 15 },
+    critical: { width: 7, height: 18 },
+  };
+  const size = sizes[severity] ?? sizes.grazing;
+  const width = Math.max(3, Math.round(size.width * scale));
+  const height = Math.max(8, Math.round(size.height * scale));
+  const gap = Math.round(clamp(3 * scale, 2, 4));
 
-  if (severity === "grazing") {
-    container.addChild(
-      drawCircle(size / 2, size / 2, size / 2, color, 0.96, 0x090909, 1, 1),
-    );
-  } else if (severity === "critical") {
-    container.addChild(
-      drawRoundedRectGraphic(0, 0, size, size, 1, color, 0.96, 0x090909, 1, 1),
-    );
-  } else {
-    const sides = severity === "minor" ? 6 : 5;
-    container.addChild(
-      drawPolygon(
-        regularPolygon(size / 2, size / 2, size / 2 , sides, -Math.PI / 2),
-        color,
-        0.96,
-        0x090909,
-        1,
-        1,
-      ),
-    );
+  const container = new PIXI.Container();
+  container.name = `axiom-wound-${severity}-row`;
+  container.axiomHeight = height;
+  container.axiomWidth = count * width + Math.max(0, count - 1) * gap;
+
+  for (let index = 0; index < count; index += 1) {
+    const pip = drawWoundSlash(severity, width, height);
+    pip.x = Math.round(index * (width + gap));
+    pip.y = 0;
+    container.addChild(pip);
   }
 
   return container;
+}
+
+function drawWoundSlash(severity, width, height) {
+  const color = COLORS[severity] ?? COLORS.grazing;
+  const radius = Math.max(2, Math.round(width / 2));
+
+  return drawRoundedRectGraphic(
+    0,
+    0,
+    width,
+    height,
+    radius,
+    color,
+    0.96,
+    COLORS.woundOutline,
+    0.98,
+    1,
+  );
 }
 
 function drawChevron(width, height, filled) {
@@ -742,6 +994,25 @@ function getTrackerData(actor, key, fallback) {
     min,
     max,
   };
+}
+
+function getTakenWoundCounts(actor) {
+  const wounds = {};
+  for (const severity of WOUND_ORDER) {
+    wounds[severity] = getTakenWoundCount(actor?.system?.wounds?.[severity]);
+  }
+  return wounds;
+}
+
+function getTakenWoundCount(track) {
+  const current = finiteNumber(track?.current, NaN);
+  if (Number.isFinite(current)) return Math.max(0, Math.floor(current));
+
+  const max = finiteNumber(track?.max, 0);
+  if (max <= 0) return 0;
+
+  const slotKeys = ["one", "two", "three", "four", "five"].slice(0, max);
+  return slotKeys.filter((key) => Boolean(track?.slots?.[key]?.taken)).length;
 }
 
 function getDepletedWoundBadges(actor) {

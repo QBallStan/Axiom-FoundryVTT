@@ -87,9 +87,31 @@
   },
   "packs": [
     {
-      "name": "axiom-basic-ammunition",
-      "label": "Axiom Basic Ammunition",
-      "path": "packs/axiom-basic-ammunition",
+      "name": "axiom-basic-qualities",
+      "label": "Axiom Basic Qualities",
+      "path": "packs/axiom-basic-qualities",
+      "type": "Item",
+      "system": "axiom",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "axiom-core-skills",
+      "label": "Axiom//Core Skills",
+      "path": "packs/axiom-core-skills",
+      "type": "Item",
+      "system": "axiom",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "axiom-basic-weapons",
+      "label": "Axiom Basic Weapons",
+      "path": "packs/axiom-basic-weapons",
       "type": "Item",
       "system": "axiom",
       "ownership": {
@@ -109,50 +131,6 @@
       }
     },
     {
-      "name": "axiom-basic-equipment",
-      "label": "Axiom Basic Equipment",
-      "path": "packs/axiom-basic-equipment",
-      "type": "Item",
-      "system": "axiom",
-      "ownership": {
-        "PLAYER": "OBSERVER",
-        "ASSISTANT": "OWNER"
-      }
-    },
-    {
-      "name": "axiom-basic-melee-weapons",
-      "label": "Axiom Basic Melee Weapons",
-      "path": "packs/axiom-basic-melee-weapons",
-      "type": "Item",
-      "system": "axiom",
-      "ownership": {
-        "PLAYER": "OBSERVER",
-        "ASSISTANT": "OWNER"
-      }
-    },
-    {
-      "name": "axiom-basic-qualities",
-      "label": "Axiom Basic Qualities",
-      "path": "packs/axiom-basic-qualities",
-      "type": "Item",
-      "system": "axiom",
-      "ownership": {
-        "PLAYER": "OBSERVER",
-        "ASSISTANT": "OWNER"
-      }
-    },
-    {
-      "name": "axiom-basic-ranged-weapons",
-      "label": "Axiom Basic Ranged Weapons",
-      "path": "packs/axiom-basic-ranged-weapons",
-      "type": "Item",
-      "system": "axiom",
-      "ownership": {
-        "PLAYER": "OBSERVER",
-        "ASSISTANT": "OWNER"
-      }
-    },
-    {
       "name": "axiom-basic-shields",
       "label": "Axiom Basic Shields",
       "path": "packs/axiom-basic-shields",
@@ -164,9 +142,20 @@
       }
     },
     {
-      "name": "axiom-core-skills",
-      "label": "Axiom//Core Skills",
-      "path": "packs/axiom-core-skills",
+      "name": "axiom-basic-ammunition",
+      "label": "Axiom Basic Ammunition",
+      "path": "packs/axiom-basic-ammunition",
+      "type": "Item",
+      "system": "axiom",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "axiom-basic-equipment",
+      "label": "Axiom Basic Equipment",
+      "path": "packs/axiom-basic-equipment",
       "type": "Item",
       "system": "axiom",
       "ownership": {
@@ -181,14 +170,13 @@
       "sorting": "a",
       "color": "#8f1218",
       "packs": [
-        "axiom.axiom-basic-ammunition",
-        "axiom.axiom-basic-armor",
-        "axiom.axiom-basic-equipment",
-        "axiom.axiom-basic-melee-weapons",
         "axiom.axiom-basic-qualities",
-        "axiom.axiom-basic-ranged-weapons",
+        "axiom.axiom-core-skills",
+        "axiom.axiom-basic-weapons",
+        "axiom.axiom-basic-armor",
         "axiom.axiom-basic-shields",
-        "axiom.axiom-core-skills"
+        "axiom.axiom-basic-ammunition",
+        "axiom.axiom-basic-equipment"
       ]
     }
   ],

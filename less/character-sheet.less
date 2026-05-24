@@ -18,9 +18,25 @@
   color: var(--axiom-text);
 
   .window-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
     padding: 12px;
     background: var(--axiom-bg);
-    overflow-y: auto;
+    overflow: hidden;
+  }
+
+  .window-content > .axiom-sheet {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .sheet-header,
+  nav.sheet-tabs {
+    flex: 0 0 auto;
   }
 
   .axiom-sheet.protagonist-sheet {
@@ -66,6 +82,65 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--axiom-text);
+  }
+
+
+  .protagonist-sheet-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 30px;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .actor-config-button {
+    width: 30px;
+    height: 30px;
+    margin: 0;
+    padding: 0;
+    background: #151519;
+    border: 1px solid var(--axiom-border);
+    border-radius: 5px;
+    color: var(--axiom-muted);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--axiom-gold);
+      border-color: var(--axiom-gold);
+    }
+  }
+
+  .actor-config-panel {
+    margin-bottom: 10px;
+    padding: 8px;
+    background: var(--axiom-panel);
+    border: 1px solid var(--axiom-border);
+    border-radius: 6px;
+  }
+
+  .actor-config-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+
+    label {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    span {
+      color: var(--axiom-muted);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    input {
+      height: 25px;
+      text-align: center;
+      font-family: "Roboto Mono", monospace;
+    }
   }
 
   .identity-row {
@@ -367,6 +442,17 @@
     }
   }
 
+  .momentum-current-value {
+    margin: -1px 0 3px;
+    color: var(--axiom-gold);
+    font-family: "Roboto Mono", monospace;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1;
+    text-align: center;
+    text-shadow: 0 0 6px rgba(216, 198, 154, 0.35);
+  }
+
   .momentum-line {
     display: grid;
     grid-template-columns: 20px 1fr 20px;
@@ -535,11 +621,36 @@
   }
 
   .sheet-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+
     .tab {
       display: none;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
 
       &.active {
         display: block;
+        overflow-y: auto;
+        padding-right: 4px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--axiom-border) #151519;
+      }
+
+      &.active::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &.active::-webkit-scrollbar-track {
+        background: #151519;
+        border-radius: 999px;
+      }
+
+      &.active::-webkit-scrollbar-thumb {
+        background: var(--axiom-border);
+        border-radius: 999px;
       }
     }
   }
@@ -799,6 +910,11 @@
 
 .application.sheet.axiom.actor.protagonist,
 .application.sheet.axiom.actor.npc {
+  .skills-tab {
+    margin-bottom: 0;
+    overflow: hidden;
+  }
+
   .skills-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -810,27 +926,108 @@
     min-width: 0;
   }
 
+  .skill-section-header {
+    gap: 6px;
+    margin-bottom: 5px;
+    padding: 4px 7px;
+  }
+
+  .skill-section-header .section-title {
+    min-width: 0;
+    font-size: 12px;
+  }
+
+  .skill-sort-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .skill-sort-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 22px;
+    height: 22px;
+    margin: 0;
+    padding: 0 4px;
+    background: #151519;
+    border: 1px solid var(--axiom-border);
+    border-radius: 4px;
+    color: var(--axiom-muted);
+    font-size: 9px;
+    line-height: 1;
+    cursor: pointer;
+
+    i {
+      margin: 0;
+      font-size: 9px;
+    }
+
+    span {
+      font-family: "Roboto Mono", monospace;
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    &:hover,
+    &.active {
+      color: var(--axiom-gold);
+      border-color: var(--axiom-gold);
+      box-shadow: 0 0 4px fade(#d8c69a, 30%);
+    }
+  }
+
   .skill-list {
     display: grid;
     gap: 0;
   }
 
+  .skill-scroll-list {
+    max-height: clamp(230px, 48vh, 500px);
+    overflow-y: auto;
+    padding-right: 3px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--axiom-border) #151519;
+  }
+
+  .skill-scroll-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .skill-scroll-list::-webkit-scrollbar-track {
+    background: #151519;
+    border-radius: 999px;
+  }
+
+  .skill-scroll-list::-webkit-scrollbar-thumb {
+    background: var(--axiom-border);
+    border-radius: 999px;
+  }
+
+  .expertise-skill-list {
+    max-height: clamp(140px, 28vh, 280px);
+  }
+
   .attribute-check-presets {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 6px;
+    gap: 4px;
+    margin-top: 5px;
   }
 
   .attribute-check-preset {
-    min-height: 24px;
+    min-height: 21px;
     margin: 0;
-    padding: 2px 7px;
+    padding: 1px 6px;
     background: #151519;
     border: 1px solid var(--axiom-border);
     border-radius: 999px;
     color: var(--axiom-muted);
-    font-size: 10px;
+    font-size: 9px;
     line-height: 1;
     text-transform: uppercase;
     cursor: pointer;
@@ -844,21 +1041,21 @@
 
   .skill-row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 48px 42px 82px;
-    gap: 6px;
+    grid-template-columns: minmax(0, 1fr) 40px 36px 68px;
+    gap: 4px;
     align-items: center;
-    min-height: 32px;
-    padding: 3px 2px;
+    min-height: 26px;
+    padding: 1px 2px;
     background: transparent;
     border: 0;
-    border-bottom: 2px solid var(--axiom-border);
+    border-bottom: 1px solid var(--axiom-border);
     border-radius: 0;
   }
 
   .skill-main {
     display: flex;
     align-items: baseline;
-    gap: 8px;
+    gap: 5px;
     min-width: 0;
   }
 
@@ -872,32 +1069,34 @@
   .skill-name {
     min-width: 0;
     color: var(--axiom-text);
-    font-size: 13px;
+    font-size: 12px;
+    line-height: 1.1;
   }
 
   .skill-attributes {
     flex: 0 1 auto;
     margin-left: auto;
-    padding: 1px 5px;
+    padding: 0 4px;
     color: var(--axiom-muted);
     background: #151519;
     border: 1px solid var(--axiom-border);
     border-radius: 999px;
-    font-size: 10px;
+    font-size: 9px;
+    line-height: 1.3;
   }
 
   .skill-level-input,
   .skill-level-static,
   .skill-total {
-    height: 26px;
+    height: 22px;
     text-align: center;
     font-family: "Roboto Mono", monospace;
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .skill-level-input {
     width: 100%;
-    padding: 0 3px;
+    padding: 0 2px;
   }
 
   .skill-level-static,
@@ -918,12 +1117,12 @@
   .skill-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 4px;
+    gap: 3px;
   }
 
   .skill-action {
-    width: 24px;
-    height: 26px;
+    width: 20px;
+    height: 22px;
     margin: 0;
     padding: 0;
     display: inline-flex;
@@ -933,7 +1132,12 @@
     border: 1px solid var(--axiom-border);
     border-radius: 4px;
     color: var(--axiom-gold);
+    font-size: 10px;
     cursor: pointer;
+
+    i {
+      margin: 0;
+    }
 
     &:hover {
       border-color: var(--axiom-gold);
@@ -956,21 +1160,21 @@
   }
 
   .attribute-check-row {
-    grid-template-columns: minmax(0, 1fr) 48px 42px 82px;
+    grid-template-columns: minmax(0, 1fr) 40px 36px 68px;
   }
 
   .attribute-check-selects {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 5px;
+    gap: 4px;
     min-width: 0;
 
     select {
       width: 100%;
-      height: 26px;
+      height: 22px;
       min-width: 0;
-      padding: 0 4px;
-      font-size: 12px;
+      padding: 0 3px;
+      font-size: 11px;
     }
   }
 
@@ -981,21 +1185,27 @@
   }
 
   .expertise-title {
-    margin-top: 12px;
+    margin-top: 10px;
   }
 
   .empty-list {
-    padding: 10px;
+    padding: 8px;
     color: var(--axiom-muted);
     background: var(--axiom-panel-2);
     border: 1px solid var(--axiom-border);
     border-radius: 5px;
     font-style: italic;
+    font-size: 11px;
   }
 
   @media (max-width: 760px) {
     .skills-layout {
       grid-template-columns: 1fr;
+    }
+
+    .skill-scroll-list,
+    .expertise-skill-list {
+      max-height: 320px;
     }
   }
 }
@@ -1758,6 +1968,21 @@
     gap: 6px;
   }
 
+  .identity-appearance-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+
+    .details-field-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .details-field.wide {
+      grid-column: span 2;
+    }
+  }
+
   .details-summary-card {
     min-width: 0;
     min-height: 58px;
@@ -1858,6 +2083,7 @@
 
   @media (max-width: 760px) {
     .details-summary-grid,
+    .identity-appearance-grid,
     .details-field-grid {
       grid-template-columns: 1fr;
     }

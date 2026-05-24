@@ -3,7 +3,7 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { mergeObject } = foundry.utils;
 import { getStoredPriceCoins, prepareCurrencyContext, priceCoinsToValue } from "../../system/currency.mjs";
 import AxiomEffectBuilder from "../../apps/effect-builder.mjs";
-import { getWeaponCategory, handStateUsesMainHand, handStateUsesOffHand, isHandEquippableItem, isHandGearState, isMeleeWeaponItem, isRangedWeaponItem, isWeaponItem, isShieldItem } from "../../system/items.mjs";
+import { getWeaponCategory, getWeaponRange, getWeaponRangeBands, handStateUsesMainHand, handStateUsesOffHand, isHandEquippableItem, isHandGearState, isMeleeWeaponItem, isRangedWeaponItem, isWeaponItem, isShieldItem } from "../../system/items.mjs";
 
 
 function normalizeSkillReference(value) {
@@ -42,22 +42,12 @@ function escapeHTML(value) {
   return div.innerHTML;
 }
 
-function normalizeTagArray(value) {
-  if (!value) return [];
-  const values = Array.isArray(value) ? value : [value];
-  return values.map(tag => String(tag)).filter(Boolean);
-}
-
 function normalizeWeaponReloadMethod(value) {
   const method = String(value ?? "").trim();
   if (["none", "thrown", "drawn", "single"].includes(method)) return method;
   if (method === "free") return "drawn";
   if (["magazine", "speedloader", "breakAction", "beltFed", "internalMagazine", "revolverCylinder", "muzzle"].includes(method)) return "single";
   return "none";
-}
-
-function getTagDialogClass() {
-  return foundry.applications?.api?.DialogV2 ?? globalThis.Dialog;
 }
 
 function getSystemSchemaField(system, path) {
@@ -169,7 +159,7 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
     context.weapon = await this._prepareWeaponContext(context.system);
     context.shield = await this._prepareShieldContext(context.system);
     context.equipment = await this._prepareEquipmentContext(context.system);
-    context.itemGenre = this._prepareGenreContext(context.system);
+    context.techLevel = this._prepareTechLevelContext(context.system);
 
     return context;
   }
@@ -202,11 +192,11 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
   }
 
   async _prepareWeaponContext(system = {}) {
-    const range = Number(system.range ?? 0);
-    const short = Math.ceil(range / 2);
-    const medium = range;
-    const long = range * 2;
-    const extreme = range * 3;
+    const actor = this._getOwningActor();
+    const range = getWeaponRange(this.item, actor);
+    const rangeBands = getWeaponRangeBands(range);
+    const baseRange = Math.max(0, Number(system.range ?? 0) || 0);
+    const strengthRangeModifier = Number(system.strengthRangeModifier ?? 0) || 0;
     const category = getWeaponCategory(this.item);
     const isMelee = isMeleeWeaponItem(this.item);
     const isRanged = isRangedWeaponItem(this.item);
@@ -246,15 +236,14 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
       ammunition: this._getAmmunitionOptions(),
       handsOptions,
       stateOptions: this._prepareHandGearStateOptions(system.state),
-      rangeBands: {
-        short,
-        medium,
-        long,
-        extreme,
-        mediumStart: range > 0 ? short + 1 : 0,
-        longStart: range > 0 ? medium + 1 : 0,
-        extremeStart: range > 0 ? long + 1 : 0
-      }
+      range,
+      baseRange,
+      strengthBasedRange: Boolean(system.strengthBasedRange),
+      strengthRangeModifier,
+      rangeFormulaLabel: Boolean(system.strengthBasedRange)
+        ? game.i18n.format("AXIOM.Weapon.RangeFormula.Strength", { modifier: strengthRangeModifier >= 0 ? `+${strengthRangeModifier}` : String(strengthRangeModifier), range })
+        : game.i18n.format("AXIOM.Weapon.RangeFormula.Fixed", { range }),
+      rangeBands
     };
   }
 
@@ -271,20 +260,27 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
   }
 
 
-  _prepareGenreContext(system = {}) {
-    const tags = normalizeTagArray(system.genre?.tag);
-    const tagSet = new Set(tags);
-    const configuredTags = this._getConfig()?.itemGenreTags ?? {};
-    const options = Object.entries(configuredTags).map(([value, label]) => ({
-      value,
-      label: this._localizeConfigLabel(label, value),
-      selected: tagSet.has(value)
-    }));
+  _prepareTechLevelContext(system = {}) {
+    const rawLevel = Number(system.tl ?? 0);
+    const selectedLevel = Number.isInteger(rawLevel) ? Math.min(12, Math.max(0, rawLevel)) : 0;
+    const configuredLevels = this._getConfig()?.itemTechLevels ?? {};
+    const options = Object.entries(configuredLevels).map(([value, data]) => {
+      const level = Number(value);
+      const name = this._localizeConfigLabel(data?.name, value);
+      const description = this._localizeConfigLabel(data?.description, "");
+      return {
+        value: level,
+        name,
+        description,
+        label: game.i18n.format("AXIOM.Item.TechLevel.Option", { level, name }),
+        selected: level === selectedLevel
+      };
+    });
 
     return {
-      options,
-      selected: options.filter(option => option.selected),
-      values: tags
+      level: selectedLevel,
+      selected: options.find(option => option.selected) ?? options[0] ?? null,
+      options
     };
   }
 
@@ -420,19 +416,20 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
         medium: "AXIOM.Shield.Cover.Medium",
         heavy: "AXIOM.Shield.Cover.Heavy"
       },
-      itemGenreTags: {
-        primitive: "AXIOM.Item.Tags.Primitive",
-        ancient: "AXIOM.Item.Tags.Ancient",
-        medieval: "AXIOM.Item.Tags.Medieval",
-        renaissance: "AXIOM.Item.Tags.Renaissance",
-        industrial: "AXIOM.Item.Tags.Industrial",
-        modern: "AXIOM.Item.Tags.Modern",
-        cyberpunk: "AXIOM.Item.Tags.Cyberpunk",
-        sciFi: "AXIOM.Item.Tags.SciFi",
-        postApocalyptic: "AXIOM.Item.Tags.PostApocalyptic",
-        fantasy: "AXIOM.Item.Tags.Fantasy",
-        horror: "AXIOM.Item.Tags.Horror",
-        universal: "AXIOM.Item.Tags.Universal"
+      itemTechLevels: {
+        0: { name: "AXIOM.Item.TechLevel.Names.0", description: "AXIOM.Item.TechLevel.Descriptions.0" },
+        1: { name: "AXIOM.Item.TechLevel.Names.1", description: "AXIOM.Item.TechLevel.Descriptions.1" },
+        2: { name: "AXIOM.Item.TechLevel.Names.2", description: "AXIOM.Item.TechLevel.Descriptions.2" },
+        3: { name: "AXIOM.Item.TechLevel.Names.3", description: "AXIOM.Item.TechLevel.Descriptions.3" },
+        4: { name: "AXIOM.Item.TechLevel.Names.4", description: "AXIOM.Item.TechLevel.Descriptions.4" },
+        5: { name: "AXIOM.Item.TechLevel.Names.5", description: "AXIOM.Item.TechLevel.Descriptions.5" },
+        6: { name: "AXIOM.Item.TechLevel.Names.6", description: "AXIOM.Item.TechLevel.Descriptions.6" },
+        7: { name: "AXIOM.Item.TechLevel.Names.7", description: "AXIOM.Item.TechLevel.Descriptions.7" },
+        8: { name: "AXIOM.Item.TechLevel.Names.8", description: "AXIOM.Item.TechLevel.Descriptions.8" },
+        9: { name: "AXIOM.Item.TechLevel.Names.9", description: "AXIOM.Item.TechLevel.Descriptions.9" },
+        10: { name: "AXIOM.Item.TechLevel.Names.10", description: "AXIOM.Item.TechLevel.Descriptions.10" },
+        11: { name: "AXIOM.Item.TechLevel.Names.11", description: "AXIOM.Item.TechLevel.Descriptions.11" },
+        12: { name: "AXIOM.Item.TechLevel.Names.12", description: "AXIOM.Item.TechLevel.Descriptions.12" }
       },
       handGearStates: {
         mainHand: "AXIOM.Item.State.MainHand",
@@ -509,11 +506,29 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
     };
   }
 
+  _adjustHeightToContent() {
+    if (!this.rendered || !this.element) return;
+
+    window.requestAnimationFrame(() => {
+      const minHeight = this.constructor.DEFAULT_OPTIONS?.position?.height ?? 440;
+      const maxHeight = Math.max(minHeight, window.innerHeight - 40);
+      const content = this.element.querySelector(".axiom-item-sheet");
+      const header = this.element.querySelector(".window-header")?.offsetHeight ?? 0;
+      const bodyHeight = content?.scrollHeight ?? this.element.scrollHeight ?? minHeight;
+      const targetHeight = Math.min(maxHeight, Math.max(minHeight, Math.ceil(bodyHeight + header + 8)));
+
+      if (Math.abs(Number(this.position?.height ?? 0) - targetHeight) > 4) {
+        this.setPosition({ height: targetHeight });
+      }
+    });
+  }
+
   _onRender(context, options) {
     super._onRender(context, options);
+    this._adjustHeightToContent();
 
-    this.element.querySelectorAll("[data-action='configureGenreTags']").forEach(element => {
-      element.addEventListener("click", this._onConfigureGenreTags.bind(this));
+    this.element.querySelectorAll("[data-action='configureTechLevel']").forEach(element => {
+      element.addEventListener("click", this._onConfigureTechLevel.bind(this));
     });
 
     this.element.querySelectorAll("[data-action='createEffect']").forEach(element => {
@@ -535,6 +550,10 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
     this.element.querySelectorAll("[data-action='selectWeaponModeTab']").forEach(element => {
       element.addEventListener("click", this._onSelectWeaponModeTab.bind(this));
     });
+
+    this.element.querySelectorAll("[data-tab]").forEach(element => {
+      element.addEventListener("click", () => this._adjustHeightToContent());
+    });
   }
 
   _onSelectWeaponModeTab(event) {
@@ -554,97 +573,60 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
     root.querySelectorAll("[data-weapon-mode-panel]").forEach(panel => {
       panel.hidden = panel.dataset.weaponModePanel !== mode;
     });
+
+    this._adjustHeightToContent();
   }
 
-  _buildTagDialogContent() {
-    const options = this._prepareGenreContext(this.item.system).options;
-    const hint = game.i18n.localize("AXIOM.Item.Tags.Hint");
 
-    const checkboxes = options.map(option => `
-      <label class="axiom-genre-tag-option axiom-tag-option">
-        <input type="checkbox" name="tags" value="${escapeHTML(option.value)}" ${option.selected ? "checked" : ""}>
+  _buildTechLevelDialogContent() {
+    const options = this._prepareTechLevelContext(this.item.system).options;
+    const hint = game.i18n.localize("AXIOM.Item.TechLevel.Hint");
+
+    const radios = options.map(option => `
+      <label class="axiom-tech-level-option" data-tooltip="${escapeHTML(option.description)}">
+        <input type="radio" name="techLevel" value="${option.value}" ${option.selected ? "checked" : ""}>
         <span>${escapeHTML(option.label)}</span>
       </label>
     `).join("");
 
     return `
-      <form class="axiom-genre-tags-dialog axiom-tag-dialog">
-        <p class="axiom-genre-tags-hint hint">${escapeHTML(hint)}</p>
-        <div class="axiom-genre-tags-grid axiom-tag-option-grid">${checkboxes}</div>
-      </form>
+      <div class="axiom-tech-level-dialog">
+        <p class="hint">${escapeHTML(hint)}</p>
+        <div class="axiom-tech-level-option-grid">${radios}</div>
+      </div>
     `;
   }
 
-  _readTagsFromDialogContent(html) {
-    const element = html instanceof HTMLElement ? html : html?.[0] ?? html;
-    return Array.from(element?.querySelectorAll?.("input[name='tags']:checked") ?? [])
-      .map(input => input.value)
-      .filter(Boolean);
-  }
-
-  async _onConfigureGenreTags(event) {
+  async _onConfigureTechLevel(event) {
     event.preventDefault();
 
-    const title = game.i18n.localize("AXIOM.Item.Tags.Configure");
-    const saveLabel = game.i18n.localize("AXIOM.Common.Save");
-    const clearLabel = game.i18n.localize("AXIOM.Item.Tags.Clear");
-    const cancelLabel = game.i18n.localize("AXIOM.Common.Cancel");
-    const content = this._buildTagDialogContent();
-    const DialogClass = getTagDialogClass();
+    const DialogV2 = foundry.applications?.api?.DialogV2;
+    if (!DialogV2?.prompt) return;
 
-    if (foundry.applications?.api?.DialogV2 && DialogClass === foundry.applications.api.DialogV2) {
-      return DialogClass.wait({
-        window: { title },
-        classes: ["axiom", "axiom-genre-tags-app"],
-        content,
-        rejectClose: false,
-        buttons: [
-          {
-            action: "save",
-            label: saveLabel,
-            icon: "fa-solid fa-check",
-            default: true,
-            callback: async (event, button, dialog) => {
-              const tags = this._readTagsFromDialogContent(dialog.element);
-              await this.item.update({ "system.genre.tag": tags });
-            }
-          },
-          {
-            action: "clear",
-            label: clearLabel,
-            icon: "fa-solid fa-eraser",
-            callback: async () => this.item.update({ "system.genre.tag": [] })
-          },
-          { action: "cancel", label: cancelLabel, icon: "fa-solid fa-xmark" }
-        ]
+    let level;
+    try {
+      level = await DialogV2.prompt({
+        window: { title: game.i18n.localize("AXIOM.Item.TechLevel.Configure") },
+        classes: ["axiom", "axiom-tech-level-app"],
+        position: { width: 560, height: "auto" },
+        modal: true,
+        content: this._buildTechLevelDialogContent(),
+        ok: {
+          label: game.i18n.localize("AXIOM.Common.Save"),
+          callback: (event, button) => Number(button.form?.elements?.techLevel?.value ?? this.item.system?.tl ?? 0)
+        },
+        rejectClose: false
       });
+    } catch {
+      return;
     }
 
-    return new DialogClass({
-      title,
-      content,
-      buttons: {
-        save: {
-          label: saveLabel,
-          icon: '<i class="fa-solid fa-check"></i>',
-          callback: async html => {
-            const tags = this._readTagsFromDialogContent(html);
-            await this.item.update({ "system.genre.tag": tags });
-          }
-        },
-        clear: {
-          label: clearLabel,
-          icon: '<i class="fa-solid fa-eraser"></i>',
-          callback: async () => this.item.update({ "system.genre.tag": [] })
-        },
-        cancel: {
-          label: cancelLabel,
-          icon: '<i class="fa-solid fa-xmark"></i>'
-        }
-      },
-      default: "save"
-    }).render(true);
+    if (!Number.isFinite(level)) return;
+    level = Math.min(12, Math.max(0, Math.trunc(level)));
+    await this.item.update({ "system.tl": level });
+    this._adjustHeightToContent();
   }
+
 
   async _onCreateEffect(event) {
     event.preventDefault();
@@ -687,6 +669,10 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
 
     if (updateData.name === undefined) delete updateData.name;
     if (updateData.img === undefined) delete updateData.img;
+
+    if (isWeaponItem(this.item) && updateData.system) {
+      updateData.system.strengthBasedRange = Boolean(updateData.system.strengthBasedRange);
+    }
 
     const nextReloadMethod = normalizeWeaponReloadMethod(updateData.system?.reloadMethod ?? this.item.system?.reloadMethod);
     if (["none", "thrown", "drawn"].includes(nextReloadMethod) && updateData.system) {

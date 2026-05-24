@@ -1,3 +1,5 @@
-2026/05/14-18:12:00.379 86ac Recovering log #19
-2026/05/14-18:12:00.454 86ac Delete type=0 #19
-2026/05/14-18:12:00.455 86ac Delete type=3 #18
+2026/05/24-20:22:01.205 8ad0 Recovering log #66
+2026/05/24-20:22:01.205 8ad0 Level-0 table #68: started
+2026/05/24-20:22:01.248 8ad0 Level-0 table #68: 9596 bytes OK
+2026/05/24-20:22:01.324 8ad0 Delete type=0 #66
+2026/05/24-20:22:01.325 8ad0 Delete type=3 #65

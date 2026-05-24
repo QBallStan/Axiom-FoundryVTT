@@ -2,11 +2,14 @@
   <header class="sheet-header npc-header">
     <div class="sheet-top npc-sheet-top">
       <input class="name-input" name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'AXIOM.Actor.NamePlaceholder'}}" />
-      <button class="npc-config-button" type="button" data-action="toggleNpcConfig" title="{{localize 'AXIOM.Actor.NPC.Config'}}">
-        <i class="fa-solid fa-gear"></i>
-      </button>
+      {{#if isGM}}
+        <button class="npc-config-button" type="button" data-action="toggleNpcConfig" title="{{localize 'AXIOM.Actor.NPC.Config'}}">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      {{/if}}
     </div>
 
+    {{#if isGM}}
     <section class="npc-config-panel" data-npc-config-panel hidden>
       <h3 class="section-title"><i class="fa-solid fa-sliders"></i> {{localize "AXIOM.Actor.NPC.Config"}}</h3>
       <div class="npc-config-grid">
@@ -18,6 +21,7 @@
         <label><span>{{localize "AXIOM.Actor.Main.Size"}}</span><input type="number" name="system.size" value="{{system.size}}" min="-5" max="8" step="1" /></label>
       </div>
     </section>
+    {{/if}}
 
     <div class="identity-row npc-identity-row">
       <div class="portrait">
@@ -86,12 +90,12 @@
         </section>
         <section class="panel tracker">
           <h3 class="tracker-title"><i class="fa-solid fa-gauge-high"></i> {{localize "AXIOM.Actor.Trackers.Momentum"}}</h3>
+          <div class="momentum-current-value">{{mock.trackers.momentum.current}}</div>
           <div class="momentum-line">
             <span>{{mock.trackers.momentum.min}}</span>
             <input type="range" name="system.trackers.momentum.current" min="{{mock.trackers.momentum.min}}" max="{{mock.trackers.momentum.max}}" value="{{mock.trackers.momentum.current}}" />
-            <span>+{{mock.trackers.momentum.max}}</span>
+            <span>{{mock.trackers.momentum.max}}</span>
           </div>
-          <div class="momentum-value">{{mock.trackers.momentum.current}}</div>
         </section>
       </aside>
     </div>

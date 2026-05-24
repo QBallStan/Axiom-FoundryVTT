@@ -2,19 +2,20 @@ const STATUS_ICON_PATH = "icons/svg";
 const AXIOM_STATUS_ICON_PATH = "systems/axiom/assets/icons/status";
 
 
-const ITEM_GENRE_TAGS = {
-  primitive: "AXIOM.Item.Tags.Primitive",
-  ancient: "AXIOM.Item.Tags.Ancient",
-  medieval: "AXIOM.Item.Tags.Medieval",
-  renaissance: "AXIOM.Item.Tags.Renaissance",
-  industrial: "AXIOM.Item.Tags.Industrial",
-  modern: "AXIOM.Item.Tags.Modern",
-  cyberpunk: "AXIOM.Item.Tags.Cyberpunk",
-  sciFi: "AXIOM.Item.Tags.SciFi",
-  postApocalyptic: "AXIOM.Item.Tags.PostApocalyptic",
-  fantasy: "AXIOM.Item.Tags.Fantasy",
-  horror: "AXIOM.Item.Tags.Horror",
-  universal: "AXIOM.Item.Tags.Universal"
+const ITEM_TECH_LEVELS = {
+  0: { name: "AXIOM.Item.TechLevel.Names.0", description: "AXIOM.Item.TechLevel.Descriptions.0" },
+  1: { name: "AXIOM.Item.TechLevel.Names.1", description: "AXIOM.Item.TechLevel.Descriptions.1" },
+  2: { name: "AXIOM.Item.TechLevel.Names.2", description: "AXIOM.Item.TechLevel.Descriptions.2" },
+  3: { name: "AXIOM.Item.TechLevel.Names.3", description: "AXIOM.Item.TechLevel.Descriptions.3" },
+  4: { name: "AXIOM.Item.TechLevel.Names.4", description: "AXIOM.Item.TechLevel.Descriptions.4" },
+  5: { name: "AXIOM.Item.TechLevel.Names.5", description: "AXIOM.Item.TechLevel.Descriptions.5" },
+  6: { name: "AXIOM.Item.TechLevel.Names.6", description: "AXIOM.Item.TechLevel.Descriptions.6" },
+  7: { name: "AXIOM.Item.TechLevel.Names.7", description: "AXIOM.Item.TechLevel.Descriptions.7" },
+  8: { name: "AXIOM.Item.TechLevel.Names.8", description: "AXIOM.Item.TechLevel.Descriptions.8" },
+  9: { name: "AXIOM.Item.TechLevel.Names.9", description: "AXIOM.Item.TechLevel.Descriptions.9" },
+  10: { name: "AXIOM.Item.TechLevel.Names.10", description: "AXIOM.Item.TechLevel.Descriptions.10" },
+  11: { name: "AXIOM.Item.TechLevel.Names.11", description: "AXIOM.Item.TechLevel.Descriptions.11" },
+  12: { name: "AXIOM.Item.TechLevel.Names.12", description: "AXIOM.Item.TechLevel.Descriptions.12" }
 };
 
 const ATTRIBUTE_CHECK_PRESETS = {
@@ -144,7 +145,7 @@ const STATUSES = {
     id: "fatigue",
     label: "AXIOM.Actor.Statuses.Fatigue",
     description: "AXIOM.Actor.StatusDescriptions.Fatigue",
-    img: `${STATUS_ICON_PATH}/unconscious.svg`,
+    img: `${AXIOM_STATUS_ICON_PATH}/fatigue.svg`,
     icon: "fa-solid fa-bed",
     category: "control",
     max: 5,
@@ -178,6 +179,20 @@ const STATUSES = {
     max: 1,
     numbered: false
   },
+  distracted: {
+    id: "distracted",
+    label: "AXIOM.Actor.Statuses.Distracted",
+    description: "AXIOM.Actor.StatusDescriptions.Distracted",
+    img: `${AXIOM_STATUS_ICON_PATH}/distracted.svg`,
+    icon: "fa-solid fa-circle-exclamation",
+    category: "control",
+    max: 4,
+    numbered: true,
+    rollModifierPerStack: -5,
+    changes: [
+      { key: "flags.axiom.rollModifiers.all", type: "add", value: -5, perStack: true }
+    ]
+  },
   fear: {
     id: "fear",
     label: "AXIOM.Actor.Statuses.Fear",
@@ -186,7 +201,8 @@ const STATUSES = {
     icon: "fa-solid fa-skull",
     category: "other",
     max: 1,
-    numbered: false
+    numbered: false,
+    hiddenOnSheet: true
   },
   lightCover: {
     id: "lightCover",
@@ -307,7 +323,7 @@ export const AXIOM = {
     decimals: 0
   },
 
-  itemGenreTags: ITEM_GENRE_TAGS,
+  itemTechLevels: ITEM_TECH_LEVELS,
 
   attributes: {
     strength: "AXIOM.Attributes.Strength",

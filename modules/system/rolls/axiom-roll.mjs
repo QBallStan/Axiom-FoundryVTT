@@ -67,6 +67,32 @@ export default class AxiomRoll {
     return { key: "rightLeg", label: "AXIOM.RollCard.HitLocations.RightLeg", value: reversed };
   }
 
+  static getCalledShotLocation(state = {}) {
+    const row = (state.modifierRows ?? []).find(row => row?.active !== false && row?.calledShot?.key);
+    const shot = row?.calledShot;
+    if (!shot) return null;
+
+    const keyMap = {
+      hands: "hands",
+      headVitals: "head",
+      arms: "arms",
+      legs: "legs",
+      heldItem: "heldItem"
+    };
+
+    return {
+      key: keyMap[shot.key] ?? shot.key,
+      label: shot.label ?? row.label ?? "AXIOM.Roll.CalledShotTarget",
+      value: null,
+      calledShot: true,
+      calledShotKey: shot.key
+    };
+  }
+
+  static getAttackHitLocation(d100, state = {}) {
+    return this.getCalledShotLocation(state) ?? this.getHitLocation(d100);
+  }
+
   static getReversedD100(value) {
     const rollValue = this.normalizeD100(value);
     const display = this.formatD100(rollValue);

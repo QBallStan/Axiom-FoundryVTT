@@ -119,6 +119,21 @@
       {{/if}}
     </div>
 
+    {{#if card.showOpposeAction}}
+      <div class="combat-action-strip opposed-roll-action-strip">
+        <button type="button" data-action="opposeRoll">
+          <i class="fa-solid fa-scale-balanced"></i> {{localize "AXIOM.RollCard.Oppose"}}
+        </button>
+      </div>
+    {{/if}}
+
+    {{#if card.showOpposedPending}}
+      <div class="combat-target-strip pending opposed-roll-pending-strip">
+        <span>{{localize "AXIOM.RollCard.OpposedWaiting"}}</span>
+        <strong>{{card.opposedPendingName}}</strong>
+      </div>
+    {{/if}}
+
     {{#if card.showWeaponSummary}}
       <div class="quick-grid">
         <div class="quick-line"><span>{{localize "AXIOM.RollCard.Location"}}</span><strong>{{card.location}}</strong></div>
@@ -142,6 +157,9 @@
         {{#if card.showBlockAction}}
           <button type="button" data-action="combatBlock" data-tooltip="{{localize 'AXIOM.Combat.Block'}}" aria-label="{{localize 'AXIOM.Combat.Block'}}"><i class="fa-solid fa-shield"></i></button>
         {{/if}}
+        {{#if card.showCounterattackAction}}
+          <button type="button" data-action="combatCounterattack" data-tooltip="{{localize 'AXIOM.Combat.Momentum.Counterattack'}}" aria-label="{{localize 'AXIOM.Combat.Momentum.Counterattack'}}"><i class="fa-solid fa-rotate-left"></i></button>
+        {{/if}}
         <button type="button" data-action="combatUnopposed" data-tooltip="{{localize 'AXIOM.Combat.Unopposed'}}" aria-label="{{localize 'AXIOM.Combat.Unopposed'}}"><i class="fa-solid fa-bullseye"></i></button>
       </div>
     {{/if}}
@@ -155,12 +173,6 @@
 
         <div class="combat-result-grid">
           <div><span>{{localize "AXIOM.Combat.Defender"}}</span><strong>{{card.combatResult.defenderName}}</strong></div>
-          <div><span>{{localize "AXIOM.Combat.AttackHitsShort"}}</span><strong>{{card.combatResult.attackHitsDisplay}}</strong></div>
-          {{#if card.combatResult.defense}}
-            <div><span>{{card.combatResult.defense.label}}</span><strong>{{card.combatResult.defense.hitsDisplay}}</strong></div>
-          {{else}}
-            <div><span>{{localize "AXIOM.Combat.Defense"}}</span><strong>{{localize "AXIOM.Combat.None"}}</strong></div>
-          {{/if}}
           <div><span>{{localize "AXIOM.Combat.NetHits"}}</span><strong>{{card.combatResult.netHitsDisplay}}</strong></div>
           <div><span>{{localize "AXIOM.RollCard.Location"}}</span><strong>{{card.combatResult.hitLocation.labelText}}</strong></div>
           <div><span>{{localize "AXIOM.Combat.FinalDamage"}}</span><strong>{{card.combatResult.damage.finalDamage}}</strong></div>

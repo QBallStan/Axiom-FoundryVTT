@@ -46,24 +46,41 @@
         "NoDetails": "Aucun champ spécifique aux munitions pour le moment."
       },
       "QuantityControlHint": "Clic gauche -1. Clic droit +1. Maintenez Maj pour 5, Maj+Ctrl pour 10.",
-      "Tags": {
-        "Label": "Tags",
-        "Configure": "Configurer les tags",
-        "Hint": "Sélectionnez tous les tags applicables à cet objet. Ces tags seront utilisés plus tard pour le filtrage.",
-        "Clear": "Effacer les tags",
-        "Primitive": "Primitif",
-        "Ancient": "Antique",
-        "Medieval": "Médiéval",
-        "Renaissance": "Renaissance",
-        "Industrial": "Industriel",
-        "Modern": "Moderne",
-        "NearFuture": "Futur proche",
-        "Cyberpunk": "Cyberpunk",
-        "SciFi": "Science-fiction",
-        "PostApocalyptic": "Post-apocalyptique",
-        "Fantasy": "Fantasy",
-        "Horror": "Horreur",
-        "Universal": "Universel"
+      "TechLevel": {
+        "Label": "TL",
+        "Option": "TL {level} - {name}",
+        "Names": {
+          "0": "Primitive",
+          "1": "Âge du bronze",
+          "2": "Âge du fer",
+          "3": "Médiéval",
+          "4": "Renaissance",
+          "5": "Industriel",
+          "6": "Mécanisé",
+          "7": "Atomique",
+          "8": "Numérique",
+          "9": "Futur proche",
+          "10": "Interplanétaire",
+          "11": "Stellaire",
+          "12": "Ultra-tech"
+        },
+        "Descriptions": {
+          "0": "Pierre, os, bois, feu, peaux, outils simples, tradition orale, aucune industrie formelle.",
+          "1": "Agriculture, villes, écriture, outils et armes en bronze, véhicules à roues, voiliers, premiers États organisés.",
+          "2": "Outils et armes en fer, monnaie, routes, empires, engins de siège, administration à grande échelle.",
+          "3": "Armes en acier, châteaux, guildes, universités, moulins à vent, chevaux lourds, maille et armure de plates, premières armes à feu en fin de TL3.",
+          "4": "Imprimerie, navigation avancée, commerce mondial, horlogerie, mousquets, piques, artillerie navale, instruments scientifiques.",
+          "5": "Vapeur, chemins de fer, télégraphe, usines, production de masse, premières armes à répétition, cuirassés, vaccins.",
+          "6": "Automobiles, avions, radio, téléphones, poudre sans fumée, armes automatiques, chars, antibiotiques.",
+          "7": "Énergie nucléaire, ordinateurs centraux, télévision, avions à réaction, satellites, armes guidées, greffes d'organes.",
+          "8": "Ordinateurs personnels, réseaux mondiaux, smartphones, drones, batteries avancées, biotechnologie, armes intelligentes.",
+          "9": "IA avancée, réalité augmentée, robotique, cybernétique, matériaux intelligents, drones de combat, ingénierie tissulaire.",
+          "10": "Industrie orbitale courante, fusion ou énergie équivalente, voyages interplanétaires rapides, habitats, armes énergétiques avancées.",
+          "11": "Voyage interstellaire, IA mature, corps artificiels, fusion portable, nanotechnologie avancée, machines vivantes.",
+          "12": "Fabrication de matière, biotechnologie extrême, matériaux autoréparants, technologie post-humaine, infrastructure proche de la post-rareté."
+        },
+        "Configure": "Configurer le niveau technologique",
+        "Hint": "Choisissez le niveau technologique de l'objet."
       }
     },
     "Skill": {
@@ -79,7 +96,9 @@
         "Melee": "Mêlée",
         "Marksmanship": "Tir",
         "Athletics": "Athlétisme"
-      }
+      },
+      "LevelShort": "Niv",
+      "TargetShort": "SR"
     },
     "Actor": {
       "Skills": {
@@ -103,6 +122,14 @@
           "Grip": "Prise",
           "MemoryAcademic": "Mémoire (académique)",
           "MemoryStreetwise": "Mémoire (terrain)"
+        },
+        "Sort": {
+          "Label": "Trier les compétences",
+          "Alphabetical": "Trier par ordre alphabétique",
+          "LevelHigh": "Trier par niveau le plus élevé",
+          "LevelLow": "Trier par niveau le plus bas",
+          "TargetHigh": "Trier par Seuil de Réussite le plus élevé",
+          "TargetLow": "Trier par Seuil de Réussite le plus bas"
         }
       },
       "Tabs": {
@@ -229,7 +256,8 @@
             "Resource": "Ressource",
             "Custom": "Clé personnalisée",
             "AttributeCheck": "Test d’attribut",
-            "SubAttribute": "Sous-attribut"
+            "SubAttribute": "Sous-attribut",
+            "Combat": "Combat"
           },
           "Targets": {
             "GrazingWoundsMax": "Emplacements de blessures superficielles",
@@ -250,7 +278,8 @@
             "Initiative": "Initiative",
             "DamageModifier": "Modificateur de dégâts",
             "Toughness": "Robustesse",
-            "CorruptionThreshold": "Seuil de corruption"
+            "CorruptionThreshold": "Seuil de corruption",
+            "MultipleAttackPenalty": "Pénalité d’attaques multiples"
           },
           "Title": "Ajouter un effet Axiom",
           "Name": "Nom de l’effet",
@@ -317,7 +346,8 @@
         "LightCover": "Couvert léger",
         "MediumCover": "Couvert moyen",
         "HeavyCover": "Couvert lourd",
-        "Sprinting": "Sprint"
+        "Sprinting": "Sprint",
+        "Distracted": "Distrait"
       },
       "StatusDescriptions": {
         "Burning": "En feu. Au début de chaque tour, subit 2 dégâts létaux par cumul. La Brûlure augmente de 1 cumul par tour jusqu’à extinction.",
@@ -334,12 +364,13 @@
         "LightCover": "Partiellement protégé par le terrain ou un obstacle. Ajoute +10 à la défense contre les tirs à distance lorsque le couvert s’applique.",
         "MediumCover": "Bien protégé par le terrain ou un obstacle. Ajoute +20 à la défense contre les tirs à distance lorsque le couvert s’applique.",
         "HeavyCover": "Presque entièrement protégé par le terrain ou un obstacle. Ajoute +30 à la défense contre les tirs à distance lorsque le couvert s’applique.",
-        "Sprinting": "Déplacement à pleine vitesse. Chaque cumul impose -5 aux tests jusqu’à la fin du round, jusqu’à 3 cumuls."
+        "Sprinting": "Déplacement à pleine vitesse. Chaque cumul impose -5 aux tests jusqu’à la fin du round, jusqu’à 3 cumuls.",
+        "Distracted": "Désorienté par la confusion, la surcharge sensorielle, les feintes, la pression suppressive ou une interruption soudaine. Chaque cumul impose -5 à tous les tests. Au début du prochain tour du personnage, tous les cumuls sont retirés sauf si la source persiste."
       },
       "Combat": {
         "EquippedArmor": "Armure",
-        "MeleeWeapons": "Armes de mêlée",
-        "RangedWeapons": "Armes à distance",
+        "MeleeWeapons": "Mêlée",
+        "RangedWeapons": "Distance",
         "Ammunition": "Munitions",
         "Armor": "Armure",
         "Attack": "Attaquer",
@@ -354,7 +385,7 @@
         "Shields": "Boucliers",
         "NoShields": "Aucun bouclier.",
         "Weapons": "Armes",
-        "MixedWeapons": "Armes mixtes",
+        "MixedWeapons": "Mixte",
         "NoWeapons": "Aucune arme"
       },
       "NPC": {
@@ -370,6 +401,9 @@
         "Morale": "Moral",
         "Treasure": "Trésor",
         "GmNotes": "Notes MJ"
+      },
+      "Config": {
+        "Title": "Configuration du personnage"
       }
     },
     "Roll": {
@@ -403,15 +437,18 @@
         "Custom": "Modificateur personnalisé",
         "Equipment": "Équipement",
         "StatusPenalty": "Pénalités de statut",
-        "ConditionalEffect": "Effet conditionnel"
+        "ConditionalEffect": "Effet conditionnel",
+        "MultipleAttacks": "Attaques multiples"
       },
       "Timeframes": {
         "None": "Aucun délai",
         "Seconds": "1d6 secondes",
         "CombatRounds": "1d6 rounds de combat",
         "TenSeconds": "1d6 × 10 secondes",
+        "ThirtySeconds": "1d6 × 30 secondes",
         "Minutes": "1d6 minutes",
         "TenMinutes": "1d6 × 10 minutes",
+        "ThirtyMinutes": "1d6 × 30 minutes",
         "Hours": "1d6 heures",
         "FourHours": "1d6 × 4 heures",
         "TenHours": "1d6 × 10 heures",
@@ -575,7 +612,12 @@
         "LeftLeg": "Jambe gauche",
         "RightLeg": "Jambe droite"
       },
-      "EditTarget": "Modifier le nombre cible"
+      "EditTarget": "Modifier le nombre cible",
+      "Oppose": "Opposer",
+      "OpposedWaiting": "Opposition",
+      "SelectOneOpposingToken": "Sélectionnez exactement un token pour opposer ce jet.",
+      "OpposingTokenHasNoActor": "Le token sélectionné n’a pas d’acteur.",
+      "OpposedRollArmed": "Le prochain jet de {actor} sera opposé à ce jet."
     },
     "Armor": {
       "Locations": {
@@ -610,7 +652,8 @@
         "Short": "Courte",
         "Medium": "Moyenne",
         "Long": "Longue",
-        "Extreme": "Extrême"
+        "Extreme": "Extrême",
+        "Close": "Contact"
       },
       "Ammo": "Munitions",
       "SkillPlaceholder": "Saisissez une compétence ou choisissez parmi celles du personnage",
@@ -677,7 +720,15 @@
       "RangedSkill": "Compétence à distance",
       "ParryBonus": "Bonus de parade",
       "Shots": "Tirs",
-      "QuantityDisplay": "Qté {quantity}"
+      "QuantityDisplay": "Qté {quantity}",
+      "StrengthBasedRange": "Portée basée sur la Force",
+      "StrengthRangeModifier": "Mod. FOR",
+      "RangeFormula": {
+        "Fixed": "Portée effective : {range}m",
+        "Strength": "Portée effective : FOR {modifier} = {range}m"
+      },
+      "StrengthBasedRangeShort": "Portée FOR",
+      "StrengthRangeModifierShort": "Mod. FOR"
     },
     "Equipment": {
       "Skill": "Compétence",
@@ -746,11 +797,14 @@
         "medium": "Portée moyenne",
         "long": "Portée longue",
         "extreme": "Portée extrême",
-        "outOfRange": "Au-delà de la portée extrême"
+        "outOfRange": "Au-delà de la portée extrême",
+        "close": "Contact"
       },
       "AssignOpponent": "Assigner un adversaire",
+      "OpposedResult": "Résultat opposé",
       "OpposedTest": "Test opposé",
       "Pending": "En attente",
+      "Resolved": "Résolu",
       "MeleeAttack": "Attaque de mêlée",
       "RangedAttack": "Attaque à distance",
       "Attacker": "Attaquant",
@@ -765,7 +819,23 @@
       "SelectOrTargetDefender": "Sélectionnez ou ciblez un défenseur avant de résoudre le combat.",
       "CalculatedFinalDamage": "Dégâts finaux calculés",
       "ManualFinalDamage": "Dégâts finaux manuels",
-      "OutOfAmmo": "Plus de munitions : {weapon}."
+      "OutOfAmmo": "Plus de munitions : {weapon}.",
+      "Winner": "Vainqueur",
+      "NoVictor": "Aucun vainqueur",
+      "Result": "Résultat",
+      "Resolution": "Résolution",
+      "OpposedMargin": "Marge",
+      "AttackerWins": "L’attaquant l’emporte",
+      "DefenderWins": "Le défenseur l’emporte",
+      "OpposedStalemate": "Égalité parfaite",
+      "UnopposedSuccess": "Réussite sans opposition",
+      "UnopposedFailure": "Échec sans opposition",
+      "TieBreakerHits": "Touches comparées",
+      "TieBreakerUnits": "Chiffre des unités",
+      "TieBreakerComplication": "Départage par complication",
+      "TieBreakerStalemate": "Égalité exacte",
+      "TieBreakerUnopposed": "Jet d’attaque",
+      "TieBreakerUnopposedFailure": "Attaque ratée"
     },
     "Currency": {
       "DefaultName": "Crédits",
@@ -868,5 +938,27 @@
   "AXIOM.Combat.BlockWith": "Bloquer avec {shield}",
   "AXIOM.Roll.ModifierSources.ShieldBlock": "Blocage du bouclier",
   "AXIOM.Shield.NoSkillSelectedWarning": "{shield} utilise {skill}, mais cette compétence est introuvable sur cet acteur.",
-  "AXIOM.Combat.NoShieldAvailable": "{actor} n’a pas de bouclier équipé."
+  "AXIOM.Combat.NoShieldAvailable": "{actor} n’a pas de bouclier équipé.",
+  "Combat": {
+    "Momentum": {
+      "PressTheAdvantage": "Presser l’avantage",
+      "Counterattack": "Contre-attaque",
+      "AvoidOpenings": "Éviter les ouvertures",
+      "Insufficient": "Pas assez de Momentum.",
+      "Gained": "Momentum +1",
+      "Capped": "Momentum au maximum",
+      "PressTheAdvantageModifier": "Presser l’avantage (+10)",
+      "GainedBy": "{actor} gagne +1 Momentum.",
+      "CappedBy": "{actor} est déjà au maximum de Momentum."
+    }
+  },
+  "Actor": {
+    "Effects": {
+      "Builder": {
+        "Targets": {
+          "MomentumMax": "Momentum maximum"
+        }
+      }
+    }
+  }
 }

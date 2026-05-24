@@ -59,3 +59,46 @@ export function getWeaponCategory(item) {
 export function isShieldItem(item) {
   return item?.type === SHIELD_ITEM_TYPE;
 }
+
+
+export function getActorStrengthValue(actor) {
+  const value = Number(actor?.system?.attributes?.strength?.value ?? actor?.system?.attributes?.strength ?? 0);
+  return Number.isFinite(value) ? value : 0;
+}
+
+export function getWeaponRange(weapon, actor = null) {
+  if (!isWeaponItem(weapon)) return 0;
+
+  const system = weapon.system ?? {};
+  const usesStrength = Boolean(system.strengthBasedRange);
+  const baseRange = Number(system.range ?? 0);
+
+  if (!usesStrength) return Number.isFinite(baseRange) ? Math.max(0, baseRange) : 0;
+
+  const strength = getActorStrengthValue(actor ?? weapon.actor ?? weapon.parent ?? null);
+  const modifier = Number(system.strengthRangeModifier ?? 0);
+  const range = strength + (Number.isFinite(modifier) ? modifier : 0);
+  return Number.isFinite(range) ? Math.max(0, range) : 0;
+}
+
+export function getWeaponRangeBands(rangeValue) {
+  const range = Math.max(0, Math.floor(Number(rangeValue ?? 0)));
+  const close = range > 0 ? Math.ceil(range / 4) : 0;
+  const short = range > 0 ? Math.ceil(range / 2) : 0;
+  const medium = range;
+  const long = range * 2;
+  const extreme = range * 3;
+
+  return {
+    close,
+    short,
+    medium,
+    long,
+    extreme,
+    closeStart: range > 0 ? 0 : 0,
+    shortStart: range > 0 ? close + 1 : 0,
+    mediumStart: range > 0 ? short + 1 : 0,
+    longStart: range > 0 ? medium + 1 : 0,
+    extremeStart: range > 0 ? long + 1 : 0
+  };
+}

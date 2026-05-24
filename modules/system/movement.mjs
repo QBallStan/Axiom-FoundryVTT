@@ -15,11 +15,14 @@ function getTokenCenter(document, source = null) {
   };
 }
 
-function formatDistance(value) {
+function roundMeters(value) {
   const number = Number(value ?? 0);
-  if (!Number.isFinite(number)) return "0";
-  const rounded = Math.round(number * 10) / 10;
-  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+  if (!Number.isFinite(number)) return 0;
+  return Math.floor(number);
+}
+
+function formatDistance(value) {
+  return String(roundMeters(value));
 }
 
 function measureTokenMovement(document, changes, cached = null) {
@@ -40,7 +43,7 @@ function measureTokenMovement(document, changes, cached = null) {
   const gridSize = Number(canvas?.scene?.grid?.size ?? canvas?.grid?.size ?? 100) || 100;
   const gridDistance = Number(canvas?.scene?.grid?.distance ?? 1) || 1;
   const distance = Math.hypot(after.x - before.x, after.y - before.y) / gridSize * gridDistance;
-  return Number.isFinite(distance) ? Math.round(distance * 10) / 10 : 0;
+  return roundMeters(distance);
 }
 
 function getTokenCombatant(document) {
@@ -67,8 +70,8 @@ async function addMovementUsed(combatant, distance) {
   const max = getMovementMax(actor);
   const previousValue = Number(combatant.getFlag?.("axiom", "movementUsed") ?? 0);
   const previous = Number.isFinite(previousValue) ? previousValue : 0;
-  const used = Math.round((previous + distance) * 10) / 10;
-  const remainingBefore = Math.max(0, max - previous);
+  const used = roundMeters(previous + distance);
+  const remainingBefore = Math.max(0, roundMeters(max - previous));
 
   const updates = { "flags.axiom.movementUsed": used };
   const round = Number(game.combat?.round ?? 0) || 0;

@@ -13,20 +13,18 @@
 
       <button
         type="button"
-        class="item-tag-config"
-        data-action="configureGenreTags"
-        data-tooltip="{{localize 'AXIOM.Item.Tags.Configure'}}"
-        aria-label="{{localize 'AXIOM.Item.Tags.Configure'}}"
+        class="item-tech-level-config"
+        data-action="configureTechLevel"
+        data-tooltip="{{localize 'AXIOM.Item.TechLevel.Configure'}}"
+        aria-label="{{localize 'AXIOM.Item.TechLevel.Configure'}}"
       >
         <i class="fa-solid fa-gear"></i>
       </button>
     </div>
 
-    {{#if itemGenre.selected.length}}
-      <div class="item-tag-list" aria-label="{{localize 'AXIOM.Item.Tags.Label'}}">
-        {{#each itemGenre.selected as |tag|}}
-          <span class="item-tag-pill" data-tag="{{tag.value}}">{{tag.label}}</span>
-        {{/each}}
+    {{#if techLevel.selected}}
+      <div class="item-tech-level-list" aria-label="{{localize 'AXIOM.Item.TechLevel.Label'}}">
+        <span class="item-tech-level-pill" data-tooltip="{{techLevel.selected.description}}">{{techLevel.selected.label}}</span>
       </div>
     {{/if}}
 
@@ -71,6 +69,7 @@
         <span>{{localize "AXIOM.Item.Availability"}}</span>
         <input type="number" name="system.availability" value="{{system.availability}}" min="0" step="1" />
       </label>
+
     </div>
     {{/if}}
   </div>

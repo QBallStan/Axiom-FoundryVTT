@@ -1,5 +1,5 @@
 import AxiomRoll from "./rolls/axiom-roll.mjs";
-import { isEquippedGearState, isMeleeWeaponItem, isRangedWeaponItem, isShieldItem } from "./items.mjs";
+import { getWeaponRange, isEquippedGearState, isMeleeWeaponItem, isRangedWeaponItem, isShieldItem } from "./items.mjs";
 
 /**
  * Combat helpers for Axiom//Core.
@@ -15,7 +15,10 @@ export default class AxiomCombat extends foundry.documents.Combat {
     activationKey: "activationKey",
     pass: "pass",
     movementUsed: "movementUsed",
-    movementWarningRound: "movementWarningRound"
+    movementWarningRound: "movementWarningRound",
+    attackCount: "attackCount",
+    attackCountRound: "attackCountRound",
+    avoidingOpeningsRound: "avoidingOpeningsRound"
   };
 
   static _turnStartLocks = new Set();
@@ -57,6 +60,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
       updateData.round = Math.max(1, Number(this.round ?? 0) + 1);
       await this._restoreAllActionPoints();
       await this._resetAllMovementUsed();
+      await this._resetAllAttackCounts();
+      await this._clearAllAvoidOpenings();
     }
 
     await this.update(updateData);
@@ -115,6 +120,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
   async _startNextAxiomRound() {
     await this._restoreAllActionPoints();
     await this._resetAllMovementUsed();
+    await this._resetAllAttackCounts();
+    await this._clearAllAvoidOpenings();
 
     const firstTurn = (this.turns ?? []).findIndex(combatant => AxiomCombat.getActionPointCurrent(combatant?.actor) > 0);
     const nextRound = Math.max(1, Number(this.round ?? 0) + 1);
@@ -151,6 +158,37 @@ export default class AxiomCombat extends foundry.documents.Combat {
     await Promise.all(updates);
   }
 
+  async _resetAllAttackCounts() {
+    const updates = [];
+    for (const combatant of this.combatants ?? []) {
+      if (!combatant) continue;
+      updates.push(combatant.update({
+        [`flags.axiom.${AxiomCombat.FLAGS.attackCount}`]: 0,
+        [`flags.axiom.${AxiomCombat.FLAGS.attackCountRound}`]: Number(this.round ?? 0) || 0
+      }));
+    }
+    await Promise.all(updates);
+  }
+
+  async _resetAllMomentum() {
+    const updates = [];
+    for (const combatant of this.combatants ?? []) {
+      const actor = combatant?.actor;
+      if (!actor?.system?.trackers?.momentum) continue;
+      updates.push(actor.update({ "system.trackers.momentum.current": 0 }));
+    }
+    await Promise.all(updates);
+  }
+
+  async _clearAllAvoidOpenings() {
+    const updates = [];
+    for (const combatant of this.combatants ?? []) {
+      if (!combatant) continue;
+      updates.push(combatant.unsetFlag?.("axiom", AxiomCombat.FLAGS.avoidingOpeningsRound));
+    }
+    await Promise.all(updates.filter(Boolean));
+  }
+
   static getActionPointTracker(actor) {
     return actor?.system?.trackers?.actionPoints ?? null;
   }
@@ -176,6 +214,75 @@ export default class AxiomCombat extends foundry.documents.Combat {
     return Math.min(value, this.getEffectiveActionPointMax(actor));
   }
 
+  static getCurrentCombat() {
+    const combat = game.combat ?? null;
+    return combat?.started ? combat : null;
+  }
+
+  static getCombatantForActor(actor, combat = this.getCurrentCombat()) {
+    if (!actor || !combat?.started) return null;
+
+    const tokens = actor.getActiveTokens?.(true, true) ?? [];
+    const tokenIds = new Set(tokens.map(token => token.id).filter(Boolean));
+    const actorId = actor.id;
+    const actorUuid = actor.uuid;
+
+    return (combat.combatants ?? []).find(combatant => {
+      if (!combatant) return false;
+      if (combatant.actor === actor) return true;
+      if (combatant.actor?.id && combatant.actor.id === actorId) return true;
+      if (combatant.actor?.uuid && combatant.actor.uuid === actorUuid) return true;
+      if (combatant.tokenId && tokenIds.has(combatant.tokenId)) return true;
+      return false;
+    }) ?? null;
+  }
+
+  static getCombatantAttackCount(combatant, combat = this.getCurrentCombat()) {
+    if (!combatant || !combat?.started) return 0;
+
+    const round = Number(combat.round ?? 0) || 0;
+    const storedRound = Number(combatant.getFlag?.("axiom", this.FLAGS.attackCountRound) ?? 0) || 0;
+    if (storedRound !== round) return 0;
+
+    const count = Number(combatant.getFlag?.("axiom", this.FLAGS.attackCount) ?? 0);
+    return Number.isFinite(count) ? Math.max(0, count) : 0;
+  }
+
+  static getActorAttackCount(actor, combat = this.getCurrentCombat()) {
+    const combatant = this.getCombatantForActor(actor, combat);
+    return this.getCombatantAttackCount(combatant, combat);
+  }
+
+  static getMultipleAttackPenaltyValue(actor) {
+    const value = Number(actor?.system?.combat?.multipleAttackPenalty ?? -20);
+    return Number.isFinite(value) ? value : -20;
+  }
+
+  static getMultipleAttackPenalty(actor, combat = this.getCurrentCombat()) {
+    if (!actor || !combat?.started) return 0;
+    const attackCount = this.getActorAttackCount(actor, combat);
+    if (attackCount <= 0) return 0;
+    return this.getMultipleAttackPenaltyValue(actor) * attackCount;
+  }
+
+  static async registerWeaponAttack(actor, combat = this.getCurrentCombat()) {
+    if (!actor || !combat?.started) return;
+
+    const combatant = this.getCombatantForActor(actor, combat);
+    if (!combatant) return;
+
+    const round = Number(combat.round ?? 0) || 0;
+    const count = this.getCombatantAttackCount(combatant, combat);
+    try {
+      await combatant.update({
+        [`flags.axiom.${this.FLAGS.attackCount}`]: count + 1,
+        [`flags.axiom.${this.FLAGS.attackCountRound}`]: round
+      });
+    } catch (error) {
+      console.warn("AXIOM//CORE | Could not update combatant attack count", error);
+    }
+  }
+
   static async clampActionPointsToEffectiveMax(actor) {
     const tracker = this.getActionPointTracker(actor);
     if (!actor || !tracker) return;
@@ -189,6 +296,64 @@ export default class AxiomCombat extends foundry.documents.Combat {
 
   static getMomentumTracker(actor) {
     return actor?.system?.trackers?.momentum ?? null;
+  }
+
+  static getMomentumCurrent(actor) {
+    const tracker = this.getMomentumTracker(actor);
+    const current = Number(tracker?.current ?? 0);
+    return Number.isFinite(current) ? Math.max(0, current) : 0;
+  }
+
+  static getMomentumMax(actor) {
+    const tracker = this.getMomentumTracker(actor);
+    const max = Number(tracker?.max ?? (actor?.type === "npc" ? 1 : 3));
+    return Number.isFinite(max) ? Math.max(0, max) : 0;
+  }
+
+  static async adjustMomentum(actor, delta = 0) {
+    const tracker = this.getMomentumTracker(actor);
+    if (!actor || !tracker) return { changed: false, current: 0, max: 0, capped: false };
+
+    const current = this.getMomentumCurrent(actor);
+    const max = this.getMomentumMax(actor);
+    const next = Math.min(max, Math.max(0, current + Number(delta ?? 0)));
+    if (next === current) return { changed: false, current, max, capped: delta > 0 && current >= max };
+
+    await actor.update({ "system.trackers.momentum.current": next });
+    return { changed: true, current: next, previous: current, max, capped: delta > 0 && next >= max };
+  }
+
+  static async spendMomentum(actor, amount = 1) {
+    const current = this.getMomentumCurrent(actor);
+    const cost = Math.max(0, Number(amount ?? 0));
+    if (!actor || cost <= 0 || current < cost) return false;
+    await actor.update({ "system.trackers.momentum.current": current - cost });
+    return true;
+  }
+
+  static canSpendMomentum(actor, amount = 1) {
+    return this.getMomentumCurrent(actor) >= Math.max(0, Number(amount ?? 0));
+  }
+
+  static getCombatantForTokenId(tokenId, combat = this.getCurrentCombat()) {
+    if (!tokenId || !combat?.started) return null;
+    return (combat.combatants ?? []).find(combatant => combatant?.tokenId === tokenId || combatant?.token?.id === tokenId) ?? null;
+  }
+
+  static async avoidOpenings(actor, combat = this.getCurrentCombat()) {
+    if (!actor || !combat?.started) return false;
+    const combatant = this.getCombatantForActor(actor, combat);
+    if (!combatant) return false;
+    if (!await this.spendMomentum(actor, 1)) return false;
+    await combatant.setFlag?.("axiom", this.FLAGS.avoidingOpeningsRound, Number(combat.round ?? 0) || 0);
+    ui.combat?.render?.();
+    return true;
+  }
+
+  static hasAvoidOpenings(combatant, combat = this.getCurrentCombat()) {
+    if (!combatant || !combat?.started) return false;
+    const round = Number(combat.round ?? 0) || 0;
+    return Number(combatant.getFlag?.("axiom", this.FLAGS.avoidingOpeningsRound) ?? -1) === round;
   }
 
   static async onCombatTurnStart(combat) {
@@ -211,7 +376,6 @@ export default class AxiomCombat extends foundry.documents.Combat {
       await combatant.setFlag?.("axiom", this.FLAGS.activationKey, activationKey);
 
       if (pass === 1) {
-        await this.stepMomentumTowardZero(actor);
         await this.resolveStartOfTurnStatuses(combat, combatant, actor);
       }
 
@@ -239,6 +403,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
     if (chilled > 0) await actor.removeStatus?.("chilled", 1);
 
     if (this.getStatusStacks(actor, "sprinting") > 0) await actor.clearStatus?.("sprinting");
+    if (this.getStatusStacks(actor, "distracted") > 0) await actor.clearStatus?.("distracted");
 
     const statusesWithCards = ["burning", "bleeding", "stunned", "corroding"]
       .map(statusId => ({ statusId, stacks: this.getStatusStacks(actor, statusId), status: CONFIG.AXIOM?.statuses?.[statusId] }))
@@ -319,22 +484,24 @@ export default class AxiomCombat extends foundry.documents.Combat {
     if (!game.user?.isGM || !combat) return;
     await combat._restoreAllActionPoints?.();
     await combat._resetAllMovementUsed?.();
+    await combat._resetAllAttackCounts?.();
+    await combat._resetAllMomentum?.();
+    await combat._clearAllAvoidOpenings?.();
     await this.onCombatTurnStart(combat);
   }
 
+  static async onCombatEnd(combat) {
+    if (!game.user?.isGM || !combat) return;
+    await combat._restoreAllActionPoints?.();
+    await combat._resetAllMovementUsed?.();
+    await combat._resetAllAttackCounts?.();
+    await combat._resetAllMomentum?.();
+    await combat._clearAllAvoidOpenings?.();
+  }
+
   static async stepMomentumTowardZero(actor) {
-    const tracker = this.getMomentumTracker(actor);
-    if (!tracker) return;
-
-    const current = Number(tracker.current ?? 0);
-    if (!Number.isFinite(current) || current === 0) return;
-
-    const min = Number(tracker.min ?? -5);
-    const max = Number(tracker.max ?? 5);
-    const next = Math.min(max, Math.max(min, current + (current > 0 ? -1 : 1)));
-    if (next === current) return;
-
-    await actor.update({ "system.trackers.momentum.current": next });
+    // Momentum is now a positive spendable resource and no longer drifts toward zero.
+    return actor;
   }
 
   static SETTINGS = {
@@ -349,10 +516,11 @@ export default class AxiomCombat extends foundry.documents.Combat {
   };
 
   static RANGE_MODIFIERS = {
-    short: 10,
-    medium: 0,
-    long: -10,
-    extreme: -30,
+    close: 30,
+    short: 20,
+    medium: 10,
+    long: 0,
+    extreme: -20,
     outOfRange: -40
   };
 
@@ -509,11 +677,12 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const distance = this.measureTokenDistance(attackerToken, targetToken);
     if (!Number.isFinite(distance)) return null;
 
-    const range = Number(weapon.system?.range ?? 0);
+    const range = getWeaponRange(weapon, attackerActor);
     if (range <= 0) return null;
 
     let band = "medium";
-    if (distance <= Math.ceil(range / 2)) band = "short";
+    if (distance <= Math.ceil(range / 4)) band = "close";
+    else if (distance <= Math.ceil(range / 2)) band = "short";
     else if (distance <= range) band = "medium";
     else if (distance <= range * 2) band = "long";
     else if (distance <= range * 3) band = "extreme";
@@ -636,7 +805,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
   }
 
   static getMomentumModifier(actor) {
-    return Number(actor?.system?.trackers?.momentum?.current ?? 0) * 5;
+    return 0;
   }
 
   static getStatusModifierRows(actor) {
@@ -668,7 +837,6 @@ export default class AxiomCombat extends foundry.documents.Combat {
   static buildAutomaticModifierRows(actor, { includeCover = false } = {}) {
     const rows = [
       { id: "auto-wounds", label: "AXIOM.Roll.ModifierSources.WoundPenalty", value: this.getWoundPenalty(actor), automatic: true, locked: true },
-      { id: "auto-momentum", label: "AXIOM.Roll.ModifierSources.Momentum", value: this.getMomentumModifier(actor), automatic: true, locked: true },
       ...this.getStatusModifierRows(actor)
     ];
 
@@ -708,6 +876,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
 
     let skill = null;
     let defenseLabel = "";
+    let shield = null;
     if (defenseType === "block") {
       const block = this.getPrimaryShieldBlockSkill(defender);
       skill = block?.skill ?? null;
@@ -718,6 +887,30 @@ export default class AxiomCombat extends foundry.documents.Combat {
       }
       if (!skill) {
         this.warnMissingSkill(defender, block.shield.system?.skill ?? "", game.i18n.localize("AXIOM.Combat.Block"));
+        return null;
+      }
+    } else if (defenseType === "counterattack") {
+      const parry = this.getPrimaryParrySkill(defender);
+      skill = parry?.skill ?? null;
+      defenseLabel = game.i18n.localize("AXIOM.Combat.Momentum.Counterattack");
+      if (!this.canSpendMomentum(defender, 1)) {
+        ui.notifications?.warn(game.i18n.localize("AXIOM.Combat.Momentum.Insufficient"));
+        return null;
+      }
+      if (!skill) {
+        this.warnMissingSkill(defender, this.getUnarmedCombatSkillName(), game.i18n.localize("AXIOM.Combat.Momentum.Counterattack"));
+        return null;
+      }
+    } else if (defenseType === "counterattack") {
+      const parry = this.getPrimaryParrySkill(defender);
+      skill = parry?.skill ?? null;
+      defenseLabel = game.i18n.localize("AXIOM.Combat.Momentum.Counterattack");
+      if (!this.canSpendMomentum(defender, 1)) {
+        ui.notifications?.warn(game.i18n.localize("AXIOM.Combat.Momentum.Insufficient"));
+        return null;
+      }
+      if (!skill) {
+        this.warnMissingSkill(defender, this.getUnarmedCombatSkillName(), game.i18n.localize("AXIOM.Combat.Momentum.Counterattack"));
         return null;
       }
     } else if (defenseType === "parry") {
@@ -796,35 +989,81 @@ export default class AxiomCombat extends foundry.documents.Combat {
   }
 
   static resolveOpposedHits(attack, defense, { unopposed = false } = {}) {
-    if (!this.getOpposedAttackSuccess(attack)) return { attackerWins: false, netHits: 0, stalemate: false };
-
     const attackHits = Number(attack?.hits ?? 0);
-    if (unopposed || !defense) return { attackerWins: true, netHits: attackHits, stalemate: false };
+
+    if (unopposed || !defense) {
+      const attackerWins = this.getOpposedAttackSuccess(attack);
+      return {
+        attackerWins,
+        defenderWins: false,
+        winner: attackerWins ? "attacker" : "defender",
+        netHits: attackerWins ? Math.max(0, attackHits) : 0,
+        margin: attackerWins ? Math.max(0, attackHits) : 0,
+        stalemate: false,
+        tieBreaker: attackerWins ? "unopposed" : "unopposedFailure"
+      };
+    }
 
     const defenseHits = Number(defense?.hits ?? 0);
     const hitDifference = attackHits - defenseHits;
-    if (hitDifference > 0) return { attackerWins: true, netHits: hitDifference, stalemate: false };
-    if (hitDifference < 0) return { attackerWins: false, netHits: 0, stalemate: false };
+    if (hitDifference > 0) {
+      return { attackerWins: true, defenderWins: false, winner: "attacker", netHits: hitDifference, margin: hitDifference, stalemate: false, tieBreaker: "hits" };
+    }
+    if (hitDifference < 0) {
+      return { attackerWins: false, defenderWins: true, winner: "defender", netHits: 0, margin: Math.abs(hitDifference), stalemate: false, tieBreaker: "hits" };
+    }
 
     const attackComplication = Boolean(attack?.complication);
     const defenseComplication = Boolean(defense?.complication);
     if (attackComplication !== defenseComplication) {
-      return { attackerWins: defenseComplication, netHits: defenseComplication ? 1 : 0, stalemate: false };
+      const attackerWins = defenseComplication;
+      return {
+        attackerWins,
+        defenderWins: !attackerWins,
+        winner: attackerWins ? "attacker" : "defender",
+        netHits: attackerWins ? 1 : 0,
+        margin: 1,
+        stalemate: false,
+        tieBreaker: "complication"
+      };
     }
 
     const attackUnits = this.getOpposedRollUnits(attack);
     const defenseUnits = this.getOpposedRollUnits(defense);
-    if (attackUnits < defenseUnits) return { attackerWins: true, netHits: 1, stalemate: false };
-    if (attackUnits > defenseUnits) return { attackerWins: false, netHits: 0, stalemate: false };
+    if (attackUnits < defenseUnits) {
+      return { attackerWins: true, defenderWins: false, winner: "attacker", netHits: 1, margin: 1, stalemate: false, tieBreaker: "units" };
+    }
+    if (attackUnits > defenseUnits) {
+      return { attackerWins: false, defenderWins: true, winner: "defender", netHits: 0, margin: 1, stalemate: false, tieBreaker: "units" };
+    }
 
-    return { attackerWins: false, netHits: 0, stalemate: true };
+    return { attackerWins: false, defenderWins: false, winner: "stalemate", netHits: 0, margin: 0, stalemate: true, tieBreaker: "stalemate" };
+  }
+
+  static getOpposedResultLabel(opposedResult, { unopposed = false } = {}) {
+    if (opposedResult?.stalemate) return "AXIOM.Combat.OpposedStalemate";
+    if (unopposed && opposedResult?.attackerWins) return "AXIOM.Combat.UnopposedSuccess";
+    if (unopposed) return "AXIOM.Combat.UnopposedFailure";
+    return opposedResult?.attackerWins ? "AXIOM.Combat.AttackerWins" : "AXIOM.Combat.DefenderWins";
+  }
+
+  static getOpposedTieBreakerLabel(opposedResult) {
+    const labels = {
+      hits: "AXIOM.Combat.TieBreakerHits",
+      units: "AXIOM.Combat.TieBreakerUnits",
+      complication: "AXIOM.Combat.TieBreakerComplication",
+      stalemate: "AXIOM.Combat.TieBreakerStalemate",
+      unopposed: "AXIOM.Combat.TieBreakerUnopposed",
+      unopposedFailure: "AXIOM.Combat.TieBreakerUnopposedFailure"
+    };
+    return labels[opposedResult?.tieBreaker] ?? labels.hits;
   }
 
   static resolveAttack({ state, attack, defender = null, defenderToken = null, defense = null, unopposed = false } = {}) {
     const opposedResult = this.resolveOpposedHits(attack, defense, { unopposed });
     const hitsAttack = opposedResult.attackerWins;
     const netHits = hitsAttack ? opposedResult.netHits : 0;
-    const hitLocation = state.isWeaponRoll ? AxiomRoll.getHitLocation(state.d100) : null;
+    const hitLocation = state.isWeaponRoll ? AxiomRoll.getAttackHitLocation(state.d100, state) : null;
     const damage = hitsAttack
       ? this.calculateDamage({ state, defender, hitLocation, netHits, defense })
       : this.emptyDamage();
@@ -834,6 +1073,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
       unopposed,
       defenderActorId: defender?.id ?? "",
       defenderTokenId: defenderToken?.id ?? "",
+      defenderSceneId: canvas?.scene?.id ?? defenderToken?.scene?.id ?? defenderToken?.document?.parent?.id ?? defenderToken?.parent?.id ?? "",
       defenderName: defender?.name ?? game.i18n.localize("AXIOM.Combat.NoDefender"),
       defense: defense ? this.serializeDefense(defense) : null,
       attackHits: Number(attack?.hits ?? 0),
@@ -842,6 +1082,12 @@ export default class AxiomCombat extends foundry.documents.Combat {
       defenseHitsDisplay: AxiomRoll.formatSigned(defense?.hits ?? 0),
       netHits,
       netHitsDisplay: AxiomRoll.formatSigned(netHits),
+      opposedMargin: opposedResult.margin,
+      opposedMarginDisplay: AxiomRoll.formatSigned(opposedResult.margin ?? 0),
+      opposedWinner: opposedResult.winner,
+      opposedResultLabel: this.getOpposedResultLabel(opposedResult, { unopposed }),
+      opposedTieBreakerLabel: this.getOpposedTieBreakerLabel(opposedResult),
+      stalemate: Boolean(opposedResult.stalemate),
       hitsAttack,
       outcomeLabel: hitsAttack ? "AXIOM.Combat.AttackHits" : "AXIOM.Combat.AttackMisses",
       outcomeCss: hitsAttack ? "hit" : "miss",
@@ -940,10 +1186,10 @@ export default class AxiomCombat extends foundry.documents.Combat {
   }
 
   static getArmorKeyForLocation(hitLocationKey) {
-    if (hitLocationKey === "head") return "head";
+    if (hitLocationKey === "head" || hitLocationKey === "headVitals") return "head";
     if (hitLocationKey === "torso") return "torso";
-    if (["leftArm", "rightArm"].includes(hitLocationKey)) return "arms";
-    if (["leftLeg", "rightLeg"].includes(hitLocationKey)) return "legs";
+    if (["leftArm", "rightArm", "arms", "hands"].includes(hitLocationKey)) return "arms";
+    if (["leftLeg", "rightLeg", "legs"].includes(hitLocationKey)) return "legs";
     return "torso";
   }
 
@@ -956,8 +1202,26 @@ export default class AxiomCombat extends foundry.documents.Combat {
     return "critical";
   }
 
-  static async applyWound(combatResult) {
+  static resolveCombatResultTarget(combatResult = {}) {
+    const tokenId = combatResult?.defenderTokenId ?? combatResult?.tokenId ?? "";
+    const sceneId = combatResult?.defenderSceneId ?? combatResult?.sceneId ?? canvas?.scene?.id ?? "";
+
+    if (tokenId) {
+      const canvasToken = canvas?.tokens?.get?.(tokenId);
+      if (canvasToken?.actor) return { actor: canvasToken.actor, token: canvasToken, tokenDocument: canvasToken.document };
+
+      const scene = sceneId ? game.scenes?.get?.(sceneId) : null;
+      const tokenDocument = scene?.tokens?.get?.(tokenId) ?? null;
+      if (tokenDocument?.actor) return { actor: tokenDocument.actor, token: tokenDocument.object ?? null, tokenDocument };
+    }
+
     const actor = game.actors?.get(combatResult?.defenderActorId);
+    return actor ? { actor, token: null, tokenDocument: null } : null;
+  }
+
+  static async applyWound(combatResult) {
+    const target = this.resolveCombatResultTarget(combatResult);
+    const actor = target?.actor ?? null;
     if (!actor) {
       ui.notifications?.warn(game.i18n.localize("AXIOM.Combat.ApplyWoundNoActor"));
       return null;
@@ -975,18 +1239,19 @@ export default class AxiomCombat extends foundry.documents.Combat {
       return null;
     }
 
-    const updates = { [`system.wounds.${applied.severity}.slots.${applied.slot}.taken`]: true };
-    if (applied.severity === "critical") updates["system.statuses.incapacitated"] = 1;
-    await actor.update(updates);
-    if (applied.severity === "critical") await actor.addStatus?.("incapacitated", 1);
+    await actor.update({ [`system.wounds.${applied.severity}.slots.${applied.slot}.taken`]: true });
+    if (applied.severity === "critical") {
+      if (actor.type === "npc") await actor.addStatus?.("dead", 1);
+      else await actor.addStatus?.("incapacitated", 1);
+    }
 
-    return applied;
+    return { ...applied, actor, token: target?.token ?? null, tokenDocument: target?.tokenDocument ?? null };
   }
 
   static findAvailableWoundSlot(actor, startingSeverity) {
     const order = ["grazing", "minor", "major", "critical"];
     const start = Math.max(0, order.indexOf(startingSeverity));
-    const slotOrder = ["one", "two", "three"];
+    const slotOrder = ["one", "two", "three", "four", "five"];
 
     for (const severity of order.slice(start)) {
       const slots = actor.system?.wounds?.[severity]?.slots ?? {};
@@ -1008,7 +1273,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
     if (!token?.actor) return null;
     return {
       tokenId: token.id ?? "",
-      sceneId: canvas?.scene?.id ?? token.scene?.id ?? "",
+      sceneId: canvas?.scene?.id ?? token.scene?.id ?? token.document?.parent?.id ?? token.parent?.id ?? "",
       actorId: token.actor.id ?? "",
       name: token.name ?? token.actor.name ?? game.i18n.localize("AXIOM.Combat.NoDefender"),
       assignedAfterRoll: Boolean(assignedAfterRoll)
@@ -1019,6 +1284,12 @@ export default class AxiomCombat extends foundry.documents.Combat {
     if (!target) return null;
     const token = canvas?.tokens?.get?.(target.tokenId);
     if (token?.actor) return token;
+
+    const scene = target.sceneId ? game.scenes?.get?.(target.sceneId) : null;
+    const tokenDocument = scene?.tokens?.get?.(target.tokenId) ?? null;
+    if (tokenDocument?.object?.actor) return tokenDocument.object;
+    if (tokenDocument?.actor) return { id: tokenDocument.id, name: tokenDocument.name, actor: tokenDocument.actor, document: tokenDocument };
+
     const actor = game.actors?.get(target.actorId);
     return actor?.getActiveTokens?.(true, true)?.[0] ?? null;
   }
@@ -1067,30 +1338,34 @@ export default class AxiomCombat extends foundry.documents.Combat {
   }
 
   static buildOpposedDataFromAttackState(attackMessage, attackState, defenderToken, { unopposed = false } = {}) {
-    const attack = this.getAttackData(attackState);
+    const ChatCard = game.axiom?.chat?.AxiomChatCard;
+    const effectiveAttackState = ChatCard ? ChatCard.normalizeState(attackState) : foundry.utils.deepClone(attackState ?? {});
+    const attack = this.getAttackData(effectiveAttackState);
     return this.normalizeOpposedData({
       id: foundry.utils.randomID(),
       attackMessageId: attackMessage.id,
-      assignedAfterRoll: Boolean(attackState.combatTarget?.assignedAfterRoll),
-      attackType: attackState.weaponInfo?.category ?? "melee",
+      assignedAfterRoll: Boolean(effectiveAttackState.combatTarget?.assignedAfterRoll),
+      attackType: effectiveAttackState.weaponInfo?.category ?? "melee",
       attacker: {
-        actorId: attackState.actorId ?? "",
-        name: attackState.actorName ?? game.i18n.localize("AXIOM.RollCard.UnknownActor")
+        actorId: effectiveAttackState.actorId ?? "",
+        name: effectiveAttackState.actorName ?? game.i18n.localize("AXIOM.RollCard.UnknownActor")
       },
       weapon: {
-        itemId: attackState.itemId ?? "",
-        name: attackState.title ?? "",
-        damage: Number(attackState.weaponInfo?.damage ?? 0),
-        armorPenetration: Number(attackState.weaponInfo?.armorPenetration ?? 0),
-        damageModifier: Number(attackState.weaponInfo?.damageModifier ?? 0),
-        delivery: attackState.weaponInfo?.delivery ?? "kinetic"
+        itemId: effectiveAttackState.itemId ?? "",
+        name: effectiveAttackState.title ?? "",
+        damage: Number(effectiveAttackState.weaponInfo?.damage ?? 0),
+        armorPenetration: Number(effectiveAttackState.weaponInfo?.armorPenetration ?? 0),
+        damageModifier: Number(effectiveAttackState.weaponInfo?.damageModifier ?? 0),
+        delivery: effectiveAttackState.weaponInfo?.delivery ?? "kinetic"
       },
       defender: defenderToken?.actor && !unopposed ? {
         tokenId: defenderToken.id,
+        sceneId: canvas?.scene?.id ?? defenderToken.scene?.id ?? defenderToken.document?.parent?.id ?? defenderToken.parent?.id ?? "",
         actorId: defenderToken.actor.id,
         name: defenderToken.name ?? defenderToken.actor.name
       } : {
         tokenId: defenderToken?.id ?? "",
+        sceneId: canvas?.scene?.id ?? defenderToken?.scene?.id ?? defenderToken?.document?.parent?.id ?? defenderToken?.parent?.id ?? "",
         actorId: defenderToken?.actor?.id ?? "",
         name: defenderToken?.actor?.name ?? game.i18n.localize("AXIOM.Combat.NarrativeTarget")
       },
@@ -1167,6 +1442,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
         attributeTwo: parts.attributeTwo,
         skillValue: parts.skillValue,
         modifierRows,
+        actionPoints: 0,
         combatDefense: {
           attackMessageId: attackMessage.id,
           defenseType,
@@ -1176,7 +1452,18 @@ export default class AxiomCombat extends foundry.documents.Combat {
             name: shield.name,
             blockValue: Number(shield.system?.blockValue ?? 0),
             armorBonus: Number(shield.system?.armorBonus ?? 0)
-          } : null
+          } : null,
+          counterWeapon: defenseType === "counterattack" ? (() => {
+            const weapon = this.getPrimaryParrySkill(defender)?.weapon ?? null;
+            return weapon ? {
+              itemId: weapon.id,
+              name: weapon.name,
+              damage: Number(weapon.system?.damage ?? 0),
+              armorPenetration: Number(weapon.system?.armorPenetration ?? 0),
+              damageModifier: Number(defender.system?.subAttributes?.damageModifier ?? 0),
+              delivery: weapon.system?.delivery ?? "kinetic"
+            } : null;
+          })() : null
         }
       }
     }).render({ force: true });
@@ -1192,7 +1479,17 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const defender = game.actors?.get(defenseState.actorId) ?? null;
     const defenderToken = this.getTokenFromCombatTarget(attackState.combatTarget) ?? this.getActorToken(defender);
     const opposedData = this.buildOpposedDataFromAttackState(attackMessage, attackState, defenderToken ?? { actor: defender, id: "", name: defender?.name });
-    return this.createCombatResultCard({ opposedData, defenseState, defenseMessage, unopposed: false });
+
+    const ChatCard = game.axiom?.chat?.AxiomChatCard;
+    if (ChatCard) {
+      const nextAttackState = ChatCard.normalizeState(attackMessage.getFlag("axiom", "roll") ?? attackState);
+      nextAttackState.combatOppositionCreated = true;
+      await ChatCard.replaceMessageState(attackMessage, nextAttackState, { refreshLinkedResults: false });
+    }
+
+    const opposedResultMessage = await this.createOpposedResultCard({ opposedData, defenseState, defenseMessage, unopposed: false });
+    const combatResultMessage = await this.createCombatResultCard({ opposedData, defenseState, defenseMessage, unopposed: false });
+    return { opposedResultMessage, combatResultMessage };
   }
 
 
@@ -1220,6 +1517,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
 
 
   static OPPOSED_TEMPLATE = "systems/axiom/templates/chat/opposed-test-card.hbs";
+  static OPPOSED_RESULT_TEMPLATE = "systems/axiom/templates/chat/opposed-result-card.hbs";
   static RESULT_TEMPLATE = "systems/axiom/templates/chat/combat-result-card.hbs";
 
   static getCombatTokensFromUserTargets() {
@@ -1297,10 +1595,11 @@ export default class AxiomCombat extends foundry.documents.Combat {
       },
       defender: {
         tokenId: defenderToken.id,
+        sceneId: canvas?.scene?.id ?? defenderToken.scene?.id ?? defenderToken.document?.parent?.id ?? defenderToken.parent?.id ?? "",
         actorId: defenderToken.actor.id,
         name: defenderToken.name ?? defenderToken.actor.name
       },
-      attack: this.serializeAttackForOpposition(attackState, attack)
+      attack: this.serializeAttackForOpposition(effectiveAttackState, attack)
     });
 
     const content = await this.renderOpposedTest(data);
@@ -1313,7 +1612,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
   }
 
   static serializeAttackForOpposition(state, attack = this.getAttackData(state)) {
-    const location = state.isWeaponRoll ? AxiomRoll.getHitLocation(state.d100) : null;
+    const location = state.isWeaponRoll ? AxiomRoll.getAttackHitLocation(state.d100, state) : null;
     return {
       d100: Number(attack.d100 ?? state.d100 ?? 100),
       rollDisplay: AxiomRoll.formatD100(attack.d100 ?? state.d100 ?? 100),
@@ -1339,6 +1638,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
       id: data.id ?? foundry.utils.randomID(),
       attackMessageId: data.attackMessageId ?? "",
       assignedAfterRoll: Boolean(data.assignedAfterRoll),
+      resolved: Boolean(data.resolved),
       attackType,
       isMelee: attackType === "melee",
       isRanged: attackType === "ranged",
@@ -1356,6 +1656,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
       },
       defender: {
         tokenId: data.defender?.tokenId ?? "",
+        sceneId: data.defender?.sceneId ?? "",
         actorId: data.defender?.actorId ?? "",
         name: data.defender?.name ?? game.i18n.localize("AXIOM.Combat.NoDefender")
       },
@@ -1373,7 +1674,9 @@ export default class AxiomCombat extends foundry.documents.Combat {
       ...normalized,
       attackTypeLabel: normalized.isRanged ? "AXIOM.Combat.RangedAttack" : "AXIOM.Combat.MeleeAttack",
       showParry: normalized.isMelee,
-      showBlock: this.hasEquippedShield(game.actors?.get(normalized.defender.actorId)),
+      showBlock: this.hasEquippedShield(this.getTokenFromCombatTarget(normalized.defender)?.actor ?? game.actors?.get(normalized.defender.actorId)),
+      showCounterattack: normalized.isMelee && this.canSpendMomentum(this.getTokenFromCombatTarget(normalized.defender)?.actor ?? game.actors?.get(normalized.defender.actorId), 1),
+      resolved: Boolean(normalized.resolved),
       assignedAfterRollNote: normalized.assignedAfterRoll ? "AXIOM.Combat.AssignedAfterRollNote" : ""
     };
   }
@@ -1456,7 +1759,18 @@ export default class AxiomCombat extends foundry.documents.Combat {
           name: shield.name,
           blockValue: Number(shield.system?.blockValue ?? 0),
           armorBonus: Number(shield.system?.armorBonus ?? 0)
-        } : null
+        } : null,
+        counterWeapon: defenseType === "counterattack" ? (() => {
+          const weapon = this.getPrimaryParrySkill(defender)?.weapon ?? null;
+          return weapon ? {
+            itemId: weapon.id,
+            name: weapon.name,
+            damage: Number(weapon.system?.damage ?? 0),
+            armorPenetration: Number(weapon.system?.armorPenetration ?? 0),
+            damageModifier: Number(defender.system?.subAttributes?.damageModifier ?? 0),
+            delivery: weapon.system?.delivery ?? "kinetic"
+          } : null;
+        })() : null
       }
     };
 
@@ -1469,12 +1783,16 @@ export default class AxiomCombat extends foundry.documents.Combat {
 
     await this.waitForDiceAnimation(defenseMessage);
 
+    if (defenseType === "counterattack") await this.spendMomentum(defender, 1);
+    await this.createOpposedResultCard({ opposedData, defenseState, defenseMessage, unopposed: false });
+    await this.markOpposedTestResolved(opposedMessage);
     await this.createCombatResultCard({ opposedData, defenseState, defenseMessage, unopposed: false });
     return defenseMessage;
   }
 
   static async resolveOpposedUnopposed(opposedMessage) {
     const opposedData = this.normalizeOpposedData(opposedMessage?.getFlag?.("axiom", "combatOpposed") ?? {});
+    await this.markOpposedTestResolved(opposedMessage);
     return this.createCombatResultCard({ opposedData, defenseState: null, defenseMessage: null, unopposed: true });
   }
 
@@ -1501,6 +1819,103 @@ export default class AxiomCombat extends foundry.documents.Combat {
     return this.createCombatResultCard({ opposedData, defenseState: null, defenseMessage: null, unopposed: true });
   }
 
+  static async markOpposedTestResolved(opposedMessage) {
+    const data = opposedMessage?.getFlag?.("axiom", "combatOpposed");
+    if (!data) return null;
+    const nextData = this.normalizeOpposedData({ ...data, resolved: true });
+    const content = await this.renderOpposedTest(nextData);
+    return opposedMessage.update({ content, flags: { axiom: { combatOpposed: nextData } } });
+  }
+
+  static getOpposedWinnerActor(opposedData, opposedResult) {
+    if (!opposedData || opposedResult?.stalemate) return null;
+    if (opposedResult?.attackerWins) return game.actors?.get(opposedData.attacker?.actorId) ?? null;
+    const token = this.getTokenFromCombatTarget(opposedData.defender);
+    return token?.actor ?? game.actors?.get(opposedData.defender?.actorId) ?? null;
+  }
+
+  static isMomentumEligibleOpposedResult({ opposedData, defenseState = null, unopposed = false } = {}) {
+    if (unopposed) return false;
+    if (defenseState?.combatDefense?.defenseType === "counterattack") return false;
+    const attackType = opposedData?.attackType ?? "";
+    return attackType === "melee" || attackType === "ranged";
+  }
+
+  static async grantMomentumForOpposedResult(data, { opposedData, defenseState = null, unopposed = false } = {}) {
+    if (!this.isMomentumEligibleOpposedResult({ opposedData, defenseState, unopposed })) return null;
+    if (Number(data?.netHits ?? 0) < 2 || data?.stalemate) return null;
+
+    const opposedResult = { attackerWins: data.winner === "attacker", defenderWins: data.winner === "defender", stalemate: Boolean(data.stalemate) };
+    const actor = this.getOpposedWinnerActor(opposedData, opposedResult);
+    if (!actor) return null;
+
+    const before = this.getMomentumCurrent(actor);
+    const result = await this.adjustMomentum(actor, 1);
+    const after = this.getMomentumCurrent(actor);
+    return {
+      actorId: actor.id,
+      actorName: actor.name ?? "",
+      before,
+      after,
+      max: this.getMomentumMax(actor),
+      gained: after > before,
+      capped: after <= before
+    };
+  }
+
+  static buildOpposedResultData({ opposedData, defenseState = null, defenseMessage = null, unopposed = false } = {}) {
+    const attackMessage = game.messages?.get(opposedData?.attackMessageId);
+    const currentAttackState = attackMessage?.getFlag?.("axiom", "roll") ?? null;
+    const attack = currentAttackState ? this.serializeAttackForOpposition(currentAttackState, this.getAttackData(currentAttackState)) : opposedData.attack;
+    const defense = defenseState ? this.serializeAttackForOpposition(defenseState, this.getAttackData(defenseState)) : null;
+    const opposedResult = this.resolveOpposedHits(attack, defense, { unopposed: Boolean(unopposed) });
+    const winnerName = opposedResult.stalemate
+      ? game.i18n.localize("AXIOM.Combat.NoVictor")
+      : opposedResult.attackerWins ? (opposedData.attacker?.name ?? "") : (opposedData.defender?.name ?? "");
+
+    return {
+      id: foundry.utils.randomID(),
+      attackMessageId: opposedData.attackMessageId ?? "",
+      defenseMessageId: defenseMessage?.id ?? "",
+      opposedMessageId: defenseState?.combatDefense?.opposedMessageId ?? "",
+      attackerName: opposedData.attacker?.name ?? "",
+      defenderName: opposedData.defender?.name ?? "",
+      winner: opposedResult.winner,
+      winnerName,
+      winnerLabel: this.getOpposedResultLabel(opposedResult, { unopposed: Boolean(unopposed) }),
+      netHits: Number(opposedResult.margin ?? 0),
+      netHitsDisplay: AxiomRoll.formatSigned(opposedResult.margin ?? 0),
+      tieBreakerLabel: this.getOpposedTieBreakerLabel(opposedResult),
+      stalemate: Boolean(opposedResult.stalemate),
+      outcomeCss: opposedResult.attackerWins ? "hit" : opposedResult.defenderWins ? "miss" : "stalemate",
+      attack: {
+        hits: Number(attack?.hits ?? 0),
+        hitsDisplay: AxiomRoll.formatSigned(attack?.hits ?? 0)
+      },
+      defense: {
+        hits: Number(defense?.hits ?? 0),
+        hitsDisplay: AxiomRoll.formatSigned(defense?.hits ?? 0)
+      }
+    };
+  }
+
+  static async renderOpposedResult(data) {
+    return foundry.applications.handlebars.renderTemplate(this.OPPOSED_RESULT_TEMPLATE, { card: data });
+  }
+
+  static async createOpposedResultCard({ opposedData, defenseState = null, defenseMessage = null, unopposed = false } = {}) {
+    if (unopposed) return null;
+    const data = this.buildOpposedResultData({ opposedData, defenseState, defenseMessage, unopposed });
+    data.momentumGain = await this.grantMomentumForOpposedResult(data, { opposedData, defenseState, unopposed });
+    const content = await this.renderOpposedResult(data);
+    return ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ alias: game.i18n.localize("AXIOM.Combat.OpposedResult") }),
+      content,
+      cssClass: "axiom-roll-message",
+      flags: { axiom: { opposedResultCard: data } }
+    });
+  }
+
   static async createCombatResultCard({ opposedData, defenseState = null, defenseMessage = null, unopposed = false } = {}) {
     const data = this.buildCombatResultData({ opposedData, defenseState, defenseMessage, unopposed });
     const content = await this.renderCombatResult(data);
@@ -1512,12 +1927,74 @@ export default class AxiomCombat extends foundry.documents.Combat {
     });
   }
 
+  static buildCounterattackCombatResultData({ opposedData, defenseState = null, defenseMessage = null } = {}) {
+    const attackMessage = game.messages?.get(opposedData?.attackMessageId);
+    const currentAttackState = attackMessage?.getFlag?.("axiom", "roll") ?? null;
+    const originalAttack = currentAttackState ? this.serializeAttackForOpposition(currentAttackState, this.getAttackData(currentAttackState)) : opposedData.attack;
+    const counterRoll = defenseState ? this.serializeAttackForOpposition(defenseState, this.getAttackData(defenseState)) : null;
+    const opposedResult = this.resolveOpposedHits(originalAttack, counterRoll, { unopposed: false });
+    if (!opposedResult.defenderWins || !counterRoll) return null;
+
+    const originalAttacker = game.actors?.get(opposedData?.attacker?.actorId) ?? null;
+    const counterWeapon = defenseState?.combatDefense?.counterWeapon ?? {};
+    const hitLocation = AxiomRoll.getAttackHitLocation(counterRoll.d100 ?? defenseState?.d100 ?? 100, {});
+    const armor = this.getArmorAtLocation(originalAttacker, hitLocation?.key);
+    const toughness = Number(originalAttacker?.system?.subAttributes?.toughness ?? 0);
+
+    return this.normalizeCombatResultCard({
+      id: foundry.utils.randomID(),
+      attackMessageId: opposedData.attackMessageId ?? "",
+      defenseMessageId: defenseMessage?.id ?? "",
+      opposedMessageId: defenseState?.combatDefense?.opposedMessageId ?? "",
+      unopposed: false,
+      attackerName: opposedData.defender?.name ?? "",
+      defenderName: opposedData.attacker?.name ?? "",
+      defenderActorId: opposedData.attacker?.actorId ?? "",
+      defenderTokenId: "",
+      defenderSceneId: "",
+      weaponName: counterWeapon.name ?? game.i18n.localize("AXIOM.Combat.Momentum.Counterattack"),
+      hitLocationKey: hitLocation?.key ?? "",
+      hitLocationLabel: hitLocation?.label ?? "AXIOM.Combat.NotApplicableShort",
+      hitLocationText: hitLocation?.labelText ?? game.i18n.localize(hitLocation?.label ?? "AXIOM.Combat.NotApplicableShort"),
+      attack: {
+        d100: Number(counterRoll.d100 ?? 100),
+        roll: counterRoll.rollDisplay ?? AxiomRoll.formatD100(counterRoll.d100),
+        successTarget: Number(counterRoll.successTarget ?? 0),
+        hits: Number(counterRoll.hits ?? 0),
+        success: Boolean(counterRoll.success),
+        complication: Boolean(counterRoll.complication)
+      },
+      defense: {
+        d100: Number(originalAttack.d100 ?? 100),
+        roll: originalAttack.rollDisplay ?? AxiomRoll.formatD100(originalAttack.d100),
+        successTarget: Number(originalAttack.successTarget ?? 0),
+        hits: Number(originalAttack.hits ?? 0),
+        success: Boolean(originalAttack.success),
+        complication: Boolean(originalAttack.complication)
+      },
+      values: {
+        baseDamage: Number(counterWeapon.damage ?? 0),
+        damageModifier: Number(counterWeapon.damageModifier ?? 0),
+        armorPenetration: Number(counterWeapon.armorPenetration ?? 0),
+        armor,
+        shieldArmorBonus: 0,
+        toughness
+      },
+      woundApplied: false
+    });
+  }
+
   static buildCombatResultData({ opposedData, defenseState = null, defenseMessage = null, unopposed = false } = {}) {
     const attackMessage = game.messages?.get(opposedData?.attackMessageId);
+    if (defenseState?.combatDefense?.defenseType === "counterattack") {
+      const counterattackData = this.buildCounterattackCombatResultData({ opposedData, defenseState, defenseMessage });
+      if (counterattackData) return counterattackData;
+    }
     const currentAttackState = attackMessage?.getFlag?.("axiom", "roll") ?? null;
     const attack = currentAttackState ? this.serializeAttackForOpposition(currentAttackState, this.getAttackData(currentAttackState)) : opposedData.attack;
     const defense = defenseState ? this.serializeAttackForOpposition(defenseState, this.getAttackData(defenseState)) : null;
-    const defender = game.actors?.get(opposedData?.defender?.actorId);
+    const defenderToken = this.getTokenFromCombatTarget(opposedData?.defender);
+    const defender = defenderToken?.actor ?? game.actors?.get(opposedData?.defender?.actorId);
     const hitLocation = attack.hitLocation ?? null;
     const shieldArmorBonus = defenseState?.combatDefense?.defenseType === "block" ? Number(defenseState.combatDefense?.shield?.armorBonus ?? 0) : 0;
     const armor = this.getArmorAtLocation(defender, hitLocation?.key) + shieldArmorBonus;
@@ -1532,6 +2009,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
       attackerName: opposedData.attacker?.name ?? "",
       defenderName: opposedData.defender?.name ?? (unopposed ? game.i18n.localize("AXIOM.Combat.NarrativeTarget") : ""),
       defenderActorId: opposedData.defender?.actorId ?? "",
+      defenderTokenId: opposedData.defender?.tokenId ?? "",
+      defenderSceneId: opposedData.defender?.sceneId ?? "",
       weaponName: opposedData.weapon?.name ?? "",
       hitLocationKey: hitLocation?.key ?? "",
       hitLocationLabel: hitLocation?.label ?? "AXIOM.Combat.NotApplicableShort",
@@ -1570,6 +2049,10 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const opposedResult = this.resolveOpposedHits(data.attack, data.defense, { unopposed: Boolean(data.unopposed) });
     const netHits = opposedResult.attackerWins ? opposedResult.netHits : 0;
     const hitsAttack = opposedResult.attackerWins;
+    const opposedMargin = Number(opposedResult.margin ?? 0);
+    const opposedWinnerName = opposedResult.stalemate
+      ? game.i18n.localize("AXIOM.Combat.NoVictor")
+      : opposedResult.attackerWins ? (data.attackerName ?? "") : (data.defenderName ?? "");
     const baseDamage = Number(data.values?.baseDamage ?? 0);
     const damageModifier = Number(data.values?.damageModifier ?? 0);
     const armorPenetration = Number(data.values?.armorPenetration ?? 0);
@@ -1627,6 +2110,15 @@ export default class AxiomCombat extends foundry.documents.Combat {
       values: { baseDamage, damageModifier, armorPenetration, armor, shieldArmorBonus, toughness },
       netHits,
       netHitsDisplay: AxiomRoll.formatSigned(netHits),
+      opposed: {
+        winner: opposedResult.winner,
+        winnerName: opposedWinnerName,
+        margin: opposedMargin,
+        marginDisplay: AxiomRoll.formatSigned(opposedMargin),
+        resultLabel: this.getOpposedResultLabel(opposedResult, { unopposed: Boolean(data.unopposed) }),
+        tieBreakerLabel: this.getOpposedTieBreakerLabel(opposedResult),
+        stalemate: Boolean(opposedResult.stalemate)
+      },
       hitsAttack,
       outcomeLabel: hitsAttack ? "AXIOM.Combat.AttackHits" : "AXIOM.Combat.AttackMisses",
       outcomeCss: hitsAttack ? "hit" : "miss",
@@ -1645,10 +2137,12 @@ export default class AxiomCombat extends foundry.documents.Combat {
       finalDamageTooltip,
       woundSeverity,
       woundSeverityLabel: woundSeverity ? `AXIOM.Combat.Wounds.${woundSeverity}` : "AXIOM.Combat.NoWound",
-      canApplyWound: Boolean(finalDamage > 0 && woundSeverity && data.defenderActorId),
+      canApplyWound: Boolean(finalDamage > 0 && woundSeverity && (data.defenderTokenId || data.defenderActorId)),
       woundApplied: Boolean(data.woundApplied),
       appliedWound: data.appliedWound ?? null,
-      defenderActorId: data.defenderActorId ?? ""
+      defenderActorId: data.defenderActorId ?? "",
+      defenderTokenId: data.defenderTokenId ?? "",
+      defenderSceneId: data.defenderSceneId ?? ""
     };
   }
 
@@ -1665,7 +2159,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
       ? this.serializeAttackForOpposition(defenseState, this.getAttackData(defenseState))
       : existing.defense;
 
-    const defender = game.actors?.get(existing.defenderActorId);
+    const defender = this.resolveCombatResultTarget(existing)?.actor ?? game.actors?.get(existing.defenderActorId);
     const hitLocation = attack?.hitLocation ?? { key: existing.hitLocationKey, label: existing.hitLocationLabel, labelText: existing.hitLocationText };
     const shieldArmorBonus = defenseState?.combatDefense?.defenseType === "block" ? Number(defenseState.combatDefense?.shield?.armorBonus ?? existing.values?.shieldArmorBonus ?? 0) : Number(existing.values?.shieldArmorBonus ?? 0);
 
@@ -1709,15 +2203,45 @@ export default class AxiomCombat extends foundry.documents.Combat {
     return message.update({ content, flags: { axiom: { combatResultCard: normalized } } });
   }
 
+  static async refreshOpposedResultMessage(message) {
+    const existing = message?.getFlag?.("axiom", "opposedResultCard");
+    if (!existing) return null;
+
+    const attackMessage = game.messages?.get(existing.attackMessageId);
+    const attackState = attackMessage?.getFlag?.("axiom", "roll") ?? null;
+    const defenseMessage = game.messages?.get(existing.defenseMessageId);
+    const defenseState = defenseMessage?.getFlag?.("axiom", "roll") ?? null;
+    const opposedData = this.normalizeOpposedData({
+      attackMessageId: existing.attackMessageId ?? "",
+      attacker: { name: existing.attackerName ?? "", actorId: attackState?.actorId ?? "" },
+      defender: { name: existing.defenderName ?? "", actorId: defenseState?.actorId ?? "" },
+      attack: attackState ? this.serializeAttackForOpposition(attackState, this.getAttackData(attackState)) : {},
+      attackType: attackState?.weaponInfo?.category ?? "melee"
+    });
+    const normalized = {
+      ...this.buildOpposedResultData({ opposedData, defenseState, defenseMessage, unopposed: false }),
+      id: existing.id ?? foundry.utils.randomID(),
+      attackerName: existing.attackerName ?? opposedData.attacker.name,
+      defenderName: existing.defenderName ?? opposedData.defender.name
+    };
+    const content = await this.renderOpposedResult(normalized);
+    return message.update({ content, flags: { axiom: { opposedResultCard: normalized } } });
+  }
+
   static async refreshLinkedCombatResultsForRollMessage(rollMessage) {
     const id = rollMessage?.id;
     if (!id) return;
-    const linked = game.messages?.filter?.(message => {
+    const linkedCombatResults = game.messages?.filter?.(message => {
       const data = message.getFlag?.("axiom", "combatResultCard");
       return data && (data.attackMessageId === id || data.defenseMessageId === id);
     }) ?? [];
+    const linkedOpposedResults = game.messages?.filter?.(message => {
+      const data = message.getFlag?.("axiom", "opposedResultCard");
+      return data && (data.attackMessageId === id || data.defenseMessageId === id);
+    }) ?? [];
 
-    for (const message of linked) await this.refreshCombatResultMessage(message);
+    for (const message of linkedOpposedResults) await this.refreshOpposedResultMessage(message);
+    for (const message of linkedCombatResults) await this.refreshCombatResultMessage(message);
   }
 
   static async renderCombatResult(data) {
@@ -1743,6 +2267,9 @@ export default class AxiomCombat extends foundry.documents.Combat {
       });
       opposed.querySelector("[data-action='combatBlock']")?.addEventListener("click", event => {
         event.preventDefault(); event.stopPropagation(); this.resolveOpposedDefense(message, "block");
+      });
+      opposed.querySelector("[data-action='combatCounterattack']")?.addEventListener("click", event => {
+        event.preventDefault(); event.stopPropagation(); this.resolveOpposedDefense(message, "counterattack");
       });
       opposed.querySelector("[data-action='combatUnopposed']")?.addEventListener("click", event => {
         event.preventDefault(); event.stopPropagation(); this.resolveOpposedUnopposed(message);
@@ -1784,6 +2311,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const data = this.normalizeCombatResultCard(message.getFlag("axiom", "combatResultCard") ?? {});
     const applied = await this.applyWound({
       defenderActorId: data.defenderActorId,
+      defenderTokenId: data.defenderTokenId,
+      defenderSceneId: data.defenderSceneId,
       damage: { woundSeverity: data.woundSeverity }
     });
     if (!applied) return;

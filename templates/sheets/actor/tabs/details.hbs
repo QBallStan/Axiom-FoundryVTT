@@ -16,7 +16,8 @@
     </label>
   </div>
 
-  <section class="details-panel">
+  <div class="identity-appearance-grid">
+    <section class="details-panel">
     <h2 class="section-title"><i class="fa-solid fa-id-card"></i> {{localize "AXIOM.Actor.Details.Identity"}}</h2>
     <div class="details-field-grid identity-details-grid">
       <label class="details-field">
@@ -48,9 +49,9 @@
         <input type="text" name="system.details.faction" value="{{system.details.faction}}" />
       </label>
     </div>
-  </section>
+    </section>
 
-  <section class="details-panel">
+    <section class="details-panel">
     <h2 class="section-title"><i class="fa-solid fa-user"></i> {{localize "AXIOM.Actor.Details.Appearance"}}</h2>
     <div class="details-field-grid appearance-details-grid">
       <label class="details-field">
@@ -82,7 +83,9 @@
         <input type="text" name="system.details.distinguishingMarks" value="{{system.details.distinguishingMarks}}" />
       </label>
     </div>
-  </section>
+    </section>
+
+  </div>
 
   <section class="details-panel biography-panel editor-section">
     <h2 class="section-title"><i class="fa-solid fa-book-open"></i> {{localize "AXIOM.Actor.Details.Biography"}}</h2>

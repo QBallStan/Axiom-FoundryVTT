@@ -2,6 +2,8 @@ import { getStatusEffectChanges } from "../system/config-axiom.mjs";
 
 const { Actor } = foundry.documents;
 
+const STATUS_ADD_PROMISES = new Map();
+
 export default class AxiomActor extends Actor {
   async _preCreate(data, options, user) {
     await super._preCreate(data, options, user);
@@ -9,53 +11,77 @@ export default class AxiomActor extends Actor {
     const model = CONFIG.Actor.dataModels?.[this.type];
     const defaultIcon = model?.DEFAULT_ICON;
     const defaultTokenIcon = model?.DEFAULT_TOKEN_ICON ?? defaultIcon;
+    const tokenDispositions = globalThis.CONST?.TOKEN_DISPOSITIONS ?? {};
+    const displayModes = globalThis.CONST?.TOKEN_DISPLAY_MODES ?? {};
+    const defaultToken = game.settings.get("core", "prototypeTokenOverrides")?.[this.type] ?? {};
 
     if (defaultIcon && (!data.img || data.img === "icons/svg/mystery-man.svg")) {
       this.updateSource({ img: defaultIcon });
     }
 
     const tokenUpdates = {};
-    const tokenImage = foundry.utils.getProperty(data, "prototypeToken.texture.src")
-      ?? foundry.utils.getProperty(this, "prototypeToken.texture.src");
+    const hasExplicit = path => foundry.utils.getProperty(data, `prototypeToken.${path}`) !== undefined;
+    const getExisting = path => foundry.utils.getProperty(data, `prototypeToken.${path}`)
+      ?? foundry.utils.getProperty(this, `prototypeToken.${path}`)
+      ?? foundry.utils.getProperty(defaultToken, path);
+
+    const tokenImage = getExisting("texture.src");
     if (defaultTokenIcon && (!tokenImage || tokenImage === "icons/svg/mystery-man.svg")) {
       tokenUpdates["prototypeToken.texture.src"] = defaultTokenIcon;
     }
 
-    const bar1 = foundry.utils.getProperty(data, "prototypeToken.bar1.attribute")
-      ?? foundry.utils.getProperty(this, "prototypeToken.bar1.attribute");
-    const bar2 = foundry.utils.getProperty(data, "prototypeToken.bar2.attribute")
-      ?? foundry.utils.getProperty(this, "prototypeToken.bar2.attribute");
-    if (!bar1) tokenUpdates["prototypeToken.bar1.attribute"] = "trackers.momentum";
-    if (!bar2) tokenUpdates["prototypeToken.bar2.attribute"] = "trackers.actionPoints";
+    if (!hasExplicit("name")) tokenUpdates["prototypeToken.name"] = data.name ?? this.name;
+    if (!hasExplicit("lockRotation")) tokenUpdates["prototypeToken.lockRotation"] = true;
+    const bar1Attribute = getExisting("bar1.attribute");
+    const bar2Attribute = getExisting("bar2.attribute");
+    if (!hasExplicit("bar1.attribute") && (!bar1Attribute || (bar1Attribute === "trackers.momentum" && bar2Attribute === "trackers.actionPoints"))) {
+      tokenUpdates["prototypeToken.bar1"] = { attribute: "trackers.actionPoints" };
+    }
+    if (!hasExplicit("bar2.attribute") && (!bar2Attribute || (bar1Attribute === "trackers.momentum" && bar2Attribute === "trackers.actionPoints"))) {
+      tokenUpdates["prototypeToken.bar2"] = { attribute: "trackers.momentum" };
+    }
+    if (!hasExplicit("sight.enabled") && ["protagonist", "npc"].includes(this.type)) tokenUpdates["prototypeToken.sight.enabled"] = true;
 
-    const tokenDispositions = globalThis.CONST?.TOKEN_DISPOSITIONS ?? {};
-    const hasExplicitActorLink = foundry.utils.getProperty(data, "prototypeToken.actorLink") !== undefined;
-    const hasExplicitDisposition = foundry.utils.getProperty(data, "prototypeToken.disposition") !== undefined;
-    const hasExplicitLockRotation = foundry.utils.getProperty(data, "prototypeToken.lockRotation") !== undefined;
-
-    if (this.type === "protagonist" && !hasExplicitActorLink) {
-      tokenUpdates["prototypeToken.actorLink"] = true;
+    if (!hasExplicit("actorLink")) {
+      tokenUpdates["prototypeToken.actorLink"] = this.type === "protagonist";
     }
 
-    if (!hasExplicitDisposition) {
-      if (this.type === "protagonist") {
-        tokenUpdates["prototypeToken.disposition"] = tokenDispositions.FRIENDLY ?? 1;
-      } else if (this.type === "npc") {
-        tokenUpdates["prototypeToken.disposition"] = tokenDispositions.HOSTILE ?? -1;
-      }
+    if (!hasExplicit("disposition")) {
+      if (defaultToken.disposition !== undefined) tokenUpdates["prototypeToken.disposition"] = defaultToken.disposition;
+      else if (this.type === "protagonist") tokenUpdates["prototypeToken.disposition"] = tokenDispositions.FRIENDLY ?? 1;
+      else if (this.type === "npc") tokenUpdates["prototypeToken.disposition"] = tokenDispositions.HOSTILE ?? -1;
+      else tokenUpdates["prototypeToken.disposition"] = tokenDispositions.NEUTRAL ?? 0;
     }
 
-    if (!hasExplicitLockRotation) tokenUpdates["prototypeToken.lockRotation"] = true;
+    if (!hasExplicit("displayName")) {
+      tokenUpdates["prototypeToken.displayName"] = defaultToken.displayName ?? displayModes.OWNER_HOVER ?? displayModes.HOVER ?? 30;
+    }
 
-    if (!Object.hasOwn(tokenUpdates, "prototypeToken.displayBars")) {
-      const displayBars = foundry.utils.getProperty(data, "prototypeToken.displayBars")
-        ?? foundry.utils.getProperty(this, "prototypeToken.displayBars");
-      if (!displayBars && globalThis.CONST?.TOKEN_DISPLAY_MODES) {
-        tokenUpdates["prototypeToken.displayBars"] = CONST.TOKEN_DISPLAY_MODES.ALWAYS;
-      }
+    if (!hasExplicit("displayBars")) {
+      tokenUpdates["prototypeToken.displayBars"] = defaultToken.displayBars ?? displayModes.OWNER_HOVER ?? displayModes.HOVER ?? 30;
     }
 
     if (Object.keys(tokenUpdates).length) this.updateSource(tokenUpdates);
+  }
+
+  async _preUpdate(changed, options, user) {
+    this.constructor._syncTrackerResourceBarValues(changed);
+    return super._preUpdate(changed, options, user);
+  }
+
+  static _syncTrackerResourceBarValues(changed) {
+    for (const tracker of ["fate", "actionPoints", "momentum"]) {
+      const currentPath = `system.trackers.${tracker}.current`;
+      const valuePath = `system.trackers.${tracker}.value`;
+      const current = foundry.utils.getProperty(changed, currentPath);
+      const value = foundry.utils.getProperty(changed, valuePath);
+
+      if (current !== undefined && value === undefined) {
+        foundry.utils.setProperty(changed, valuePath, current);
+      } else if (value !== undefined && current === undefined) {
+        foundry.utils.setProperty(changed, currentPath, value);
+      }
+    }
   }
 
   prepareData() {
@@ -186,7 +212,11 @@ export default class AxiomActor extends Actor {
   }
 
   getAxiomStatusEffect(statusId) {
-    return this.effects.find(effect => this._effectHasStatus(effect, statusId));
+    return this.getAxiomStatusEffects(statusId)[0] ?? null;
+  }
+
+  getAxiomStatusEffects(statusId) {
+    return Array.from(this.effects ?? []).filter(effect => this._effectHasStatus(effect, statusId));
   }
 
   getAxiomStatusValue(statusId) {
@@ -201,14 +231,34 @@ export default class AxiomActor extends Actor {
   }
 
   async addStatus(statusId, value = 1) {
+    const lockKey = `${this.uuid ?? this.id ?? this.name}:${statusId}`;
+    const existingPromise = STATUS_ADD_PROMISES.get(lockKey);
+    if (existingPromise) return existingPromise;
+
+    const promise = this._addStatusUnlocked(statusId, value).finally(() => {
+      if (STATUS_ADD_PROMISES.get(lockKey) === promise) STATUS_ADD_PROMISES.delete(lockKey);
+    });
+    STATUS_ADD_PROMISES.set(lockKey, promise);
+    return promise;
+  }
+
+  async _addStatusUnlocked(statusId, value = 1) {
     if (!Number.isFinite(Number(value)) || Number(value) <= 0) return null;
     const status = CONFIG.AXIOM?.statuses?.[statusId];
     if (!status) return null;
 
-    let effect = this.getAxiomStatusEffect(statusId);
+    await this._clearExclusiveStatusGroup(statusId, status);
+
+    let effects = this.getAxiomStatusEffects(statusId);
+    let effect = effects[0] ?? null;
     const wasCreated = !effect;
 
-    await this._clearExclusiveStatusGroup(statusId, status);
+    if (effect && !status.numbered) {
+      await this._dedupeAxiomStatusEffects(statusId, effect);
+      await this.update({ [`system.statuses.${statusId}`]: 1 }, { render: false });
+      await this._drawActiveTokenStatusIcons();
+      return effect;
+    }
 
     if (!effect) {
       const result = await super.toggleStatusEffect(statusId, { active: true, overlay: status.overlay ?? false });
@@ -221,6 +271,7 @@ export default class AxiomActor extends Actor {
       ? this._clampStatusValue(status, wasCreated ? Number(value) : this.getAxiomStatusValue(statusId) + Number(value))
       : 1;
 
+    await this._dedupeAxiomStatusEffects(statusId, effect);
     await this._updateAxiomStatusEffect(effect, status, next);
     await this.update({ [`system.statuses.${statusId}`]: next }, { render: false });
     await this._drawActiveTokenStatusIcons();
@@ -254,29 +305,12 @@ export default class AxiomActor extends Actor {
     const status = CONFIG.AXIOM?.statuses?.[statusId];
     if (!status) return null;
 
-    // Delete the matching ActiveEffect directly instead of routing the final
-    // stack removal through Foundry's toggleStatusEffect. The Token HUD also
-    // has native right-click delete handling, and using the native toggle here
-    // can cause a second delete/update attempt if a default listener slips
-    // through. Direct deletion is enough: the effect already has the proper
-    // statuses Set and Token#drawEffects responds to the embedded document
-    // change normally.
-    const existing = this.getAxiomStatusEffect(statusId);
-    if (existing) {
-      try { await existing.delete(); }
-      catch (error) {
-        // Ignore stale embedded-document delete races. These can happen when
-        // an older HUD listener already removed the same ActiveEffect.
-        if (!String(error?.message ?? "").includes("does not exist")) throw error;
-      }
-    }
-
-    // Clean up any legacy duplicates from earlier builds which may not have a
-    // real statuses Set and therefore are invisible to Foundry's native status
-    // pipeline.
-    const legacy = this.getAxiomStatusEffect(statusId);
-    if (legacy && legacy.id !== existing?.id) {
-      try { await legacy.delete(); }
+    // Delete matching ActiveEffects directly instead of routing the final stack
+    // removal through Foundry's toggleStatusEffect. Direct deletion avoids a
+    // second toggle/update when native Token HUD listeners are also involved,
+    // and it clears any duplicate effects left by older builds or async races.
+    for (const effect of this.getAxiomStatusEffects(statusId)) {
+      try { await effect.delete(); }
       catch (error) {
         if (!String(error?.message ?? "").includes("does not exist")) throw error;
       }
@@ -326,6 +360,21 @@ export default class AxiomActor extends Actor {
       if (!this.getAxiomStatusEffect(other.id) && !this.system.statuses?.[other.id]) continue;
       await this.clearStatus(other.id);
     }
+  }
+
+  async _dedupeAxiomStatusEffects(statusId, keep = null) {
+    const effects = this.getAxiomStatusEffects(statusId);
+    if (effects.length <= 1) return keep ?? effects[0] ?? null;
+
+    const kept = keep && effects.includes(keep) ? keep : effects[0];
+    for (const effect of effects) {
+      if (effect.id === kept.id) continue;
+      try { await effect.delete(); }
+      catch (error) {
+        if (!String(error?.message ?? "").includes("does not exist")) throw error;
+      }
+    }
+    return kept;
   }
 
   async _updateAxiomStatusEffect(effect, status, value) {

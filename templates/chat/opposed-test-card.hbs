@@ -4,7 +4,7 @@
       <strong>{{localize "AXIOM.Combat.OpposedTest"}}</strong>
       <span>{{localize card.attackTypeLabel}}</span>
     </div>
-    <div class="card-badge">{{localize "AXIOM.Combat.Pending"}}</div>
+    <div class="card-badge">{{#if card.resolved}}{{localize "AXIOM.Combat.Resolved"}}{{else}}{{localize "AXIOM.Combat.Pending"}}{{/if}}</div>
   </header>
 
   <section class="card-body">
@@ -33,15 +33,20 @@
       <div><span>{{localize "AXIOM.RollCard.Location"}}</span><strong>{{card.attack.hitLocation.labelText}}</strong></div>
     </div>
 
-    <div class="combat-action-strip">
-      <button type="button" data-action="combatDodge"><i class="fa-solid fa-person-running"></i> {{localize "AXIOM.Combat.Dodge"}}</button>
-      {{#if card.showParry}}
-        <button type="button" data-action="combatParry"><i class="fa-solid fa-shield-halved"></i> {{localize "AXIOM.Combat.Parry"}}</button>
-      {{/if}}
-      {{#if card.showBlock}}
-        <button type="button" data-action="combatBlock"><i class="fa-solid fa-shield"></i> {{localize "AXIOM.Combat.Block"}}</button>
-      {{/if}}
-      <button type="button" data-action="combatUnopposed"><i class="fa-solid fa-bullseye"></i> {{localize "AXIOM.Combat.Unopposed"}}</button>
-    </div>
+    {{#unless card.resolved}}
+      <div class="combat-action-strip">
+        <button type="button" data-action="combatDodge"><i class="fa-solid fa-person-running"></i> {{localize "AXIOM.Combat.Dodge"}}</button>
+        {{#if card.showParry}}
+          <button type="button" data-action="combatParry"><i class="fa-solid fa-shield-halved"></i> {{localize "AXIOM.Combat.Parry"}}</button>
+        {{/if}}
+        {{#if card.showBlock}}
+          <button type="button" data-action="combatBlock"><i class="fa-solid fa-shield"></i> {{localize "AXIOM.Combat.Block"}}</button>
+        {{/if}}
+        {{#if card.showCounterattack}}
+          <button type="button" data-action="combatCounterattack"><i class="fa-solid fa-rotate-left"></i> {{localize "AXIOM.Combat.Momentum.Counterattack"}}</button>
+        {{/if}}
+        <button type="button" data-action="combatUnopposed"><i class="fa-solid fa-bullseye"></i> {{localize "AXIOM.Combat.Unopposed"}}</button>
+      </div>
+    {{/unless}}
   </section>
 </article>

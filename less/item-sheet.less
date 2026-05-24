@@ -96,6 +96,11 @@
   min-width: 0;
 }
 
+.axiom.item-sheet .item-title-row,
+.axiom-item-sheet .item-title-row {
+  display: block;
+}
+
 .axiom.item-sheet .item-name,
 .axiom-item-sheet .item-name {
   width: 100%;
@@ -132,7 +137,9 @@
 }
 
 .axiom.item-sheet .item-field label,
-.axiom-item-sheet .item-field label {
+.axiom-item-sheet .item-field label,
+.axiom.item-sheet .item-field > span,
+.axiom-item-sheet .item-field > span {
   color: var(--item-muted);
   font-size: 10px;
   font-weight: 700;
@@ -147,6 +154,103 @@
   width: 100%;
   height: 28px;
   padding: 2px 6px;
+}
+
+
+/* ----------------------------------------- */
+/*  Item Tech Level                          */
+/* ----------------------------------------- */
+
+.axiom.item-sheet .item-title-row,
+.axiom-item-sheet .item-title-row {
+  display: grid;
+  grid-template-columns: 1fr 32px;
+  gap: 8px;
+  align-items: center;
+}
+
+.axiom.item-sheet .item-tech-level-config,
+.axiom-item-sheet .item-tech-level-config {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--item-line);
+  border-radius: 7px;
+  background: var(--item-panel-dark);
+  color: var(--item-bone);
+  cursor: pointer;
+}
+
+.axiom.item-sheet .item-tech-level-config:hover,
+.axiom-item-sheet .item-tech-level-config:hover {
+  border-color: var(--item-bone);
+  box-shadow: 0 0 10px var(--item-shadow-bone);
+}
+
+.axiom.item-sheet .item-tech-level-list,
+.axiom-item-sheet .item-tech-level-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: -2px;
+}
+
+.axiom.item-sheet .item-tech-level-pill,
+.axiom-item-sheet .item-tech-level-pill,
+.axiom-tech-level-dialog .axiom-tech-level-option span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 2px 7px;
+  border: 1px solid var(--item-line, #333338);
+  border-radius: 999px;
+  background: rgba(224, 212, 184, 0.08);
+  color: var(--item-bone, #e0d4b8);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.axiom-tech-level-dialog .hint {
+  margin: 0 0 10px;
+  color: var(--item-muted, #aaa);
+  font-size: 12px;
+}
+
+.axiom-tech-level-dialog .axiom-tech-level-option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.axiom-tech-level-dialog .axiom-tech-level-option {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.axiom-tech-level-dialog .axiom-tech-level-option input {
+  margin: 0;
+}
+
+
+.application .axiom-tech-level-dialog .axiom-tech-level-option-grid,
+.dialog .axiom-tech-level-dialog .axiom-tech-level-option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.application .axiom-tech-level-dialog .axiom-tech-level-option,
+.dialog .axiom-tech-level-dialog .axiom-tech-level-option {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
 }
 
 /* Skill sheets only need image + name */
@@ -902,96 +1006,6 @@
 }
 
 /* ----------------------------------------- */
-/*  Item Genre Tags                          */
-/* ----------------------------------------- */
-
-.axiom.item-sheet .item-title-row,
-.axiom-item-sheet .item-title-row {
-  display: grid;
-  grid-template-columns: 1fr 32px;
-  gap: 8px;
-  align-items: center;
-}
-
-.axiom.item-sheet .item-tag-config,
-.axiom-item-sheet .item-tag-config {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 1px solid var(--item-line);
-  border-radius: 7px;
-  background: var(--item-panel-dark);
-  color: var(--item-bone);
-  cursor: pointer;
-}
-
-.axiom.item-sheet .item-tag-config:hover,
-.axiom-item-sheet .item-tag-config:hover {
-  border-color: var(--item-bone);
-  box-shadow: 0 0 10px var(--item-shadow-bone);
-}
-
-.axiom.item-sheet .item-tag-list,
-.axiom-item-sheet .item-tag-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: -2px;
-}
-
-.axiom.item-sheet .item-tag-pill,
-.axiom-item-sheet .item-tag-pill,
-.axiom-tag-dialog .axiom-tag-option span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 20px;
-  padding: 2px 7px;
-  border: 1px solid var(--item-line, #333338);
-  border-radius: 999px;
-  background: rgba(224, 212, 184, 0.08);
-  color: var(--item-bone, #e0d4b8);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.axiom-tag-dialog .hint {
-  margin: 0 0 10px;
-  color: var(--color-text-dark-secondary, #aaa);
-}
-
-.axiom-tag-dialog .axiom-tag-option-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.axiom-tag-dialog .axiom-tag-option {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-}
-
-.axiom-tag-dialog .axiom-tag-option input {
-  flex: 0 0 auto;
-}
-
-.application .axiom-tag-dialog .axiom-tag-option-grid,
-.dialog .axiom-tag-dialog .axiom-tag-option-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.application .axiom-tag-dialog .axiom-tag-option,
-.dialog .axiom-tag-dialog .axiom-tag-option {
-  width: 100%;
-  min-width: 0;
-}
-
-/* ----------------------------------------- */
 /*  Ranged Weapon Sheet Layout               */
 /* ----------------------------------------- */
 
@@ -1376,4 +1390,121 @@
   color: var(--item-muted);
   font-size: 11px;
   line-height: 1.35;
+}
+
+.axiom.item-sheet .range-input-grid,
+.axiom-item-sheet .range-input-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 116px 116px;
+  gap: 8px;
+  align-items: end;
+}
+
+.axiom.item-sheet .checkbox-field,
+.axiom-item-sheet .checkbox-field {
+  align-items: center;
+  justify-content: center;
+}
+
+.axiom.item-sheet .checkbox-field input[type="checkbox"],
+.axiom-item-sheet .checkbox-field input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+}
+
+.axiom.item-sheet .range-formula-line,
+.axiom-item-sheet .range-formula-line {
+  margin-top: 8px;
+  padding: 5px 8px;
+  border: 1px solid var(--item-line-soft);
+  border-radius: 5px;
+  background: var(--item-panel-dark);
+  color: var(--item-bone);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.axiom.item-sheet .range-band-grid.five-bands,
+.axiom-item-sheet .range-band-grid.five-bands {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.axiom.item-sheet .ranged-range-panel,
+.axiom-item-sheet .ranged-range-panel,
+.axiom.item-sheet.ranged-weapon .ranged-range-panel,
+.axiom-item-sheet.rangedWeapon .ranged-range-panel,
+.axiom-item-sheet.ranged-weapon .ranged-range-panel {
+  display: block;
+}
+
+/* ----------------------------------------- */
+/*  Compact Ranged Weapon Layout             */
+/* ----------------------------------------- */
+.axiom.item-sheet .ranged-top-grid,
+.axiom-item-sheet .ranged-top-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px 112px;
+  gap: 8px;
+  align-items: end;
+}
+
+.axiom.item-sheet .range-row-grid,
+.axiom-item-sheet .range-row-grid {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 8px;
+  align-items: stretch;
+}
+
+.axiom.item-sheet .range-row-grid .range-band-grid,
+.axiom-item-sheet .range-row-grid .range-band-grid {
+  margin-top: 0;
+}
+
+.axiom.item-sheet .reload-ammo-grid,
+.axiom-item-sheet .reload-ammo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  align-items: end;
+}
+
+.axiom.item-sheet .reload-ammo-grid.with-shots,
+.axiom-item-sheet .reload-ammo-grid.with-shots {
+  grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
+}
+
+.axiom.item-sheet .reload-ammo-grid.with-reload-cost,
+.axiom-item-sheet .reload-ammo-grid.with-reload-cost {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 120px;
+}
+
+.axiom.item-sheet .reload-ammo-grid.with-shots.with-reload-cost,
+.axiom-item-sheet .reload-ammo-grid.with-shots.with-reload-cost {
+  grid-template-columns: minmax(0, 1fr) 138px minmax(0, 1fr) 112px;
+}
+
+.axiom.item-sheet .reload-ammo-grid > input[type="hidden"],
+.axiom-item-sheet .reload-ammo-grid > input[type="hidden"] {
+  display: none;
+}
+
+@media (max-width: 620px) {
+  .axiom.item-sheet .ranged-top-grid,
+  .axiom-item-sheet .ranged-top-grid,
+  .axiom.item-sheet .range-row-grid,
+  .axiom-item-sheet .range-row-grid,
+  .axiom.item-sheet .reload-ammo-grid,
+  .axiom-item-sheet .reload-ammo-grid,
+  .axiom.item-sheet .reload-ammo-grid.with-shots,
+  .axiom-item-sheet .reload-ammo-grid.with-shots,
+  .axiom.item-sheet .reload-ammo-grid.with-reload-cost,
+  .axiom-item-sheet .reload-ammo-grid.with-reload-cost,
+  .axiom.item-sheet .reload-ammo-grid.with-shots.with-reload-cost,
+  .axiom-item-sheet .reload-ammo-grid.with-shots.with-reload-cost {
+    grid-template-columns: 1fr;
+  }
 }

@@ -22,17 +22,23 @@ function getActionPointData(actor) {
 }
 
 
+function roundMeters(value) {
+  const number = Number(value ?? 0);
+  if (!Number.isFinite(number)) return 0;
+  return Math.floor(number);
+}
+
 function getMovementData(actor, combatant = null) {
   if (!actor) return null;
 
   const max = Number(actor.system?.subAttributes?.movement ?? 0);
   const used = Number(combatant?.getFlag?.("axiom", "movementUsed") ?? 0);
-  const safeMax = Number.isFinite(max) ? Math.max(0, Math.trunc(max)) : 0;
-  const safeUsed = Number.isFinite(used) ? used : 0;
+  const safeMax = Number.isFinite(max) ? Math.max(0, roundMeters(max)) : 0;
+  const safeUsed = Number.isFinite(used) ? roundMeters(used) : 0;
 
   return {
     used: safeUsed,
-    remaining: Math.round((safeMax - safeUsed) * 10) / 10,
+    remaining: roundMeters(safeMax - safeUsed),
     max: safeMax
   };
 }
@@ -205,6 +211,31 @@ function findCombatantRow(root, combatant) {
     ?? root.querySelector(`[data-document-id="${combatant.id}"]`);
 }
 
+function useActorArtworkForCombatant(row, combatant) {
+  const actorImage = combatant?.actor?.img;
+  if (!row || !actorImage) return;
+
+  const image = row.querySelector("img.combatant-image, img.token-image, .combatant-image img, .token-image img, img");
+  if (image) {
+    image.src = actorImage;
+    image.alt = combatant.actor?.name ?? combatant.name ?? "";
+    image.title = combatant.actor?.name ?? combatant.name ?? "";
+  }
+
+  const portrait = row.querySelector(".combatant-image, .token-image, .combatant-portrait, .token-portrait");
+  if (portrait instanceof HTMLElement && !(portrait instanceof HTMLImageElement)) {
+    portrait.style.backgroundImage = `url("${actorImage}")`;
+  }
+}
+
+function useActorArtworkForCombatants(root, combat) {
+  if (!combat) return;
+  for (const combatant of combat.combatants ?? []) {
+    const row = findCombatantRow(root, combatant);
+    useActorArtworkForCombatant(row, combatant);
+  }
+}
+
 function findInsertionPoint(row) {
   return row.querySelector(".token-name")
     ?? row.querySelector(".combatant-name")
@@ -245,9 +276,7 @@ function buildActionPointTracker(combatant, actor, data) {
 }
 
 function formatMovementValue(value) {
-  const number = Number(value ?? 0);
-  if (!Number.isFinite(number)) return "0";
-  return Number.isInteger(number) ? String(number) : number.toFixed(1).replace(/\.0$/, "");
+  return String(roundMeters(value));
 }
 
 function buildMovementTracker(combatant, actor, data) {
@@ -345,7 +374,7 @@ async function adjustCombatantMovement(event) {
   // Left click spends 1 m. Right click adds 1 m back, which also supports sprinting
   // or other effects that increase available movement for the round.
   const deltaUsed = event.type === "contextmenu" ? -1 : 1;
-  const next = Math.round((data.used + deltaUsed) * 10) / 10;
+  const next = roundMeters(data.used + deltaUsed);
   if (next === data.used) return;
 
   await combatant.setFlag?.("axiom", "movementUsed", next);
@@ -381,6 +410,7 @@ export function registerAxiomCombatTracker() {
     if (!root) return;
 
     replaceInitiativeIcons(root);
+    useActorArtworkForCombatants(root, game.combat);
     updateNativeNextTurnControls(root, game.combat);
     addAxiomCombatControls(root, game.combat);
     addCombatantResourceTrackers(root, game.combat);

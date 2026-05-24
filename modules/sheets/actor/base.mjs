@@ -4,7 +4,7 @@ const { mergeObject } = foundry.utils;
 import AxiomRollWindow from "../../apps/roll-window.mjs";
 import AxiomEffectBuilder from "../../apps/effect-builder.mjs";
 import { formatAxiomPrice, getStoredCurrencyCoins, prepareCurrencyContext, priceCoinsToValue } from "../../system/currency.mjs";
-import { getWeaponCategory, handStateUsesMainHand, handStateUsesOffHand, isEquippedGearState, isHandEquippableItem, isHandGearState, isMeleeWeaponItem, isRangedWeaponItem, isWeaponItem, isShieldItem, WEAPON_ITEM_TYPES, SHIELD_ITEM_TYPE } from "../../system/items.mjs";
+import { getWeaponCategory, getWeaponRange, getWeaponRangeBands, handStateUsesMainHand, handStateUsesOffHand, isEquippedGearState, isHandEquippableItem, isHandGearState, isMeleeWeaponItem, isRangedWeaponItem, isWeaponItem, isShieldItem, WEAPON_ITEM_TYPES, SHIELD_ITEM_TYPE } from "../../system/items.mjs";
 
 const LEGACY_ACTIVE_EFFECT_MODE_TYPES = Object.freeze({
   0: "custom",
@@ -180,6 +180,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     context.editorFields = this._prepareEditorFields();
     this._enrichedItemDescriptions = await this._prepareEnrichedItemDescriptions();
     context.config = CONFIG.AXIOM ?? {};
+    context.isGM = Boolean(game.user?.isGM);
 
     const activeTab = this._getActiveTab();
     context.activeTab = activeTab;
@@ -524,7 +525,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
   _prepareWeaponCombatRow(item) {
     const system = item.system ?? {};
     const category = getWeaponCategory(item);
-    const range = Number(system.range ?? 0);
+    const range = getWeaponRange(item, this.actor);
     const ammoContainer = Number(system.ammoContainer ?? 0);
     const ammoLoaded = Math.max(0, Number(system.ammo ?? 0));
     const loadingMethod = normalizeWeaponReloadMethod(system.reloadMethod);
@@ -577,12 +578,9 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       minStrength: Number(system.minStrength ?? 0),
       meetsMinStrength: this._meetsWeaponStrengthRequirement(system),
       strengthRequirementLabel: this._formatStrengthRequirement(system),
-      rangeBands: {
-        short: Math.ceil(range / 2),
-        medium: range,
-        long: range * 2,
-        extreme: range * 3
-      }
+      strengthBasedRange: Boolean(system.strengthBasedRange),
+      strengthRangeModifier: Number(system.strengthRangeModifier ?? 0) || 0,
+      rangeBands: getWeaponRangeBands(range)
     };
   }
 
@@ -827,7 +825,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
 
     const readTracker = (key, fallback) => {
       const data = trackers[key] ?? fallback;
-      const rawCurrent = Number(data.current ?? fallback.current);
+      const rawCurrent = Number(data.current ?? data.value ?? fallback.current);
       const min = Number(data.min ?? fallback.min);
       const rawMax = Number(data.max ?? fallback.max);
       const max = Number.isFinite(rawMax) ? rawMax : fallback.max;
@@ -899,7 +897,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       trackers: {
         fate: readTracker("fate", { current: 3, min: 0, max: 3 }),
         actionPoints: readTracker("actionPoints", { current: 3, min: 0, max: 3 }),
-        momentum: readTracker("momentum", { current: 0, min: -5, max: 5 })
+        momentum: readTracker("momentum", { current: 0, min: 0, max: this.actor?.type === "npc" ? 1 : 3 })
       },
       qualities: ["Brave", "Loyal", "Resourceful"],
       flaws: ["Stubborn", "Distrustful"],
@@ -910,8 +908,8 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
   _onRender(context, options) {
     super._onRender(context, options);
 
-    this.element.querySelectorAll("[data-action='toggleNpcConfig']").forEach(element => {
-      element.addEventListener("click", this._onToggleNpcConfig.bind(this));
+    this.element.querySelectorAll("[data-action='toggleNpcConfig'], [data-action='toggleActorConfig']").forEach(element => {
+      element.addEventListener("click", this._onToggleActorConfig.bind(this));
     });
 
     this.element.querySelectorAll("[data-action='toggleWound']").forEach(element => {
@@ -922,6 +920,10 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     this.element.querySelectorAll("[data-action='adjustTracker']").forEach(element => {
       element.addEventListener("click", this._onAdjustTracker.bind(this));
       element.addEventListener("contextmenu", this._onAdjustTracker.bind(this));
+    });
+
+    this.element.querySelectorAll("[data-action='avoidOpenings']").forEach(element => {
+      element.addEventListener("click", this._onAvoidOpenings.bind(this));
     });
 
     this.element.querySelectorAll("[data-action='updateSkillLevel']").forEach(element => {
@@ -946,6 +948,10 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
 
     this.element.querySelectorAll("[data-action='rollSkill']").forEach(element => {
       element.addEventListener("click", this._onRollSkill.bind(this));
+    });
+
+    this.element.querySelectorAll("[data-action='sortSkills']").forEach(element => {
+      element.addEventListener("click", this._onSortSkills.bind(this));
     });
 
     this.element.querySelectorAll("[data-action='rollAttributeCheck']").forEach(element => {
@@ -1031,13 +1037,17 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     });
   }
 
-  _onToggleNpcConfig(event) {
+  _onToggleActorConfig(event) {
     event.preventDefault();
     event.stopPropagation();
 
-    const panel = this.element.querySelector("[data-npc-config-panel]");
+    const panel = this.element.querySelector("[data-actor-config-panel], [data-npc-config-panel]");
     if (!panel) return;
     panel.hidden = !panel.hidden;
+  }
+
+  _onToggleNpcConfig(event) {
+    return this._onToggleActorConfig(event);
   }
 
   _onToggleItemDescriptionKeydown(event) {
@@ -1068,7 +1078,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     event.stopPropagation();
 
     const tracker = event.currentTarget.dataset.tracker;
-    if (!tracker || !["fate", "actionPoints"].includes(tracker)) return;
+    if (!tracker || !["fate", "actionPoints", "momentum"].includes(tracker)) return;
 
     const data = this.actor.system.trackers?.[tracker];
     if (!data) return;
@@ -1082,6 +1092,17 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
 
     if (next === current) return;
     await this.actor.update({ [`system.trackers.${tracker}.current`]: next });
+  }
+
+
+  async _onAvoidOpenings(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const combat = game.axiom?.combat;
+    const helper = combat ?? (await import("../../system/combat.mjs")).default;
+    const ok = await helper.avoidOpenings(this.actor);
+    if (!ok) ui.notifications?.warn(game.i18n.localize("AXIOM.Combat.Momentum.Insufficient"));
   }
 
   async _onToggleWound(event) {
@@ -1614,6 +1635,46 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
         skillValue: 30
       }
     }).render({ force: true });
+  }
+
+
+  _onSortSkills(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const button = event.currentTarget;
+    const sortMode = button.dataset.sort ?? "nameAsc";
+    const column = button.closest(".skill-column");
+    const list = column?.querySelector("[data-sortable-skills]");
+    if (!list) return;
+
+    const rows = Array.from(list.querySelectorAll(".skill-row[data-skill-id]"));
+    const direction = sortMode.endsWith("Asc") ? 1 : -1;
+    const getNumber = (row, key) => Number(row.dataset[key] ?? 0);
+    const getName = row => String(row.dataset.skillName ?? "");
+
+    rows.sort((a, b) => {
+      let result = 0;
+
+      if (sortMode.startsWith("level")) {
+        result = getNumber(a, "skillLevel") - getNumber(b, "skillLevel");
+      } else if (sortMode.startsWith("total")) {
+        result = getNumber(a, "skillTotal") - getNumber(b, "skillTotal");
+      } else {
+        result = getName(a).localeCompare(getName(b), game.i18n.lang, { sensitivity: "base" });
+      }
+
+      if (result === 0) return getName(a).localeCompare(getName(b), game.i18n.lang, { sensitivity: "base" });
+      return result * direction;
+    });
+
+    for (const row of rows) list.append(row);
+
+    column.querySelectorAll("[data-action='sortSkills']").forEach(control => {
+      const active = control === button;
+      control.classList.toggle("active", active);
+      control.setAttribute("aria-pressed", String(active));
+    });
   }
 
   _onRollSkill(event) {

@@ -97,7 +97,14 @@ export default class AxiomChatCard {
       rerollHistory: Array.isArray(state.rerollHistory) ? state.rerollHistory.map(value => AxiomRoll.normalizeD100(value)) : [],
       complicationResolved: Boolean(state.complicationResolved),
       complicationResolution: state.complicationResolution ?? "",
-      combatOppositionCreated: Boolean(state.combatOppositionCreated)
+      combatOppositionCreated: Boolean(state.combatOppositionCreated),
+      opposedRollPending: state.opposedRollPending ? {
+        tokenId: state.opposedRollPending.tokenId ?? "",
+        sceneId: state.opposedRollPending.sceneId ?? "",
+        actorId: state.opposedRollPending.actorId ?? "",
+        name: state.opposedRollPending.name ?? ""
+      } : null,
+      opposedRollResolved: Boolean(state.opposedRollResolved)
     };
   }
 
@@ -146,7 +153,7 @@ export default class AxiomChatCard {
     };
 
     const showWeaponSummary = normalized.isWeaponRoll;
-    const hitLocation = showWeaponSummary ? AxiomRoll.getHitLocation(normalized.d100) : null;
+    const hitLocation = showWeaponSummary ? AxiomRoll.getAttackHitLocation(normalized.d100, normalized) : null;
     const location = normalized.combatResult?.hitLocation?.labelText
       ?? (showWeaponSummary ? game.i18n.localize(hitLocation.label) : normalized.location || game.i18n.localize("AXIOM.RollCard.Pending"));
     const pendingDamageModifier = normalized.weaponInfo?.category === "melee" ? Number(normalized.weaponInfo?.damageModifier ?? 0) : 0;
@@ -193,7 +200,11 @@ export default class AxiomChatCard {
       showDefenseActions: isAttackCard && !normalized.combatOppositionCreated,
       showParryAction: normalized.weaponInfo?.category !== "ranged",
       showBlockAction: true,
+      showCounterattackAction: normalized.weaponInfo?.category !== "ranged" && AxiomCombat.canSpendMomentum(AxiomCombat.getTokenFromCombatTarget(normalized.combatTarget)?.actor ?? game.actors?.get(normalized.combatTarget?.actorId), 1),
       showAttackTargetActions: false,
+      showOpposeAction: !isAttackCard && !normalized.timeframeOnly && !normalized.opposedRollPending && !normalized.opposedRollResolved,
+      showOpposedPending: Boolean(normalized.opposedRollPending) && !normalized.opposedRollResolved,
+      opposedPendingName: normalized.opposedRollPending?.name ?? "",
       combatTargetName,
       hasCombatTarget: Boolean(normalized.combatTarget?.actorId),
       combatTargetAssignedAfterRoll: Boolean(normalized.combatTarget?.assignedAfterRoll),
@@ -227,7 +238,9 @@ export default class AxiomChatCard {
     if (Array.isArray(roll)) messageData.rolls = roll.filter(Boolean);
     else if (roll) messageData.rolls = [roll];
     this.applyRollMode(messageData, rollMode);
-    return ChatMessage.create(messageData);
+    const message = await ChatMessage.create(messageData);
+    await this._maybeResolvePendingOpposition(message, normalized);
+    return message;
   }
 
   static onRenderChatMessageHTML(message, element) {
@@ -274,9 +287,11 @@ export default class AxiomChatCard {
     card.querySelector("[data-action='negateComplication']")?.addEventListener("click", event => this._onNegateComplication(event, message));
     card.querySelector("[data-action='acceptComplication']")?.addEventListener("click", event => this._onAcceptComplication(event, message));
     card.querySelector("[data-action='assignCombatOpponent']")?.addEventListener("click", event => this._onAssignCombatOpponent(event, message));
+    card.querySelector("[data-action='opposeRoll']")?.addEventListener("click", event => this._onOpposeRoll(event, message));
     card.querySelector("[data-action='combatDodge']")?.addEventListener("click", event => this._onCombatDefense(event, message, "dodge"));
     card.querySelector("[data-action='combatParry']")?.addEventListener("click", event => this._onCombatDefense(event, message, "parry"));
     card.querySelector("[data-action='combatBlock']")?.addEventListener("click", event => this._onCombatDefense(event, message, "block"));
+    card.querySelector("[data-action='combatCounterattack']")?.addEventListener("click", event => this._onCombatDefense(event, message, "counterattack"));
     card.querySelector("[data-action='combatUnopposed']")?.addEventListener("click", event => this._onCombatUnopposed(event, message));
     card.querySelector("[data-action='applyCombatWound']")?.addEventListener("click", event => this._onApplyCombatWound(event, message));
 
@@ -435,9 +450,11 @@ export default class AxiomChatCard {
     const response = await AxiomCombat.resolveAttackCardDefense(message, defenseType);
     if (!response) return;
 
+    // Keep the defense buttons available while only the roll window has opened.
+    // The attack card is marked resolved after the defense roll actually creates
+    // a chat message, so closing the roll window does not force the GM to reroll.
     const nextState = this.normalizeState(message.getFlag("axiom", "roll") ?? state);
     nextState.detailsOpen = detailsOpen;
-    nextState.combatOppositionCreated = true;
     await this.replaceMessageState(message, nextState, { refreshLinkedResults: false });
   }
 
@@ -461,6 +478,108 @@ export default class AxiomChatCard {
     const state = this.normalizeState(message.getFlag("axiom", "roll") ?? {});
     state.combatOppositionCreated = true;
     await this.replaceMessageState(message, state);
+  }
+
+
+  static getSelectedOppositionToken() {
+    const controlled = canvas?.tokens?.controlled ?? [];
+    if (controlled.length !== 1) {
+      ui.notifications?.warn(game.i18n.localize("AXIOM.RollCard.SelectOneOpposingToken"));
+      return null;
+    }
+
+    const token = controlled[0];
+    if (!token?.actor) {
+      ui.notifications?.warn(game.i18n.localize("AXIOM.RollCard.OpposingTokenHasNoActor"));
+      return null;
+    }
+
+    return token;
+  }
+
+  static serializeOppositionToken(token) {
+    return {
+      tokenId: token?.id ?? "",
+      sceneId: canvas?.scene?.id ?? token?.scene?.id ?? token?.document?.parent?.id ?? token?.parent?.id ?? "",
+      actorId: token?.actor?.id ?? "",
+      name: token?.name ?? token?.actor?.name ?? game.i18n.localize("AXIOM.RollCard.UnknownActor")
+    };
+  }
+
+  static async _onOpposeRoll(event, message) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const token = this.getSelectedOppositionToken();
+    if (!token?.actor) return;
+
+    const detailsOpen = Boolean(event.currentTarget.closest(".axiom-chat-card.roll-card")?.querySelector("details.breakdown")?.open);
+    const state = this.normalizeState(message.getFlag("axiom", "roll") ?? {});
+    if (state.timeframeOnly || state.isWeaponRoll) return;
+
+    const pending = {
+      sourceMessageId: message.id,
+      sourceActorId: state.actorId ?? "",
+      target: this.serializeOppositionToken(token)
+    };
+
+    game.axiom.pendingOpposedRoll = pending;
+    state.detailsOpen = detailsOpen;
+    state.opposedRollPending = pending.target;
+    state.opposedRollResolved = false;
+    await this.replaceMessageState(message, state, { refreshLinkedResults: false });
+    ui.notifications?.info(game.i18n.format("AXIOM.RollCard.OpposedRollArmed", { actor: pending.target.name }));
+  }
+
+  static async _maybeResolvePendingOpposition(defenseMessage, defenseState) {
+    const pending = game.axiom?.pendingOpposedRoll;
+    if (!pending?.sourceMessageId || !pending?.target?.actorId) return null;
+    if (!defenseMessage?.id || defenseMessage.id === pending.sourceMessageId) return null;
+    if (defenseState?.timeframeOnly || defenseState?.isWeaponRoll) return null;
+    if (String(defenseState?.actorId ?? "") !== String(pending.target.actorId ?? "")) return null;
+
+    const sourceMessage = game.messages?.get(pending.sourceMessageId);
+    const sourceState = sourceMessage?.getFlag?.("axiom", "roll") ?? null;
+    if (!sourceMessage || !sourceState) {
+      game.axiom.pendingOpposedRoll = null;
+      return null;
+    }
+
+    await AxiomCombat.waitForDiceAnimation(defenseMessage);
+
+    const opposedData = AxiomCombat.normalizeOpposedData({
+      id: foundry.utils.randomID(),
+      attackMessageId: sourceMessage.id,
+      attackType: "test",
+      attacker: {
+        actorId: sourceState.actorId ?? "",
+        name: sourceState.actorName ?? game.i18n.localize("AXIOM.RollCard.UnknownActor")
+      },
+      defender: {
+        tokenId: pending.target.tokenId ?? "",
+        sceneId: pending.target.sceneId ?? "",
+        actorId: defenseState.actorId ?? pending.target.actorId ?? "",
+        name: defenseState.actorName ?? pending.target.name ?? game.i18n.localize("AXIOM.RollCard.UnknownActor")
+      },
+      weapon: {
+        itemId: "",
+        name: sourceState.title ?? "",
+        damage: 0,
+        armorPenetration: 0,
+        damageModifier: 0,
+        delivery: ""
+      },
+      attack: AxiomCombat.serializeAttackForOpposition(sourceState, AxiomCombat.getAttackData(sourceState))
+    });
+
+    await AxiomCombat.createOpposedResultCard({ opposedData, defenseState, defenseMessage, unopposed: false });
+
+    const nextSourceState = this.normalizeState(sourceMessage.getFlag("axiom", "roll") ?? sourceState);
+    nextSourceState.opposedRollResolved = true;
+    nextSourceState.opposedRollPending = null;
+    await this.replaceMessageState(sourceMessage, nextSourceState, { refreshLinkedResults: false });
+    game.axiom.pendingOpposedRoll = null;
+    return opposedData;
   }
 
   static async _onApplyCombatWound(event, message) {
