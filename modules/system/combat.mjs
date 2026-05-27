@@ -609,6 +609,51 @@ export default class AxiomCombat extends foundry.documents.Combat {
     return skill ? { skill, weapon: null, source: "unarmed" } : null;
   }
 
+  static normalizeGuardValue(value) {
+    return String(value ?? "full") === "limited" ? "limited" : "full";
+  }
+
+  static getWeaponGuardValue(weapon) {
+    return this.normalizeGuardValue(weapon?.system?.guard ?? "full");
+  }
+
+  static getAttackingWeaponFromState(state) {
+    const actor = game.actors?.get(state?.actorId ?? "") ?? null;
+    return actor?.items?.get(state?.itemId ?? "") ?? null;
+  }
+
+  static getAttackingWeaponFromOpposedData(opposedData) {
+    const actor = game.actors?.get(opposedData?.attacker?.actorId ?? "") ?? null;
+    return actor?.items?.get(opposedData?.weapon?.itemId ?? "") ?? null;
+  }
+
+  static getDefenseGuardValue({ defenseType, defender, shield = null, parry = null } = {}) {
+    if (defenseType === "block") return shield ? "full" : null;
+    if (!["parry", "counterattack"].includes(defenseType)) return null;
+
+    const parryData = parry ?? this.getPrimaryParrySkill(defender);
+    if (parryData?.weapon) return this.getWeaponGuardValue(parryData.weapon);
+    if (parryData?.source === "unarmed" || parryData?.skill) return "limited";
+    return null;
+  }
+
+  static buildGuardModifierRow({ isMeleeAttack = false, attackWeapon = null, defender = null, defenseType = "", shield = null, parry = null } = {}) {
+    if (!isMeleeAttack || !["parry", "block", "counterattack"].includes(defenseType)) return null;
+
+    const attackerGuard = this.getWeaponGuardValue(attackWeapon);
+    const defenderGuard = this.getDefenseGuardValue({ defenseType, defender, shield, parry });
+    if (!defenderGuard || attackerGuard === defenderGuard) return null;
+
+    const value = attackerGuard === "limited" && defenderGuard === "full" ? 10 : -10;
+    return {
+      id: "auto-guard",
+      label: value > 0 ? "AXIOM.Roll.ModifierSources.GuardAdvantage" : "AXIOM.Roll.ModifierSources.GuardDisadvantage",
+      value,
+      automatic: true,
+      locked: true
+    };
+  }
+
   static getSkillAliases(skill) {
     const aliases = new Set([skill?.id, skill?.name]);
     const name = this.normalizeSkillReference(skill?.name);
@@ -935,21 +980,29 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const roll = await new Roll("1d100").evaluate();
     const parts = this.getSkillRollParts(defender, skill);
     const modifierRows = this.buildAutomaticModifierRows(defender, { includeCover: isRanged });
-    if (defenseType === "block") {
-      const block = this.getPrimaryShieldBlockSkill(defender);
-      if (block?.shield) modifierRows.push({
-        id: "auto-shield-block",
-        label: "AXIOM.Roll.ModifierSources.ShieldBlock",
-        value: Number(block.shield.system?.blockValue ?? 0),
-        automatic: true,
-        locked: true
-      });
-    }
+    const guardShield = defenseType === "block" ? this.getPrimaryShieldBlockSkill(defender)?.shield ?? null : null;
+    const guardParry = ["parry", "counterattack"].includes(defenseType) ? this.getPrimaryParrySkill(defender) : null;
+    if (guardShield) modifierRows.push({
+      id: "auto-shield-block",
+      label: "AXIOM.Roll.ModifierSources.ShieldBlock",
+      value: Number(guardShield.system?.blockValue ?? 0),
+      automatic: true,
+      locked: true
+    });
+    const guardRow = this.buildGuardModifierRow({
+      isMeleeAttack: !isRanged,
+      attackWeapon: weapon,
+      defender,
+      defenseType,
+      shield: guardShield,
+      parry: guardParry
+    });
+    if (guardRow) modifierRows.push(guardRow);
     const modifierTotal = modifierRows.reduce((sum, row) => sum + Number(row.value ?? 0), 0);
     const successTarget = Math.min(150, Math.max(5, parts.basePool + modifierTotal));
     const result = AxiomRoll.evaluateResult({ d100: roll.total, successTarget });
     const attack = this.getAttackData(state);
-    const blockShield = defenseType === "block" ? this.getPrimaryShieldBlockSkill(defender)?.shield : null;
+    const blockShield = guardShield;
     const combatResult = this.resolveAttack({ state, attack, defender, defenderToken, defense: { ...result, roll, ...parts, modifierRows, modifierTotal, successTarget, type: defenseType, label: defenseLabel, skillName: skill.name, shieldArmorBonus: Number(blockShield?.system?.armorBonus ?? 0), shieldName: blockShield?.name ?? "" } });
 
     return { roll, combatResult };
@@ -1387,6 +1440,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
     let skill = null;
     let defenseLabel = "";
     let shield = null;
+    let parry = null;
     if (defenseType === "block") {
       const block = this.getPrimaryShieldBlockSkill(defender);
       shield = block?.shield ?? null;
@@ -1401,13 +1455,25 @@ export default class AxiomCombat extends foundry.documents.Combat {
         return null;
       }
     } else if (defenseType === "parry") {
-      const parry = this.getPrimaryParrySkill(defender);
+      parry = this.getPrimaryParrySkill(defender);
       skill = parry?.skill ?? null;
       defenseLabel = parry?.weapon
         ? game.i18n.format("AXIOM.Combat.ParryWith", { weapon: parry.weapon.name })
         : game.i18n.localize("AXIOM.Combat.Parry");
       if (!skill) {
         this.warnMissingSkill(defender, this.getUnarmedCombatSkillName(), game.i18n.localize("AXIOM.Combat.Parry"));
+        return null;
+      }
+    } else if (defenseType === "counterattack") {
+      parry = this.getPrimaryParrySkill(defender);
+      skill = parry?.skill ?? null;
+      defenseLabel = game.i18n.localize("AXIOM.Combat.Momentum.Counterattack");
+      if (!this.canSpendMomentum(defender, 1)) {
+        ui.notifications?.warn(game.i18n.localize("AXIOM.Combat.Momentum.Insufficient"));
+        return null;
+      }
+      if (!skill) {
+        this.warnMissingSkill(defender, this.getUnarmedCombatSkillName(), game.i18n.localize("AXIOM.Combat.Momentum.Counterattack"));
         return null;
       }
     } else {
@@ -1428,6 +1494,15 @@ export default class AxiomCombat extends foundry.documents.Combat {
       automatic: true,
       locked: true
     });
+    const guardRow = this.buildGuardModifierRow({
+      isMeleeAttack: opposedData.isMelee,
+      attackWeapon: this.getAttackingWeaponFromOpposedData(opposedData),
+      defender,
+      defenseType,
+      shield,
+      parry
+    });
+    if (guardRow) modifierRows.push(guardRow);
     const { default: AxiomRollWindow } = await import("../apps/roll-window.mjs");
 
     return new AxiomRollWindow({
@@ -1692,6 +1767,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
     let skill = null;
     let defenseLabel = "";
     let shield = null;
+    let parry = null;
     if (defenseType === "block") {
       const block = this.getPrimaryShieldBlockSkill(defender);
       shield = block?.shield ?? null;
@@ -1706,13 +1782,25 @@ export default class AxiomCombat extends foundry.documents.Combat {
         return null;
       }
     } else if (defenseType === "parry") {
-      const parry = this.getPrimaryParrySkill(defender);
+      parry = this.getPrimaryParrySkill(defender);
       skill = parry?.skill ?? null;
       defenseLabel = parry?.weapon
         ? game.i18n.format("AXIOM.Combat.ParryWith", { weapon: parry.weapon.name })
         : game.i18n.localize("AXIOM.Combat.Parry");
       if (!skill) {
         this.warnMissingSkill(defender, this.getUnarmedCombatSkillName(), game.i18n.localize("AXIOM.Combat.Parry"));
+        return null;
+      }
+    } else if (defenseType === "counterattack") {
+      parry = this.getPrimaryParrySkill(defender);
+      skill = parry?.skill ?? null;
+      defenseLabel = game.i18n.localize("AXIOM.Combat.Momentum.Counterattack");
+      if (!this.canSpendMomentum(defender, 1)) {
+        ui.notifications?.warn(game.i18n.localize("AXIOM.Combat.Momentum.Insufficient"));
+        return null;
+      }
+      if (!skill) {
+        this.warnMissingSkill(defender, this.getUnarmedCombatSkillName(), game.i18n.localize("AXIOM.Combat.Momentum.Counterattack"));
         return null;
       }
     } else {
@@ -1734,6 +1822,15 @@ export default class AxiomCombat extends foundry.documents.Combat {
       automatic: true,
       locked: true
     });
+    const guardRow = this.buildGuardModifierRow({
+      isMeleeAttack: opposedData.isMelee,
+      attackWeapon: this.getAttackingWeaponFromOpposedData(opposedData),
+      defender,
+      defenseType,
+      shield,
+      parry
+    });
+    if (guardRow) modifierRows.push(guardRow);
     const modifierTotal = modifierRows.reduce((sum, row) => sum + Number(row.value ?? 0), 0);
     const successTarget = Math.min(150, Math.max(5, parts.basePool + modifierTotal));
     const result = AxiomRoll.evaluateResult({ d100: roll.total, successTarget });
@@ -2401,7 +2498,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
     if (stacks <= 0) return null;
 
     const d100 = (await new Roll("1d100").evaluate()).total;
-    const basePool = AxiomRoll.calculateBasePool(actor, "fortitude", "resolve", 30);
+    const basePool = AxiomRoll.calculateAttributeCheckPool(actor, "fortitude", "resolve");
     const successTarget = AxiomRoll.normalizeSuccessTarget(basePool);
     const result = AxiomRoll.evaluateResult({ d100, successTarget });
     const recovered = Math.max(0, Number(result.hits ?? 0));

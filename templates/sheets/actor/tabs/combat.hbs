@@ -27,11 +27,21 @@
                   <span>{{localize "AXIOM.Shield.Cover.Label"}} {{coverLabel}}</span>
                 </div>
                 <div class="combat-item-actions">
-                  <select class="combat-state-select" data-action="updateCombatItemState" title="{{localize 'AXIOM.Item.State.Label'}}">
-                    {{#each stateOptions}}
-                      <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
-                    {{/each}}
-                  </select>
+                  <details class="combat-state-dropdown">
+                    <summary class="combat-state-dropdown-current" title="{{stateLabel}}" aria-label="{{localize 'AXIOM.Item.State.Label'}}">
+                      {{#each stateOptions}}
+                        {{#if selected}}<i class="{{iconClass}} {{#if mirrored}}gear-state-icon-mirrored{{/if}}"></i>{{/if}}
+                      {{/each}}
+                      <i class="fa-solid fa-caret-down combat-state-dropdown-caret"></i>
+                    </summary>
+                    <div class="combat-state-dropdown-menu" role="menu" aria-label="{{localize 'AXIOM.Item.State.Label'}}">
+                      {{#each stateOptions}}
+                        <button type="button" class="combat-state-toggle {{#if selected}}active{{/if}}" data-action="updateCombatItemState" data-state="{{key}}" title="{{label}}" aria-label="{{label}}" role="menuitemradio" {{#if selected}}aria-checked="true"{{else}}aria-checked="false"{{/if}}>
+                          <i class="{{iconClass}} {{#if mirrored}}gear-state-icon-mirrored{{/if}}"></i>
+                        </button>
+                      {{/each}}
+                    </div>
+                  </details>
                   <button type="button" data-action="rollShieldBlock" title="{{localize 'AXIOM.Combat.Block'}}"><i class="fa-solid fa-shield-halved"></i></button>
                   <button type="button" data-action="editCombatItem" title="{{localize 'AXIOM.Actor.Combat.EditItem'}}"><i class="fa-solid fa-pen-to-square"></i></button>
                   <button type="button" data-action="deleteCombatItem" title="{{localize 'AXIOM.Actor.Combat.DeleteItem'}}"><i class="fa-solid fa-trash"></i></button>
@@ -48,17 +58,28 @@
                   <span>{{localize "AXIOM.Weapon.Damage"}} {{effectiveDamage}}{{#if versatileDamageBonus}} <span title="{{localize 'AXIOM.Weapon.VersatileBonus'}}">{{localize "AXIOM.Weapon.VersatileBonusShort"}}</span>{{/if}}</span>
                   <span>{{localize "AXIOM.Weapon.ArmorPenetration"}} {{armorPenetration}}</span>
                   {{#if reach}}<span>{{localize "AXIOM.Weapon.Reach"}} {{reach}}</span>{{/if}}
+                  <span>{{localize "AXIOM.Weapon.Guard.Label"}} {{guardLabel}}</span>
                   {{#if parryBonus}}<span>{{localize "AXIOM.Weapon.ParryBonus"}} {{parryBonus}}</span>{{/if}}
                   <span>{{delivery}}</span>
                   <span>{{handsLabel}}</span>
                   {{#if strengthRequirementLabel}}<span class="{{#unless meetsMinStrength}}requirement-unmet{{/unless}}">{{strengthRequirementLabel}}</span>{{/if}}
                 </div>
                 <div class="combat-item-actions">
-                  <select class="combat-state-select" data-action="updateCombatItemState" title="{{localize 'AXIOM.Item.State.Label'}}">
-                    {{#each stateOptions}}
-                      <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
-                    {{/each}}
-                  </select>
+                  <details class="combat-state-dropdown">
+                    <summary class="combat-state-dropdown-current" title="{{stateLabel}}" aria-label="{{localize 'AXIOM.Item.State.Label'}}">
+                      {{#each stateOptions}}
+                        {{#if selected}}<i class="{{iconClass}} {{#if mirrored}}gear-state-icon-mirrored{{/if}}"></i>{{/if}}
+                      {{/each}}
+                      <i class="fa-solid fa-caret-down combat-state-dropdown-caret"></i>
+                    </summary>
+                    <div class="combat-state-dropdown-menu" role="menu" aria-label="{{localize 'AXIOM.Item.State.Label'}}">
+                      {{#each stateOptions}}
+                        <button type="button" class="combat-state-toggle {{#if selected}}active{{/if}}" data-action="updateCombatItemState" data-state="{{key}}" title="{{label}}" aria-label="{{label}}" role="menuitemradio" {{#if selected}}aria-checked="true"{{else}}aria-checked="false"{{/if}}>
+                          <i class="{{iconClass}} {{#if mirrored}}gear-state-icon-mirrored{{/if}}"></i>
+                        </button>
+                      {{/each}}
+                    </div>
+                  </details>
                   <button type="button" data-action="rollWeaponAttack" data-weapon-mode="melee" title="{{#if meetsMinStrength}}{{localize 'AXIOM.Actor.Combat.Attack'}}{{else}}{{localize 'AXIOM.Weapon.MinStrengthNotMet'}}{{/if}}" {{#unless meetsMinStrength}}disabled{{/unless}}><i class="fa-solid fa-dice-d20"></i></button>
                   <button type="button" data-action="editCombatItem" title="{{localize 'AXIOM.Actor.Combat.EditItem'}}"><i class="fa-solid fa-pen-to-square"></i></button>
                   <button type="button" data-action="deleteCombatItem" title="{{localize 'AXIOM.Actor.Combat.DeleteItem'}}"><i class="fa-solid fa-trash"></i></button>
@@ -87,11 +108,21 @@
                 {{#if showAmmoDisplay}}<span class="combat-ammo-counter">{{ammoDisplay}}{{#if canReload}} <button type="button" class="quantity-control reload-weapon-button" data-action="reloadWeapon" title="{{localize 'AXIOM.Weapon.Reload'}}"><i class="fa-solid fa-rotate-right"></i></button>{{/if}}</span>{{/if}}
               </div>
               <div class="combat-item-actions">
-                <select class="combat-state-select" data-action="updateCombatItemState" title="{{localize 'AXIOM.Item.State.Label'}}">
-                  {{#each stateOptions}}
-                    <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
-                  {{/each}}
-                </select>
+                <details class="combat-state-dropdown">
+                    <summary class="combat-state-dropdown-current" title="{{stateLabel}}" aria-label="{{localize 'AXIOM.Item.State.Label'}}">
+                      {{#each stateOptions}}
+                        {{#if selected}}<i class="{{iconClass}} {{#if mirrored}}gear-state-icon-mirrored{{/if}}"></i>{{/if}}
+                      {{/each}}
+                      <i class="fa-solid fa-caret-down combat-state-dropdown-caret"></i>
+                    </summary>
+                    <div class="combat-state-dropdown-menu" role="menu" aria-label="{{localize 'AXIOM.Item.State.Label'}}">
+                      {{#each stateOptions}}
+                        <button type="button" class="combat-state-toggle {{#if selected}}active{{/if}}" data-action="updateCombatItemState" data-state="{{key}}" title="{{label}}" aria-label="{{label}}" role="menuitemradio" {{#if selected}}aria-checked="true"{{else}}aria-checked="false"{{/if}}>
+                          <i class="{{iconClass}} {{#if mirrored}}gear-state-icon-mirrored{{/if}}"></i>
+                        </button>
+                      {{/each}}
+                    </div>
+                  </details>
                 <button type="button" data-action="rollWeaponAttack" data-weapon-mode="ranged" title="{{#if meetsMinStrength}}{{localize 'AXIOM.Actor.Combat.Attack'}}{{else}}{{localize 'AXIOM.Weapon.MinStrengthNotMet'}}{{/if}}" {{#unless meetsMinStrength}}disabled{{/unless}}><i class="fa-solid fa-dice-d20"></i></button>
                 <button type="button" data-action="editCombatItem" title="{{localize 'AXIOM.Actor.Combat.EditItem'}}"><i class="fa-solid fa-pen-to-square"></i></button>
                 <button type="button" data-action="deleteCombatItem" title="{{localize 'AXIOM.Actor.Combat.DeleteItem'}}"><i class="fa-solid fa-trash"></i></button>
@@ -117,11 +148,21 @@
                 {{#if showAmmoDisplay}}<span class="combat-ammo-counter">{{ammoDisplay}}{{#if canReload}} <button type="button" class="quantity-control reload-weapon-button" data-action="reloadWeapon" title="{{localize 'AXIOM.Weapon.Reload'}}"><i class="fa-solid fa-rotate-right"></i></button>{{/if}}</span>{{/if}}
               </div>
               <div class="combat-item-actions">
-                <select class="combat-state-select" data-action="updateCombatItemState" title="{{localize 'AXIOM.Item.State.Label'}}">
-                  {{#each stateOptions}}
-                    <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
-                  {{/each}}
-                </select>
+                <details class="combat-state-dropdown">
+                    <summary class="combat-state-dropdown-current" title="{{stateLabel}}" aria-label="{{localize 'AXIOM.Item.State.Label'}}">
+                      {{#each stateOptions}}
+                        {{#if selected}}<i class="{{iconClass}} {{#if mirrored}}gear-state-icon-mirrored{{/if}}"></i>{{/if}}
+                      {{/each}}
+                      <i class="fa-solid fa-caret-down combat-state-dropdown-caret"></i>
+                    </summary>
+                    <div class="combat-state-dropdown-menu" role="menu" aria-label="{{localize 'AXIOM.Item.State.Label'}}">
+                      {{#each stateOptions}}
+                        <button type="button" class="combat-state-toggle {{#if selected}}active{{/if}}" data-action="updateCombatItemState" data-state="{{key}}" title="{{label}}" aria-label="{{label}}" role="menuitemradio" {{#if selected}}aria-checked="true"{{else}}aria-checked="false"{{/if}}>
+                          <i class="{{iconClass}} {{#if mirrored}}gear-state-icon-mirrored{{/if}}"></i>
+                        </button>
+                      {{/each}}
+                    </div>
+                  </details>
                 <button type="button" data-action="rollWeaponAttack" data-weapon-mode="melee" title="{{localize 'AXIOM.Combat.MeleeAttack'}}" {{#unless meetsMinStrength}}disabled{{/unless}}><i class="fa-solid fa-gavel"></i></button>
                 <button type="button" data-action="rollWeaponAttack" data-weapon-mode="ranged" title="{{localize 'AXIOM.Combat.RangedAttack'}}" {{#unless meetsMinStrength}}disabled{{/unless}}><i class="fa-solid fa-crosshairs"></i></button>
                 <button type="button" data-action="editCombatItem" title="{{localize 'AXIOM.Actor.Combat.EditItem'}}"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -150,11 +191,21 @@
               <span>{{localize "AXIOM.Item.Weight"}} {{weight}}</span>
             </div>
             <div class="combat-item-actions">
-              <select class="combat-state-select" data-action="updateCombatItemState" title="{{localize 'AXIOM.Item.State.Label'}}">
-                {{#each stateOptions}}
-                  <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
-                {{/each}}
-              </select>
+              <details class="combat-state-dropdown">
+                    <summary class="combat-state-dropdown-current" title="{{stateLabel}}" aria-label="{{localize 'AXIOM.Item.State.Label'}}">
+                      {{#each stateOptions}}
+                        {{#if selected}}<i class="{{iconClass}} {{#if mirrored}}gear-state-icon-mirrored{{/if}}"></i>{{/if}}
+                      {{/each}}
+                      <i class="fa-solid fa-caret-down combat-state-dropdown-caret"></i>
+                    </summary>
+                    <div class="combat-state-dropdown-menu" role="menu" aria-label="{{localize 'AXIOM.Item.State.Label'}}">
+                      {{#each stateOptions}}
+                        <button type="button" class="combat-state-toggle {{#if selected}}active{{/if}}" data-action="updateCombatItemState" data-state="{{key}}" title="{{label}}" aria-label="{{label}}" role="menuitemradio" {{#if selected}}aria-checked="true"{{else}}aria-checked="false"{{/if}}>
+                          <i class="{{iconClass}} {{#if mirrored}}gear-state-icon-mirrored{{/if}}"></i>
+                        </button>
+                      {{/each}}
+                    </div>
+                  </details>
               <button type="button" data-action="editCombatItem" title="{{localize 'AXIOM.Actor.Combat.EditItem'}}"><i class="fa-solid fa-pen-to-square"></i></button>
               <button type="button" data-action="deleteCombatItem" title="{{localize 'AXIOM.Actor.Combat.DeleteItem'}}"><i class="fa-solid fa-trash"></i></button>
             </div>
@@ -182,11 +233,21 @@
               <span>{{localize "AXIOM.Armor.Locations.Legs"}} {{legs}}</span>
             </div>
             <div class="combat-item-actions">
-              <select class="combat-state-select" data-action="updateCombatItemState" title="{{localize 'AXIOM.Item.State.Label'}}">
-                {{#each stateOptions}}
-                  <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
-                {{/each}}
-              </select>
+              <details class="combat-state-dropdown">
+                    <summary class="combat-state-dropdown-current" title="{{stateLabel}}" aria-label="{{localize 'AXIOM.Item.State.Label'}}">
+                      {{#each stateOptions}}
+                        {{#if selected}}<i class="{{iconClass}} {{#if mirrored}}gear-state-icon-mirrored{{/if}}"></i>{{/if}}
+                      {{/each}}
+                      <i class="fa-solid fa-caret-down combat-state-dropdown-caret"></i>
+                    </summary>
+                    <div class="combat-state-dropdown-menu" role="menu" aria-label="{{localize 'AXIOM.Item.State.Label'}}">
+                      {{#each stateOptions}}
+                        <button type="button" class="combat-state-toggle {{#if selected}}active{{/if}}" data-action="updateCombatItemState" data-state="{{key}}" title="{{label}}" aria-label="{{label}}" role="menuitemradio" {{#if selected}}aria-checked="true"{{else}}aria-checked="false"{{/if}}>
+                          <i class="{{iconClass}} {{#if mirrored}}gear-state-icon-mirrored{{/if}}"></i>
+                        </button>
+                      {{/each}}
+                    </div>
+                  </details>
               <button type="button" data-action="editCombatItem" title="{{localize 'AXIOM.Actor.Combat.EditItem'}}"><i class="fa-solid fa-pen-to-square"></i></button>
               <button type="button" data-action="deleteCombatItem" title="{{localize 'AXIOM.Actor.Combat.DeleteItem'}}"><i class="fa-solid fa-trash"></i></button>
             </div>

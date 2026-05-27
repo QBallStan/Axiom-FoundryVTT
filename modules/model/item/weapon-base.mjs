@@ -16,7 +16,8 @@ export default class AxiomWeaponBaseData extends AxiomItemData {
       elemental: new fields.StringField({ required: false, blank: true, initial: "" }),
       hands: new fields.StringField({ required: true, choices: ["one", "two", "versatile"], initial: "one" }),
       minStrength: new fields.NumberField({ required: true, integer: true, min: 0, initial: 0 }),
-      parryBonus: new fields.NumberField({ required: true, integer: true, initial: 0 })
+      parryBonus: new fields.NumberField({ required: true, integer: true, initial: 0 }),
+      guard: new fields.StringField({ required: true, choices: ["full", "limited"], initial: "full" })
     };
   }
 }

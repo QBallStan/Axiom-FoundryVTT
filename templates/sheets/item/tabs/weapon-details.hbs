@@ -91,6 +91,13 @@
           </label>
 
           <label class="field-group">
+            <span>{{localize "AXIOM.Weapon.Guard.Label"}}</span>
+            <select name="system.guard">
+              {{selectOptions weapon.guardOptions selected=weapon.guard localize=true}}
+            </select>
+          </label>
+
+          <label class="field-group">
             <span>{{localize "AXIOM.Weapon.ParryBonus"}}</span>
             <input type="number" name="system.parryBonus" value="{{system.parryBonus}}" step="5" />
           </label>

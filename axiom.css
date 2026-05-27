@@ -739,7 +739,7 @@
 .application.sheet.axiom.actor.protagonist .stat-grid,
 .application.sheet.axiom.actor.npc .stat-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 8px;
 }
 .application.sheet.axiom.actor.protagonist .stat-card,
@@ -952,6 +952,12 @@
 .application.sheet.axiom.actor.protagonist .expertise-skill-list,
 .application.sheet.axiom.actor.npc .expertise-skill-list {
   max-height: clamp(140px, 28vh, 280px);
+}
+.application.sheet.axiom.actor.protagonist .preset-attribute-check-list {
+  margin-top: 5px;
+}
+.application.sheet.axiom.actor.protagonist .preset-attribute-check-row .skill-name {
+  cursor: default;
 }
 .application.sheet.axiom.actor.protagonist .attribute-check-presets,
 .application.sheet.axiom.actor.npc .attribute-check-presets {
@@ -1599,28 +1605,106 @@
   align-items: center;
   gap: 4px;
 }
-.application.sheet.axiom.actor.protagonist .combat-state-select,
-.application.sheet.axiom.actor.npc .combat-state-select {
-  width: 82px;
-  height: 26px;
-  margin: 0;
-  padding: 0 4px;
-  background: #151519;
+.application.sheet.axiom.actor.protagonist .combat-state-toggle-group,
+.application.sheet.axiom.actor.npc .combat-state-toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px;
+  background: #101014;
   border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+}
+.application.sheet.axiom.actor.protagonist .combat-state-toggle,
+.application.sheet.axiom.actor.npc .combat-state-toggle {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: 4px;
   color: var(--axiom-muted);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
+  line-height: 1;
 }
-.application.sheet.axiom.actor.protagonist .combat-state-select:hover,
-.application.sheet.axiom.actor.npc .combat-state-select:hover {
+.application.sheet.axiom.actor.protagonist .combat-state-toggle:hover,
+.application.sheet.axiom.actor.npc .combat-state-toggle:hover {
+  color: var(--axiom-gold);
+  border-color: var(--axiom-gold);
+  box-shadow: 0 0 5px rgba(216, 198, 154, 0.3);
+}
+.application.sheet.axiom.actor.protagonist .combat-state-toggle.active,
+.application.sheet.axiom.actor.npc .combat-state-toggle.active {
+  color: var(--axiom-gold);
+  background: rgba(216, 198, 154, 0.14);
+  border-color: rgba(216, 198, 154, 0.45);
+}
+.application.sheet.axiom.actor.protagonist .combat-state-dropdown,
+.application.sheet.axiom.actor.npc .combat-state-dropdown {
+  position: relative;
+  flex: 0 0 auto;
+}
+.application.sheet.axiom.actor.protagonist .combat-state-dropdown[open],
+.application.sheet.axiom.actor.npc .combat-state-dropdown[open] {
+  z-index: 30;
+}
+.application.sheet.axiom.actor.protagonist .combat-state-dropdown-current,
+.application.sheet.axiom.actor.npc .combat-state-dropdown-current {
+  width: 34px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 4px;
+  color: var(--axiom-gold);
+  cursor: pointer;
+  list-style: none;
+  line-height: 1;
+}
+.application.sheet.axiom.actor.protagonist .combat-state-dropdown-current::-webkit-details-marker,
+.application.sheet.axiom.actor.npc .combat-state-dropdown-current::-webkit-details-marker {
+  display: none;
+}
+.application.sheet.axiom.actor.protagonist .combat-state-dropdown-current:hover,
+.application.sheet.axiom.actor.npc .combat-state-dropdown-current:hover,
+.application.sheet.axiom.actor.protagonist .combat-state-dropdown-current:focus-visible,
+.application.sheet.axiom.actor.npc .combat-state-dropdown-current:focus-visible {
   border-color: var(--axiom-gold);
   box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+  outline: none;
 }
-.application.sheet.axiom.actor.protagonist .combat-state-select option,
-.application.sheet.axiom.actor.npc .combat-state-select option {
-  color: var(--axiom-text);
-  background: #151519;
+.application.sheet.axiom.actor.protagonist .combat-state-dropdown-caret,
+.application.sheet.axiom.actor.npc .combat-state-dropdown-caret {
+  color: var(--axiom-muted);
+  font-size: 9px;
+}
+.application.sheet.axiom.actor.protagonist .combat-state-dropdown-menu,
+.application.sheet.axiom.actor.npc .combat-state-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 3px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  padding: 3px;
+  background: #101014;
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+  z-index: 31;
+}
+.application.sheet.axiom.actor.protagonist .gear-state-icon-mirrored,
+.application.sheet.axiom.actor.npc .gear-state-icon-mirrored {
+  display: inline-block;
+  transform: scaleX(-1);
 }
 .application.sheet.axiom.actor.protagonist .combat-item-actions button,
 .application.sheet.axiom.actor.npc .combat-item-actions button {
@@ -1641,6 +1725,23 @@
 .application.sheet.axiom.actor.npc .combat-item-actions button:hover {
   border-color: var(--axiom-gold);
   box-shadow: 0 0 5px rgba(216, 198, 154, 0.35);
+}
+.application.sheet.axiom.actor.protagonist .combat-item-actions button.combat-state-toggle,
+.application.sheet.axiom.actor.npc .combat-item-actions button.combat-state-toggle {
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  color: var(--axiom-muted);
+}
+.application.sheet.axiom.actor.protagonist .combat-item-actions button.combat-state-toggle:hover,
+.application.sheet.axiom.actor.npc .combat-item-actions button.combat-state-toggle:hover {
+  color: var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .combat-item-actions button.combat-state-toggle.active,
+.application.sheet.axiom.actor.npc .combat-item-actions button.combat-state-toggle.active {
+  color: var(--axiom-gold);
+  background: rgba(216, 198, 154, 0.14);
+  border-color: rgba(216, 198, 154, 0.45);
 }
 .application.sheet.axiom.actor.protagonist .combat-item-actions button[data-action="deleteCombatItem"],
 .application.sheet.axiom.actor.npc .combat-item-actions button[data-action="deleteCombatItem"] {

@@ -235,6 +235,8 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
       skills: await this._getWeaponSkillNameOptions(),
       ammunition: this._getAmmunitionOptions(),
       handsOptions,
+      guard: ["full", "limited"].includes(system.guard) ? system.guard : "full",
+      guardOptions: this._getConfig()?.weaponGuard ?? {},
       stateOptions: this._prepareHandGearStateOptions(system.state),
       range,
       baseRange,

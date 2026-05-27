@@ -225,8 +225,9 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
 
     const attributeOne = this.rollData.attributeOne ?? "strength";
     const attributeTwo = this.rollData.attributeTwo ?? attributeOne;
-    const skillValue = Number(this.rollData.skillValue ?? 30);
-    const basePool = AxiomRoll.calculateBasePool(actor, attributeOne, attributeTwo, skillValue);
+    const skillValue = Number(this.rollData.skillValue ?? 0);
+    const testType = this.rollData.testType ?? "skill";
+    const basePool = AxiomRoll.calculateBasePoolForTest({ actor, testType, attributeOne, attributeTwo, skillValue });
     const selectedTimeframe = this.rollData.timeframe ?? "none";
     const timeframeResult = this._getStoredTimeframeResult(selectedTimeframe);
     const selectedDifficulty = this.rollData.difficulty ?? "average";
@@ -256,6 +257,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
       attributeOneOptions: this._prepareAttributeOptions(actor, attributeOne),
       attributeTwoOptions: this._prepareAttributeOptions(actor, attributeTwo),
       skillValue,
+      isAttributeCheck: testType === "attribute",
       poolEditorOpen: this.poolEditorOpen,
       hasModifierRows: Boolean(this.rollData.modifierRows?.length),
       modifierRows: this.rollData.modifierRows ?? [],
@@ -674,7 +676,8 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
     const attributeOne = this.rollData.attributeOne ?? "strength";
     const attributeTwo = this.rollData.attributeTwo ?? attributeOne;
     const skillValue = Number(this.rollData.skillValue ?? 0);
-    const basePool = AxiomRoll.calculateBasePool(actor, attributeOne, attributeTwo, skillValue);
+    const testType = this.rollData.testType ?? "skill";
+    const basePool = AxiomRoll.calculateBasePoolForTest({ actor, testType, attributeOne, attributeTwo, skillValue });
     const difficulty = this._getDifficultyValue(this.rollData.difficulty ?? "average");
     const modifiers = this._getModifierTotal();
     const successTarget = Math.min(150, Math.max(5, basePool + difficulty + modifiers));

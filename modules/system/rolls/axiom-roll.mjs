@@ -11,7 +11,7 @@ export default class AxiomRoll {
   static async test({ actor, title, testType = "skill", attributeOne, attributeTwo, skillValue = 0, difficulty = 0, modifiers = 0, item = null, rollMode = "public" } = {}) {
     const roll = await new Roll("1d100").evaluate();
     const d100 = Number(roll.total ?? 0);
-    const basePool = this.calculateBasePool(actor, attributeOne, attributeTwo, skillValue);
+    const basePool = this.calculateBasePoolForTest({ actor, testType, attributeOne, attributeTwo, skillValue });
     const rawSuccessTarget = basePool + Number(difficulty ?? 0) + Number(modifiers ?? 0);
     const successTarget = Math.min(150, Math.max(5, rawSuccessTarget));
     const result = this.evaluateResult({ d100, successTarget });
@@ -36,10 +36,21 @@ export default class AxiomRoll {
     };
   }
 
+  static calculateBasePoolForTest({ actor, testType = "skill", attributeOne, attributeTwo, skillValue = 0 } = {}) {
+    if (testType === "attribute") return this.calculateAttributeCheckPool(actor, attributeOne, attributeTwo);
+    return this.calculateBasePool(actor, attributeOne, attributeTwo, skillValue);
+  }
+
   static calculateBasePool(actor, attributeOne, attributeTwo, skillValue = 0) {
     const first = this.getAttributeValue(actor, attributeOne);
     const second = this.getAttributeValue(actor, attributeTwo ?? attributeOne);
     return first + second + Number(skillValue ?? 0);
+  }
+
+  static calculateAttributeCheckPool(actor, attributeOne, attributeTwo) {
+    const first = this.getAttributeValue(actor, attributeOne);
+    const second = this.getAttributeValue(actor, attributeTwo ?? attributeOne);
+    return (first + second) * 2;
   }
 
   static getAttributeValue(actor, key) {

@@ -400,6 +400,11 @@ export const AXIOM = {
     versatile: "AXIOM.Weapon.Hands.Versatile"
   },
 
+  weaponGuard: {
+    full: "AXIOM.Weapon.Guard.Full",
+    limited: "AXIOM.Weapon.Guard.Limited"
+  },
+
   weaponReloadMethods: {
     none: "AXIOM.Weapon.ReloadMethod.None",
     thrown: "AXIOM.Weapon.ReloadMethod.Thrown",

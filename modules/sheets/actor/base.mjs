@@ -269,14 +269,13 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
   _prepareAttributeCheckPresets() {
     const presets = CONFIG.AXIOM?.attributeCheckPresets ?? {};
 
-    return Object.entries(presets).map(([key, preset]) => ({
+    return Object.entries(presets).map(([key, preset]) => this._prepareAttributeCheckRow({
+      id: key,
       key,
+      name: game.i18n.localize(preset.label),
       label: preset.label,
       attributeOne: preset.attributeOne,
-      attributeTwo: preset.attributeTwo,
-      attributeOneLabel: this._getAttributeLabel(preset.attributeOne),
-      attributeTwoLabel: this._getAttributeLabel(preset.attributeTwo),
-      attributesLabel: `${game.i18n.localize(this._getAttributeLabel(preset.attributeOne))} + ${game.i18n.localize(this._getAttributeLabel(preset.attributeTwo))}`
+      attributeTwo: preset.attributeTwo
     }));
   }
 
@@ -390,7 +389,8 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       ...check,
       attributeOneLabel: this._getAttributeLabel(check.attributeOne),
       attributeTwoLabel: this._getAttributeLabel(check.attributeTwo),
-      total: attributeOneValue + attributeTwoValue + 30,
+      attributesLabel: `${game.i18n.localize(this._getAttributeLabel(check.attributeOne))} + ${game.i18n.localize(this._getAttributeLabel(check.attributeTwo))}`,
+      total: (attributeOneValue + attributeTwoValue) * 2,
       attributeOneOptions: this._prepareAttributeOptions(check.attributeOne),
       attributeTwoOptions: this._prepareAttributeOptions(check.attributeTwo)
     };
@@ -561,6 +561,8 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       rangedSkill: system.rangedSkill || system.skill || (category === "mixed" ? "Athletics" : "Marksmanship"),
       reach: Number(system.reach ?? 0),
       parryBonus: Number(system.parryBonus ?? 0),
+      guard: ["full", "limited"].includes(system.guard) ? system.guard : "full",
+      guardLabel: this._localizeConfigLabel(CONFIG.AXIOM?.weaponGuard?.[["full", "limited"].includes(system.guard) ? system.guard : "full"], system.guard ?? "full"),
       range,
       ammoLoaded,
       ammoContainer,
@@ -662,8 +664,22 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     return Object.entries(states).map(([key, label]) => ({
       key,
       label: game.i18n.localize(label),
-      selected: key === normalizedState
+      selected: key === normalizedState,
+      iconClass: this._getGearStateIconClass(key),
+      mirrored: key === "offHand"
     }));
+  }
+
+  _getGearStateIconClass(state = "carried") {
+    switch (state) {
+      case "mainHand": return "fa-solid fa-hand";
+      case "offHand": return "fa-solid fa-hand";
+      case "bothHands": return "fa-solid fa-hands";
+      case "carried": return "fa-solid fa-backpack";
+      case "stored": return "fa-solid fa-box";
+      case "equipped": return "fa-solid fa-shirt";
+      default: return "fa-solid fa-circle";
+    }
   }
 
   _meetsWeaponStrengthRequirement(system = {}) {
@@ -979,7 +995,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     });
 
     this.element.querySelectorAll("[data-action='updateCombatItemState']").forEach(element => {
-      element.addEventListener("change", this._onUpdateCombatItemState.bind(this));
+      element.addEventListener(element.matches("select") ? "change" : "click", this._onUpdateCombatItemState.bind(this));
     });
 
     this.element.querySelectorAll("[data-action='editEquipmentItem']").forEach(element => {
@@ -995,7 +1011,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     });
 
     this.element.querySelectorAll("[data-action='updateEquipmentItemState']").forEach(element => {
-      element.addEventListener("change", this._onUpdateEquipmentItemState.bind(this));
+      element.addEventListener(element.matches("select") ? "change" : "click", this._onUpdateEquipmentItemState.bind(this));
     });
 
     this.element.querySelectorAll("[data-action='adjustItemQuantity']").forEach(element => {
@@ -1249,7 +1265,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     const item = this._getEquipmentItemFromEvent(event);
     if (!item) return;
 
-    await this._updateItemState(item, event.currentTarget.value);
+    await this._updateItemState(item, event.currentTarget.dataset.state ?? event.currentTarget.value);
   }
 
   async _onAdjustItemQuantity(event) {
@@ -1387,7 +1403,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     const item = this._getCombatItemFromEvent(event);
     if (!item) return;
 
-    await this._updateItemState(item, event.currentTarget.value);
+    await this._updateItemState(item, event.currentTarget.dataset.state ?? event.currentTarget.value);
   }
 
   async _updateItemState(item, state) {
@@ -1582,7 +1598,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     const total = Array.from(selects).reduce((sum, select) => {
       const selected = select.selectedOptions?.[0];
       return sum + Number(selected?.dataset.value ?? 0);
-    }, 30);
+    }, 0) * 2;
 
     const totalElement = row.querySelector("[data-attribute-check-total]");
     if (totalElement) totalElement.textContent = String(total);
@@ -1632,7 +1648,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
         attributeCheckId: checkId,
         attributeOne,
         attributeTwo,
-        skillValue: 30
+        skillValue: 0
       }
     }).render({ force: true });
   }
@@ -1670,11 +1686,41 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
 
     for (const row of rows) list.append(row);
 
+    this._updateSkillSortControls(column, button, sortMode);
+  }
+
+  _updateSkillSortControls(column, activeButton, appliedSortMode) {
     column.querySelectorAll("[data-action='sortSkills']").forEach(control => {
-      const active = control === button;
+      const active = control === activeButton;
       control.classList.toggle("active", active);
       control.setAttribute("aria-pressed", String(active));
     });
+
+    if (!activeButton?.dataset?.sortKey) return;
+
+    const nextSortMode = this._getNextSkillSortMode(appliedSortMode);
+    activeButton.dataset.sort = nextSortMode;
+    this._updateSkillSortIcon(activeButton, appliedSortMode);
+  }
+
+  _getNextSkillSortMode(sortMode) {
+    if (sortMode === "nameAsc") return "nameDesc";
+    if (sortMode === "nameDesc") return "nameAsc";
+    if (sortMode === "levelDesc") return "levelAsc";
+    if (sortMode === "levelAsc") return "levelDesc";
+    if (sortMode === "totalDesc") return "totalAsc";
+    if (sortMode === "totalAsc") return "totalDesc";
+    return "nameAsc";
+  }
+
+  _updateSkillSortIcon(button, sortMode) {
+    const icon = button.querySelector("i");
+    if (!icon) return;
+
+    const descending = sortMode.endsWith("Desc");
+    icon.className = "fa-solid";
+    if (sortMode.startsWith("name")) icon.classList.add(descending ? "fa-arrow-up-z-a" : "fa-arrow-down-a-z");
+    else icon.classList.add(descending ? "fa-arrow-down-wide-short" : "fa-arrow-up-short-wide");
   }
 
   _onRollSkill(event) {
@@ -1706,11 +1752,14 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     const row = event.currentTarget.closest("[data-check-id]");
     const selects = row?.querySelectorAll("select[data-action='updateAttributeCheckPreview']") ?? [];
 
+    const attributeOne = selects[0]?.value ?? row?.dataset.attributeOne ?? "strength";
+    const attributeTwo = selects[1]?.value ?? row?.dataset.attributeTwo ?? attributeOne;
+
     this._rollAttributeCheck({
       checkId: row?.dataset.checkId ?? "custom",
       checkName: row?.dataset.checkName || game.i18n.localize("AXIOM.Actor.Skills.AttributeCheck"),
-      attributeOne: selects[0]?.value ?? "strength",
-      attributeTwo: selects[1]?.value ?? "agility"
+      attributeOne,
+      attributeTwo
     });
   }
 

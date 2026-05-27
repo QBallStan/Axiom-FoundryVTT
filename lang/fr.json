@@ -438,7 +438,9 @@
         "Equipment": "Équipement",
         "StatusPenalty": "Pénalités de statut",
         "ConditionalEffect": "Effet conditionnel",
-        "MultipleAttacks": "Attaques multiples"
+        "MultipleAttacks": "Attaques multiples",
+        "GuardAdvantage": "Avantage de garde",
+        "GuardDisadvantage": "Désavantage de garde"
       },
       "Timeframes": {
         "None": "Aucun délai",
@@ -693,6 +695,11 @@
         }
       },
       "Reach": "Allonge",
+      "Guard": {
+        "Label": "Garde",
+        "Full": "Complète",
+        "Limited": "Limitée"
+      },
       "VersatileBonus": "Bonus versatile à deux mains",
       "VersatileBonusShort": "+1 2M",
       "Elemental": {
@@ -755,8 +762,8 @@
       "TargetOneDefender": "Ciblez exactement un défenseur avant de résoudre le combat.",
       "TargetHasNoActor": "Le token ciblé n'a pas d'acteur.",
       "Dodge": "Esquive",
-      "Parry": "Parade",
-      "ParryWith": "Parade avec {weapon}",
+      "Parry": "Mêlée",
+      "ParryWith": "Mêlée avec {weapon}",
       "Unopposed": "Sans opposition",
       "UnopposedBonus": "Attaque sans opposition",
       "Cover": "Couvert",
@@ -937,6 +944,8 @@
   "AXIOM.Combat.Block": "Bloquer",
   "AXIOM.Combat.BlockWith": "Bloquer avec {shield}",
   "AXIOM.Roll.ModifierSources.ShieldBlock": "Blocage du bouclier",
+  "AXIOM.Roll.ModifierSources.GuardAdvantage": "Avantage de garde",
+  "AXIOM.Roll.ModifierSources.GuardDisadvantage": "Désavantage de garde",
   "AXIOM.Shield.NoSkillSelectedWarning": "{shield} utilise {skill}, mais cette compétence est introuvable sur cet acteur.",
   "AXIOM.Combat.NoShieldAvailable": "{actor} n’a pas de bouclier équipé.",
   "Combat": {

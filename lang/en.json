@@ -438,7 +438,9 @@
         "Equipment": "Equipment",
         "StatusPenalty": "Status Penalties",
         "ConditionalEffect": "Conditional Effect",
-        "MultipleAttacks": "Multiple Attacks"
+        "MultipleAttacks": "Multiple Attacks",
+        "GuardAdvantage": "Guard Advantage",
+        "GuardDisadvantage": "Guard Disadvantage"
       },
       "Timeframes": {
         "None": "No Timeframe",
@@ -693,6 +695,11 @@
         }
       },
       "Reach": "Reach",
+      "Guard": {
+        "Label": "Guard",
+        "Full": "Full",
+        "Limited": "Limited"
+      },
       "VersatileBonus": "Versatile two-handed bonus",
       "VersatileBonusShort": "+1 2H",
       "Elemental": {
@@ -755,8 +762,8 @@
       "TargetOneDefender": "Target exactly one defender before resolving combat.",
       "TargetHasNoActor": "The targeted token has no actor.",
       "Dodge": "Dodge",
-      "Parry": "Parry",
-      "ParryWith": "Parry with {weapon}",
+      "Parry": "Melee",
+      "ParryWith": "Melee with {weapon}",
       "Unopposed": "Unopposed",
       "UnopposedBonus": "Unopposed Attack",
       "Cover": "Cover",
@@ -937,6 +944,8 @@
   "AXIOM.Combat.Block": "Block",
   "AXIOM.Combat.BlockWith": "Block with {shield}",
   "AXIOM.Roll.ModifierSources.ShieldBlock": "Shield Block",
+  "AXIOM.Roll.ModifierSources.GuardAdvantage": "Guard Advantage",
+  "AXIOM.Roll.ModifierSources.GuardDisadvantage": "Guard Disadvantage",
   "AXIOM.Shield.NoSkillSelectedWarning": "{shield} uses {skill}, but that skill could not be found on this actor.",
   "AXIOM.Combat.NoShieldAvailable": "{actor} has no equipped shield.",
   "Combat": {
