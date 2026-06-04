@@ -160,6 +160,7 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
     context.weapon = await this._prepareWeaponContext(context.system);
     context.shield = await this._prepareShieldContext(context.system);
     context.equipment = await this._prepareEquipmentContext(context.system);
+    context.ammunition = this._prepareAmmunitionContext(context.system);
     context.techLevel = this._prepareTechLevelContext(context.system);
 
     return context;
@@ -342,6 +343,15 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
       skills: await this._getSkillOptions(system.skill)
     };
   }
+
+  _prepareAmmunitionContext(system = {}) {
+    return {
+      elemental: system.elemental || "none",
+      damageModifier: Number(system.damageModifier ?? 0),
+      armorPenetrationModifier: Number(system.armorPenetrationModifier ?? 0)
+    };
+  }
+
 
   _getOwningActor() {
     const parent = this.item.parent;

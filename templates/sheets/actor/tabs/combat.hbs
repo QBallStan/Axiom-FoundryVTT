@@ -188,6 +188,9 @@
             <div class="combat-item-line">
               <span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span>
               <span>{{localize "AXIOM.Item.Quantity"}} <button type="button" class="quantity-control" data-action="adjustItemQuantity" title="{{localize 'AXIOM.Item.QuantityControlHint'}}">{{quantity}}</button></span>
+              <span>{{localize "AXIOM.Weapon.Elemental.Label"}} {{elemental}}</span>
+              <span>{{localize "AXIOM.Ammunition.DamageModifierShort"}} {{damageModifier}}</span>
+              <span>{{localize "AXIOM.Ammunition.ArmorPenetrationModifierShort"}} {{armorPenetrationModifier}}</span>
               <span>{{localize "AXIOM.Item.Weight"}} {{weight}}</span>
             </div>
             <div class="combat-item-actions">
@@ -227,10 +230,10 @@
             <img class="combat-item-img" src="{{img}}" alt="{{name}}" />
             <div class="combat-item-line">
               <span class="skill-name" data-action="toggleItemDescription" role="button" tabindex="0" aria-expanded="false">{{name}}</span>
-              <span>{{localize "AXIOM.Armor.Locations.Head"}} {{head}}</span>
-              <span>{{localize "AXIOM.Armor.Locations.Torso"}} {{torso}}</span>
-              <span>{{localize "AXIOM.Armor.Locations.Arms"}} {{arms}}</span>
-              <span>{{localize "AXIOM.Armor.Locations.Legs"}} {{legs}}</span>
+              <span class="armor-location-pill" title="{{localize 'AXIOM.Armor.Locations.Head'}}" aria-label="{{localize 'AXIOM.Armor.Locations.Head'}}"><i class="fa-solid fa-helmet-safety" aria-hidden="true"></i> {{head}}</span>
+              <span class="armor-location-pill" title="{{localize 'AXIOM.Armor.Locations.Torso'}}" aria-label="{{localize 'AXIOM.Armor.Locations.Torso'}}"><i class="fa-solid fa-shirt" aria-hidden="true"></i> {{torso}}</span>
+              <span class="armor-location-pill" title="{{localize 'AXIOM.Armor.Locations.Arms'}}" aria-label="{{localize 'AXIOM.Armor.Locations.Arms'}}"><i class="fa-solid fa-bicep" aria-hidden="true"></i> {{arms}}</span>
+              <span class="armor-location-pill" title="{{localize 'AXIOM.Armor.Locations.Legs'}}" aria-label="{{localize 'AXIOM.Armor.Locations.Legs'}}"><i class="fa-solid fa-pants" aria-hidden="true"></i> {{legs}}</span>
             </div>
             <div class="combat-item-actions">
               <details class="combat-state-dropdown">

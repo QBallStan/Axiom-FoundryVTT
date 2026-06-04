@@ -350,6 +350,7 @@ async function preloadTemplates() {
     "systems/axiom/templates/sheets/item/tabs/weapon-details.hbs",
     "systems/axiom/templates/sheets/item/tabs/equipment-details.hbs",
     "systems/axiom/templates/sheets/item/tabs/trait-details.hbs",
+    "systems/axiom/templates/sheets/item/tabs/ammunition-details.hbs",
     "systems/axiom/templates/sheets/item/tabs/effects.hbs"
   ]);
 }

@@ -1582,25 +1582,27 @@
 
   .armor-value {
     display: inline-flex;
-    align-items: baseline;
-    gap: 5px;
-    padding: 2px 7px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 38px;
+    padding: 3px 7px;
     background: #151519;
     border: 1px solid var(--axiom-border);
     border-radius: 4px;
     white-space: nowrap;
 
-    span {
+    i {
       color: var(--axiom-muted);
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+      font-size: 12px;
+      line-height: 1;
     }
 
     strong {
       color: var(--axiom-text);
       font-family: "Roboto Mono", monospace;
       font-size: 14px;
+      line-height: 1;
       text-shadow: 0 0 6px fade(#d8c69a, 35%);
     }
   }
@@ -1653,6 +1655,20 @@
       color: var(--axiom-muted);
       font-size: 11px;
       line-height: 1.35;
+    }
+
+    .armor-location-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 28px;
+      justify-content: center;
+
+      i {
+        color: var(--axiom-gold);
+        font-size: 11px;
+        line-height: 1;
+      }
     }
 
     em {
@@ -2487,6 +2503,19 @@
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
   }
 
+  .npc-skills-split-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .npc-skills-split-grid .skill-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 8px;
+  }
+
+  .npc-skills-split-grid .empty-list {
+    grid-column: 1 / -1;
+  }
+
   .skill-subtitle-row {
     display: flex;
     align-items: center;
@@ -2669,6 +2698,10 @@
     .npc-two-column-grid,
     .npc-skills-split-grid,
     .npc-notes-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .npc-skills-split-grid .skill-list {
       grid-template-columns: 1fr;
     }
 

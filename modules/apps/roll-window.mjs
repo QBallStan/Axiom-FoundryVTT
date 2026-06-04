@@ -848,22 +848,7 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
       })),
       isWeaponRoll: result.isWeaponRoll,
       isMeleeWeaponRoll: this._getWeaponRollMode() === "melee",
-      weaponInfo: isWeaponItem(item) ? {
-        category: this._getWeaponRollMode(),
-        itemCategory: getWeaponCategory(item),
-        damage: Number(item.system?.damage ?? 0),
-        armorPenetration: Number(item.system?.armorPenetration ?? 0),
-        damageModifier: this._getWeaponRollMode() === "melee" ? Number(actor?.system?.subAttributes?.damageModifier ?? 0) + this._getVersatileDamageBonus(item) : 0,
-        versatileDamageBonus: this._getVersatileDamageBonus(item),
-        hands: item.system?.hands ?? "one",
-        state: item.system?.state ?? "carried",
-        delivery: item.system?.delivery ?? "",
-        reach: Number(item.system?.reach ?? 0),
-        range: getWeaponRange(item, actor),
-        ammo: Number(item.system?.ammo ?? 0),
-        ammoContainer: Number(item.system?.ammoContainer ?? 0),
-        reloadMethod: normalizeWeaponReloadMethod(item.system?.reloadMethod)
-      } : null,
+      weaponInfo: isWeaponItem(item) ? this._getWeaponInfoForChat(item, actor) : null,
       combatTarget: result.isWeaponRoll ? AxiomCombat.getInitialCombatTargetData() : null,
       combatDefense: this.rollData.combatDefense ?? null,
       location: "",
@@ -877,6 +862,38 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
       speaker: ChatMessage.getSpeaker({ actor })
     });
   }
+
+  _getWeaponInfoForChat(item, actor) {
+    const mode = this._getWeaponRollMode();
+    const ammunition = mode === "ranged" ? this._getLinkedAmmunitionItem(item) : null;
+    const ammunitionDamageModifier = Number(ammunition?.system?.damageModifier ?? 0);
+    const ammunitionArmorPenetrationModifier = Number(ammunition?.system?.armorPenetrationModifier ?? 0);
+    const weaponArmorPenetration = Number(item.system?.armorPenetration ?? 0);
+    const ammunitionElemental = String(ammunition?.system?.elemental ?? "none").trim();
+
+    return {
+      category: mode,
+      itemCategory: getWeaponCategory(item),
+      damage: Math.max(0, Number(item.system?.damage ?? 0) + ammunitionDamageModifier),
+      armorPenetration: Math.max(0, weaponArmorPenetration + ammunitionArmorPenetrationModifier),
+      damageModifier: mode === "melee" ? Number(actor?.system?.subAttributes?.damageModifier ?? 0) + this._getVersatileDamageBonus(item) : 0,
+      ammunitionDamageModifier,
+      ammunitionArmorPenetrationModifier,
+      ammunitionId: ammunition?.id ?? "",
+      ammunitionName: ammunition?.name ?? "",
+      versatileDamageBonus: this._getVersatileDamageBonus(item),
+      hands: item.system?.hands ?? "one",
+      state: item.system?.state ?? "carried",
+      delivery: item.system?.delivery ?? "",
+      elemental: ammunitionElemental && ammunitionElemental !== "none" ? ammunitionElemental : (item.system?.elemental ?? "none"),
+      reach: Number(item.system?.reach ?? 0),
+      range: getWeaponRange(item, actor),
+      ammo: Number(item.system?.ammo ?? 0),
+      ammoContainer: Number(item.system?.ammoContainer ?? 0),
+      reloadMethod: normalizeWeaponReloadMethod(item.system?.reloadMethod)
+    };
+  }
+
   _getVersatileDamageBonus(item) {
     return this._getWeaponRollMode() === "melee" && item?.system?.hands === "versatile" && item?.system?.state === "bothHands" ? 1 : 0;
   }

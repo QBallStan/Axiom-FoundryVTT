@@ -1,0 +1,24 @@
+<section class="tab-section details-tab ammunition-details">
+  <h3 class="section-title compact-title">{{localize "AXIOM.Ammunition.Details"}}</h3>
+
+  <div class="form-grid compact ammunition-grid">
+    <label class="field-group ammunition-elemental-field">
+      <span>{{localize "AXIOM.Weapon.Elemental.Label"}}</span>
+      <select name="system.elemental">
+        {{selectOptions config.elementalDamage selected=ammunition.elemental localize=true}}
+      </select>
+    </label>
+
+    <label class="field-group ammunition-damage-modifier-field compact-number-field">
+      <span>{{localize "AXIOM.Ammunition.DamageModifier"}}</span>
+      <input type="number" name="system.damageModifier" value="{{system.damageModifier}}" step="1" />
+    </label>
+
+    <label class="field-group ammunition-ap-modifier-field compact-number-field">
+      <span>{{localize "AXIOM.Ammunition.ArmorPenetrationModifier"}}</span>
+      <input type="number" name="system.armorPenetrationModifier" value="{{system.armorPenetrationModifier}}" step="1" />
+    </label>
+  </div>
+
+  <p class="ammunition-details-note">{{localize "AXIOM.Ammunition.ModifierNote"}}</p>
+</section>

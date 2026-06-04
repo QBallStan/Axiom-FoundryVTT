@@ -651,6 +651,9 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       quantity: Number(system.quantity ?? 0),
       weight: Number(system.weight ?? 0),
       price: formatAxiomPrice(system),
+      elemental: this._localizeConfigLabel(CONFIG.AXIOM?.elementalDamage?.[system.elemental || "none"], system.elemental || "none"),
+      damageModifier: Number(system.damageModifier ?? 0),
+      armorPenetrationModifier: Number(system.armorPenetrationModifier ?? 0),
       state: system.state ?? "carried",
       stateLabel: this._localizeGearState(system.state),
       stateOptions: this._prepareGearStateOptions(system.state, item)

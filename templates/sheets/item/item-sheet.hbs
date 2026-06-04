@@ -20,6 +20,9 @@
         {{#if isWeapon}}
           {{> "systems/axiom/templates/sheets/item/tabs/weapon-details.hbs"}}
         {{/if}}
+        {{#if isAmmunition}}
+          {{> "systems/axiom/templates/sheets/item/tabs/ammunition-details.hbs"}}
+        {{/if}}
         {{#if isEquipment}}
           {{> "systems/axiom/templates/sheets/item/tabs/equipment-details.hbs"}}
         {{/if}}

@@ -1584,26 +1584,28 @@
 .application.sheet.axiom.actor.protagonist .armor-value,
 .application.sheet.axiom.actor.npc .armor-value {
   display: inline-flex;
-  align-items: baseline;
-  gap: 5px;
-  padding: 2px 7px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 38px;
+  padding: 3px 7px;
   background: #151519;
   border: 1px solid var(--axiom-border);
   border-radius: 4px;
   white-space: nowrap;
 }
-.application.sheet.axiom.actor.protagonist .armor-value span,
-.application.sheet.axiom.actor.npc .armor-value span {
+.application.sheet.axiom.actor.protagonist .armor-value i,
+.application.sheet.axiom.actor.npc .armor-value i {
   color: var(--axiom-muted);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-size: 12px;
+  line-height: 1;
 }
 .application.sheet.axiom.actor.protagonist .armor-value strong,
 .application.sheet.axiom.actor.npc .armor-value strong {
   color: var(--axiom-text);
   font-family: "Roboto Mono", monospace;
   font-size: 14px;
+  line-height: 1;
   text-shadow: 0 0 6px rgba(216, 198, 154, 0.35);
 }
 .application.sheet.axiom.actor.protagonist .combat-gear-section,
@@ -1656,6 +1658,20 @@
   color: var(--axiom-muted);
   font-size: 11px;
   line-height: 1.35;
+}
+.application.sheet.axiom.actor.protagonist .combat-item-line .armor-location-pill,
+.application.sheet.axiom.actor.npc .combat-item-line .armor-location-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 28px;
+  justify-content: center;
+}
+.application.sheet.axiom.actor.protagonist .combat-item-line .armor-location-pill i,
+.application.sheet.axiom.actor.npc .combat-item-line .armor-location-pill i {
+  color: var(--axiom-gold);
+  font-size: 11px;
+  line-height: 1;
 }
 .application.sheet.axiom.actor.protagonist .combat-item-line em,
 .application.sheet.axiom.actor.npc .combat-item-line em {
@@ -2425,6 +2441,16 @@
 .application.sheet.axiom.actor.npc .npc-main-lower-grid {
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
 }
+.application.sheet.axiom.actor.npc .npc-skills-split-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.application.sheet.axiom.actor.npc .npc-skills-split-grid .skill-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 8px;
+}
+.application.sheet.axiom.actor.npc .npc-skills-split-grid .empty-list {
+  grid-column: 1 / -1;
+}
 .application.sheet.axiom.actor.npc .skill-subtitle-row {
   display: flex;
   align-items: center;
@@ -2575,6 +2601,9 @@
   .application.sheet.axiom.actor.npc .npc-two-column-grid,
   .application.sheet.axiom.actor.npc .npc-skills-split-grid,
   .application.sheet.axiom.actor.npc .npc-notes-grid {
+    grid-template-columns: 1fr;
+  }
+  .application.sheet.axiom.actor.npc .npc-skills-split-grid .skill-list {
     grid-template-columns: 1fr;
   }
   .application.sheet.axiom.actor.npc .portrait {
@@ -7673,6 +7702,16 @@ body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .jour
 }
 .axiom-chat-card.axiom-status-card .axiom-status-card-resolution span {
   color: var(--axiom-muted);
+}
+.axiom-chat-card.axiom-status-card .axiom-elemental-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 6px;
+}
+.axiom-chat-card.axiom-status-card .axiom-elemental-actions .axiom-status-card-button {
+  min-width: 0;
+  white-space: normal;
 }
 .axiom-chat-card.axiom-status-card .axiom-status-card-result {
   padding: 8px;

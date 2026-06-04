@@ -1439,7 +1439,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
         damage: Number(effectiveAttackState.weaponInfo?.damage ?? 0),
         armorPenetration: Number(effectiveAttackState.weaponInfo?.armorPenetration ?? 0),
         damageModifier: Number(effectiveAttackState.weaponInfo?.damageModifier ?? 0),
-        delivery: effectiveAttackState.weaponInfo?.delivery ?? "kinetic"
+        delivery: effectiveAttackState.weaponInfo?.delivery ?? "kinetic",
+        elemental: effectiveAttackState.weaponInfo?.elemental ?? "none"
       },
       defender: defenderToken?.actor && !unopposed ? {
         tokenId: defenderToken.id,
@@ -1562,7 +1563,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
               damage: Number(weapon.system?.damage ?? 0),
               armorPenetration: Number(weapon.system?.armorPenetration ?? 0),
               damageModifier: Number(defender.system?.subAttributes?.damageModifier ?? 0),
-              delivery: weapon.system?.delivery ?? "kinetic"
+              delivery: weapon.system?.delivery ?? "kinetic",
+              elemental: weapon.system?.elemental ?? "none"
             } : null;
           })() : null
         }
@@ -1691,7 +1693,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
         damage: Number(effectiveAttackState.weaponInfo?.damage ?? 0),
         armorPenetration: Number(effectiveAttackState.weaponInfo?.armorPenetration ?? 0),
         damageModifier: Number(effectiveAttackState.weaponInfo?.damageModifier ?? 0),
-        delivery: effectiveAttackState.weaponInfo?.delivery ?? "kinetic"
+        delivery: effectiveAttackState.weaponInfo?.delivery ?? "kinetic",
+        elemental: effectiveAttackState.weaponInfo?.elemental ?? "none"
       },
       defender: {
         tokenId: defenderToken.id,
@@ -1752,7 +1755,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
         damage: Number(data.weapon?.damage ?? 0),
         armorPenetration: Number(data.weapon?.armorPenetration ?? 0),
         damageModifier: Number(data.weapon?.damageModifier ?? 0),
-        delivery: data.weapon?.delivery ?? "kinetic"
+        delivery: data.weapon?.delivery ?? "kinetic",
+        elemental: data.weapon?.elemental ?? "none"
       },
       defender: {
         tokenId: data.defender?.tokenId ?? "",
@@ -2054,12 +2058,310 @@ export default class AxiomCombat extends foundry.documents.Combat {
   static async createCombatResultCard({ opposedData, defenseState = null, defenseMessage = null, unopposed = false } = {}) {
     const data = await this.ensureCombatResultMomentum(this.buildCombatResultData({ opposedData, defenseState, defenseMessage, unopposed }));
     const content = await this.renderCombatResult(data);
-    return ChatMessage.create({
+    const message = await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor: game.actors?.get(opposedData?.attacker?.actorId) ?? null }),
       content,
       cssClass: "axiom-roll-message",
       flags: { axiom: { combatResultCard: data } }
     });
+    await this.createElementalEffectCards(data, message);
+    return message;
+  }
+
+
+
+  static async createElementalEffectCards(combatResult = {}, sourceMessage = null) {
+    const normalized = this.normalizeCombatResultCard(combatResult);
+    const cards = [];
+    const attackCard = this.buildElementalEffectData(normalized, { source: "attack", sourceMessage });
+    if (attackCard) cards.push(attackCard);
+
+    const counterattack = normalized.counterattack;
+    if (counterattack?.enabled) {
+      const counterCard = this.buildElementalEffectData(counterattack, { source: "counterattack", sourceMessage });
+      if (counterCard) cards.push(counterCard);
+    }
+
+    for (const card of cards) await this.createElementalEffectCard(card);
+  }
+
+  static buildElementalEffectData(result = {}, { source = "attack", sourceMessage = null } = {}) {
+    const elemental = String(result.values?.elemental ?? result.weapon?.elemental ?? "none").trim() || "none";
+    if (["none", "radiant", "necrotic"].includes(elemental)) return null;
+
+    const hitsAttack = Boolean(result.hitsAttack ?? result.attack?.success);
+    const finalDamage = Number(result.finalDamage ?? 0);
+    const targetActorId = result.defenderActorId ?? "";
+    if (!targetActorId) return null;
+
+    const triggersOnHit = ["fire", "cold", "electric"].includes(elemental);
+    const triggersOnDamage = ["acid", "corruption", "psychic"].includes(elemental);
+    if (triggersOnHit && !hitsAttack) return null;
+    if (triggersOnDamage && finalDamage <= 0) return null;
+
+    const effect = this.getElementalEffectDefinition(elemental);
+    if (!effect) return null;
+
+    return {
+      id: foundry.utils.randomID(),
+      source,
+      sourceMessageId: sourceMessage?.id ?? result.attackMessageId ?? "",
+      elemental,
+      elementalLabel: CONFIG.AXIOM?.elementalDamage?.[elemental] ?? `AXIOM.Weapon.Elemental.${elemental.titleCase?.() ?? elemental}`,
+      title: effect.title,
+      description: effect.description,
+      icon: effect.icon,
+      mode: effect.mode,
+      statusId: effect.statusId ?? "",
+      resistance: effect.resistance ?? null,
+      targetActorId,
+      targetTokenId: result.defenderTokenId ?? "",
+      targetSceneId: result.defenderSceneId ?? "",
+      targetName: result.defenderName ?? "",
+      finalDamage,
+      roll: null,
+      amount: 0,
+      applied: false,
+      resolved: false
+    };
+  }
+
+  static getElementalEffectDefinition(elemental) {
+    const definitions = {
+      fire: {
+        title: "AXIOM.Elemental.Card.FireTitle",
+        description: "AXIOM.Elemental.Card.FireDescription",
+        icon: "fa-solid fa-fire",
+        mode: "ignition",
+        statusId: "burning"
+      },
+      cold: {
+        title: "AXIOM.Elemental.Card.ColdTitle",
+        description: "AXIOM.Elemental.Card.ColdDescription",
+        icon: "fa-solid fa-snowflake",
+        mode: "resistance",
+        statusId: "chilled",
+        resistance: { label: "AXIOM.Actor.Skills.Presets.Vigor", attributeOne: "fortitude", attributeTwo: "resolve" }
+      },
+      electric: {
+        title: "AXIOM.Elemental.Card.ElectricTitle",
+        description: "AXIOM.Elemental.Card.ElectricDescription",
+        icon: "fa-solid fa-bolt",
+        mode: "resistance",
+        statusId: "distracted",
+        resistance: { label: "AXIOM.Actor.Skills.Presets.Vigor", attributeOne: "fortitude", attributeTwo: "resolve" }
+      },
+      acid: {
+        title: "AXIOM.Elemental.Card.AcidTitle",
+        description: "AXIOM.Elemental.Card.AcidDescription",
+        icon: "fa-solid fa-flask",
+        mode: "apply",
+        statusId: "corroding"
+      },
+      corruption: {
+        title: "AXIOM.Elemental.Card.CorruptionTitle",
+        description: "AXIOM.Elemental.Card.CorruptionDescription",
+        icon: "fa-solid fa-virus",
+        mode: "resistance",
+        resistance: { label: "AXIOM.Elemental.Card.CorruptionResistance", attributeOne: "fortitude", attributeTwo: "resolve" }
+      },
+      psychic: {
+        title: "AXIOM.Elemental.Card.PsychicTitle",
+        description: "AXIOM.Elemental.Card.PsychicDescription",
+        icon: "fa-solid fa-brain",
+        mode: "resistance",
+        statusId: "distracted",
+        exceptionalStatusId: "stunned",
+        resistance: { label: "AXIOM.Actor.Skills.Presets.Willpower", attributeOne: "resolve", attributeTwo: "instinct" }
+      }
+    };
+    return definitions[elemental] ?? null;
+  }
+
+  static async createElementalEffectCard(data = {}) {
+    const content = this.renderElementalEffectCard(data);
+    return ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor: game.actors?.get(data.targetActorId) ?? null }),
+      content,
+      cssClass: "axiom-roll-message",
+      flags: { axiom: { elementalEffectCard: data } }
+    });
+  }
+
+  static renderElementalEffectCard(data = {}) {
+    const title = game.i18n.localize(data.title ?? "AXIOM.Elemental.Card.Title");
+    const target = foundry.utils.escapeHTML(data.targetName ?? "");
+    const elemental = game.i18n.localize(data.elementalLabel ?? "AXIOM.Weapon.Elemental.None");
+    const description = game.i18n.localize(data.description ?? "");
+    const icon = data.icon ? `<i class="${data.icon}"></i>` : "";
+    const roll = data.roll ? this.renderElementalRollResult(data) : "";
+    const controls = this.renderElementalEffectControls(data);
+    const resolved = data.resolved ? `<div class="axiom-status-card-result ${data.applied ? "success" : "failure"}">${game.i18n.localize(data.applied ? "AXIOM.Elemental.Card.Applied" : "AXIOM.Elemental.Card.NotApplied")}</div>` : "";
+
+    return `
+      <article class="axiom-chat-card roll-card axiom-status-card axiom-elemental-card" data-elemental-effect-id="${data.id ?? ""}">
+        <header class="card-header">
+          <div class="card-title">
+            <strong>${title}</strong>
+            <span>${target}</span>
+          </div>
+          <div class="card-badge">${elemental}</div>
+        </header>
+        <section class="card-body">
+          <div class="axiom-status-card-row">
+            <div class="axiom-status-card-main">
+              <span class="axiom-status-card-icon">${icon}</span>
+              <div>
+                <strong>${elemental}</strong>
+                <span>${description}</span>
+              </div>
+            </div>
+          </div>
+          ${roll}
+          ${controls}
+          ${resolved}
+        </section>
+      </article>
+    `;
+  }
+
+  static renderElementalRollResult(data = {}) {
+    const roll = data.roll ?? {};
+    const outcome = roll.outcomeTierLabel ? game.i18n.localize(roll.outcomeTierLabel) : "";
+    const resultClass = roll.success ? "success" : "failure";
+    return `
+      <div class="axiom-status-card-result ${resultClass}">
+        <span>${game.i18n.localize(roll.label ?? "AXIOM.Elemental.Card.ResistanceRoll")}</span>
+        <strong>${AxiomRoll.formatD100(roll.d100)} / ${roll.successTarget}</strong>
+        <em>${outcome}</em>
+      </div>
+    `;
+  }
+
+  static renderElementalEffectControls(data = {}) {
+    if (data.resolved) return "";
+
+    if (data.mode === "ignition") {
+      return `
+        <div class="axiom-status-card-actions axiom-elemental-actions">
+          <button type="button" class="axiom-status-card-button" data-action="rollElementalIgnition" data-threshold="9">${game.i18n.localize("AXIOM.Elemental.Fire.Resistant")}</button>
+          <button type="button" class="axiom-status-card-button" data-action="rollElementalIgnition" data-threshold="7">${game.i18n.localize("AXIOM.Elemental.Fire.Flammable")}</button>
+          <button type="button" class="axiom-status-card-button" data-action="rollElementalIgnition" data-threshold="5">${game.i18n.localize("AXIOM.Elemental.Fire.VeryFlammable")}</button>
+          <button type="button" class="axiom-status-card-button" data-action="rollElementalIgnition" data-threshold="3">${game.i18n.localize("AXIOM.Elemental.Fire.ExtremelyFlammable")}</button>
+        </div>
+      `;
+    }
+
+    if (data.mode === "resistance" && !data.roll) {
+      return `<button type="button" class="axiom-status-card-button" data-action="rollElementalResistance">${game.i18n.localize("AXIOM.Elemental.Card.RollResistance")}</button>`;
+    }
+
+    if (data.roll && Number(data.amount ?? 0) > 0) {
+      return `<button type="button" class="axiom-status-card-button" data-action="applyElementalEffect">${game.i18n.localize("AXIOM.Elemental.Card.ApplyEffect")}</button>`;
+    }
+
+    if (data.mode === "apply") {
+      return `<button type="button" class="axiom-status-card-button" data-action="applyElementalEffect">${game.i18n.localize("AXIOM.Elemental.Card.ApplyEffect")}</button>`;
+    }
+
+    return "";
+  }
+
+  static async updateElementalEffectCard(message, data = {}) {
+    const normalized = { ...(message.getFlag?.("axiom", "elementalEffectCard") ?? {}), ...data };
+    const content = this.renderElementalEffectCard(normalized);
+    return message.update({ content, flags: { axiom: { elementalEffectCard: normalized } } });
+  }
+
+  static getElementalTargetActor(data = {}) {
+    const token = this.getTokenFromCombatTarget({ tokenId: data.targetTokenId, sceneId: data.targetSceneId, actorId: data.targetActorId });
+    return token?.actor ?? game.actors?.get(data.targetActorId) ?? null;
+  }
+
+  static async _onRollElementalIgnition(event, message) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!game.user?.isGM) return;
+
+    const threshold = Math.max(1, Number(event.currentTarget?.dataset?.threshold ?? 9) || 9);
+    const data = message.getFlag?.("axiom", "elementalEffectCard") ?? {};
+    const roll = await new Roll("1d10").evaluate();
+    const ignites = Number(roll.total ?? 0) >= threshold;
+    await this.updateElementalEffectCard(message, {
+      ...data,
+      roll: {
+        label: "AXIOM.Elemental.Card.IgnitionRoll",
+        d100: Number(roll.total ?? 0),
+        successTarget: threshold,
+        success: ignites,
+        outcomeTierLabel: ignites ? "AXIOM.Elemental.Card.Ignites" : "AXIOM.Elemental.Card.DoesNotIgnite"
+      },
+      amount: ignites ? 1 : 0,
+      resolved: !ignites,
+      applied: false
+    });
+  }
+
+  static async _onRollElementalResistance(event, message) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!game.user?.isGM) return;
+
+    const data = message.getFlag?.("axiom", "elementalEffectCard") ?? {};
+    const actor = this.getElementalTargetActor(data);
+    if (!actor) return;
+
+    const effect = this.getElementalEffectDefinition(data.elemental);
+    const resistance = effect?.resistance;
+    if (!resistance) return;
+
+    const roll = await new Roll("1d100").evaluate();
+    const successTarget = AxiomRoll.normalizeSuccessTarget(AxiomRoll.calculateAttributeCheckPool(actor, resistance.attributeOne, resistance.attributeTwo));
+    const result = AxiomRoll.evaluateResult({ d100: roll.total, successTarget });
+    const exceptionalFailure = result.outcomeKey === "exceptionalFailure";
+    let amount = 0;
+    if (!result.success) {
+      if (data.elemental === "corruption") amount = exceptionalFailure ? 2 : 1;
+      else if (data.elemental === "psychic") amount = 1;
+      else amount = exceptionalFailure ? 2 : 1;
+    }
+
+    await this.updateElementalEffectCard(message, {
+      ...data,
+      roll: {
+        label: resistance.label,
+        d100: result.d100,
+        successTarget,
+        success: result.success,
+        hits: result.hits,
+        outcomeTierLabel: result.outcomeTierLabel
+      },
+      amount,
+      resolved: amount <= 0,
+      applied: false
+    });
+  }
+
+  static async _onApplyElementalEffect(event, message) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!game.user?.isGM) return;
+
+    const data = message.getFlag?.("axiom", "elementalEffectCard") ?? {};
+    const actor = this.getElementalTargetActor(data);
+    if (!actor) return;
+
+    const amount = Math.max(1, Number(data.amount ?? 1) || 1);
+    if (data.elemental === "corruption") {
+      const current = Number(actor.system?.corruption?.current ?? 0);
+      await actor.update({ "system.corruption.current": Math.max(0, current + amount) });
+    } else if (data.elemental === "psychic" && data.roll?.outcomeTierLabel === "AXIOM.RollCard.Outcomes.ExceptionalFailure") {
+      await actor.addStatus?.("stunned", 1);
+    } else if (data.statusId) {
+      await actor.addStatus?.(data.statusId, amount);
+    }
+
+    await this.updateElementalEffectCard(message, { ...data, amount, applied: true, resolved: true });
   }
 
   static getCombatResultMomentumActor(combatResult = {}, side = "defender") {
@@ -2141,7 +2443,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
         armor,
         shieldArmorBonus: 0,
         toughness,
-        delivery: opposedData.weapon?.delivery ?? "kinetic"
+        delivery: opposedData.weapon?.delivery ?? "kinetic",
+        elemental: opposedData.weapon?.elemental ?? "none"
       },
       woundApplied: false
     });
@@ -2201,7 +2504,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
         armor,
         shieldArmorBonus,
         toughness,
-        delivery: opposedData.weapon?.delivery ?? "kinetic"
+        delivery: opposedData.weapon?.delivery ?? "kinetic",
+        elemental: opposedData.weapon?.elemental ?? "none"
       },
       counterattack,
       woundApplied: false
@@ -2239,7 +2543,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
         damage: Number(counterWeapon?.damage ?? existing.weapon?.damage ?? existing.values?.baseDamage ?? 0),
         armorPenetration,
         damageModifier: Number(counterWeapon?.damageModifier ?? existing.weapon?.damageModifier ?? existing.values?.damageModifier ?? 0),
-        delivery
+        delivery,
+        elemental: counterWeapon?.elemental ?? existing.weapon?.elemental ?? existing.values?.elemental ?? "none"
       },
       hitLocationKey: counterHitLocation?.key ?? existing.hitLocationKey ?? "",
       hitLocationLabel: counterHitLocation?.label ?? existing.hitLocationLabel ?? "AXIOM.Combat.NotApplicableShort",
@@ -2267,7 +2572,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
         armor,
         shieldArmorBonus: 0,
         toughness,
-        delivery
+        delivery,
+        elemental: counterWeapon?.elemental ?? existing.values?.elemental ?? "none"
       },
       finalDamageOverride: existing.finalDamageOverride ?? null,
       woundApplied: Boolean(existing.woundApplied),
@@ -2287,6 +2593,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const damageModifier = Number(track.values?.damageModifier ?? 0);
     const armorPenetration = Number(track.values?.armorPenetration ?? 0);
     const delivery = track.values?.delivery ?? "kinetic";
+    const elemental = track.values?.elemental ?? track.weapon?.elemental ?? "none";
     const armor = delivery === "direct" ? 0 : Number(track.values?.armor ?? 0);
     const toughness = Number(track.values?.toughness ?? 0);
     const shieldArmorBonus = Number(track.values?.shieldArmorBonus ?? 0);
@@ -2347,7 +2654,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
         success: originalAttackSucceeded,
         complication: Boolean(track.defense?.complication)
       },
-      values: { baseDamage, damageModifier, armorPenetration, armor, shieldArmorBonus, toughness, delivery },
+      values: { baseDamage, damageModifier, armorPenetration, armor, shieldArmorBonus, toughness, delivery, elemental },
       outcomeLabel: counterSucceeded ? "AXIOM.Combat.CounterattackHits" : "AXIOM.Combat.CounterattackMisses",
       outcomeCss: counterSucceeded ? "hit" : "miss",
       incomingDamage,
@@ -2387,6 +2694,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const damageModifier = Number(data.values?.damageModifier ?? 0);
     const armorPenetration = Number(data.values?.armorPenetration ?? 0);
     const delivery = data.values?.delivery ?? "kinetic";
+    const elemental = data.values?.elemental ?? "none";
     const armor = delivery === "direct" ? 0 : Number(data.values?.armor ?? 0);
     const toughness = Number(data.values?.toughness ?? 0);
     const shieldArmorBonus = Number(data.values?.shieldArmorBonus ?? 0);
@@ -2445,7 +2753,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
         success: Boolean(data.defense?.success),
         complication: Boolean(data.defense?.complication)
       },
-      values: { baseDamage, damageModifier, armorPenetration, armor, shieldArmorBonus, toughness, delivery },
+      values: { baseDamage, damageModifier, armorPenetration, armor, shieldArmorBonus, toughness, delivery, elemental },
       netHits: attackHits,
       netHitsDisplay: AxiomRoll.formatSigned(attackHits),
       opposed: {
@@ -2518,7 +2826,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
         damage: Number(attackState?.weaponInfo?.damage ?? existing.values?.baseDamage ?? 0),
         armorPenetration: Number(attackState?.weaponInfo?.armorPenetration ?? existing.values?.armorPenetration ?? 0),
         damageModifier: Number(attackState?.weaponInfo?.damageModifier ?? existing.values?.damageModifier ?? 0),
-        delivery: attackState?.weaponInfo?.delivery ?? existing.values?.delivery ?? "kinetic"
+        delivery: attackState?.weaponInfo?.delivery ?? existing.values?.delivery ?? "kinetic",
+        elemental: attackState?.weaponInfo?.elemental ?? existing.values?.elemental ?? "none"
       },
       attackType: attackState?.weaponInfo?.category ?? (Number(existing.values?.damageModifier ?? 0) !== 0 ? "melee" : "ranged"),
       attack
@@ -2553,7 +2862,8 @@ export default class AxiomCombat extends foundry.documents.Combat {
         armor: this.getArmorAtLocation(defender, hitLocation?.key) + shieldArmorBonus,
         shieldArmorBonus,
         toughness: Number(defender?.system?.subAttributes?.toughness ?? existing.values?.toughness ?? 0),
-        delivery: attackState?.weaponInfo?.delivery ?? existing.values?.delivery ?? "kinetic"
+        delivery: attackState?.weaponInfo?.delivery ?? existing.values?.delivery ?? "kinetic",
+        elemental: attackState?.weaponInfo?.elemental ?? existing.values?.elemental ?? "none"
       },
       counterattack
     });
@@ -2659,6 +2969,11 @@ export default class AxiomCombat extends foundry.documents.Combat {
       statusCard.querySelectorAll("[data-action='resolveStatus']").forEach(button => {
         button.addEventListener("click", event => this._onResolveStatusCardAction(event, message));
       });
+      statusCard.querySelectorAll("[data-action='rollElementalIgnition']").forEach(button => {
+        button.addEventListener("click", event => this._onRollElementalIgnition(event, message));
+      });
+      statusCard.querySelector("[data-action='rollElementalResistance']")?.addEventListener("click", event => this._onRollElementalResistance(event, message));
+      statusCard.querySelector("[data-action='applyElementalEffect']")?.addEventListener("click", event => this._onApplyElementalEffect(event, message));
     }
   }
 
@@ -2749,7 +3064,7 @@ export default class AxiomCombat extends foundry.documents.Combat {
     const rawDamage = stacks * 2;
     const armorPenetration = stacks * 2;
     const armor = this.getArmorAtLocation(actor, "torso");
-    const effectiveArmor = delivery === "direct" ? 0 : Math.max(0, armor - armorPenetration);
+    const effectiveArmor = Math.max(0, armor - armorPenetration);
     const toughness = Number(actor.system?.subAttributes?.toughness ?? 0);
     const finalDamage = Math.max(0, rawDamage - effectiveArmor - toughness);
     const woundSeverity = this.getWoundSeverity(finalDamage);

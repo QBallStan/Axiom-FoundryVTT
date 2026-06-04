@@ -974,6 +974,46 @@
       "StunnedRecovery": "Récupération Sonné",
       "StunnedResolved": "{recovered} cumul(s) récupéré(s)",
       "StunnedFormula": "Jet de Vigueur {roll} contre {target}"
+    },
+    "Ammunition": {
+      "Details": "Détails des munitions",
+      "DamageModifier": "Modificateur de dégâts",
+      "DamageModifierShort": "Mod dégâts",
+      "ArmorPenetrationModifier": "Modificateur de PA",
+      "ArmorPenetrationModifierShort": "Mod PA",
+      "ModifierNote": "Les modificateurs de munition sont ajoutés à l’arme lorsque cette munition est sélectionnée pour une attaque à distance. L’élément de la munition remplace celui de l’arme, sauf s’il est réglé sur Aucun."
+    },
+    "Elemental": {
+      "Card": {
+        "Title": "Effet élémentaire",
+        "FireTitle": "Test d’embrasement",
+        "FireDescription": "Le feu a touché. Lancez l’embrasement selon l’inflammabilité de la cible ou de l’environnement.",
+        "ColdTitle": "Effet de froid",
+        "ColdDescription": "Le froid a touché. Lancez Vigueur. En cas d’échec, appliquez Glacé. En cas d’Échec exceptionnel, appliquez une pile supplémentaire.",
+        "ElectricTitle": "Effet électrique",
+        "ElectricDescription": "L’électricité a touché. Lancez Vigueur. En cas d’échec, appliquez Distrait. En cas d’Échec exceptionnel, appliquez une pile supplémentaire.",
+        "AcidTitle": "Effet d’acide",
+        "AcidDescription": "L’acide a infligé des dégâts. Appliquez Corrosion.",
+        "CorruptionTitle": "Effet de corruption",
+        "CorruptionDescription": "La corruption a infligé des dégâts. Lancez Fortitude + Résolution. En cas d’échec, gagnez de la Corruption. En cas d’Échec exceptionnel, gagnez 2 Corruption.",
+        "PsychicTitle": "Effet psychique",
+        "PsychicDescription": "Le psychique a infligé des dégâts. Lancez Volonté. En cas d’échec, appliquez Distrait. En cas d’Échec exceptionnel, appliquez Sonné à la place.",
+        "CorruptionResistance": "Fortitude + Résolution",
+        "RollResistance": "Lancer la résistance",
+        "ResistanceRoll": "Jet de résistance",
+        "IgnitionRoll": "Jet d’embrasement",
+        "Ignites": "S’embrase",
+        "DoesNotIgnite": "Ne s’embrase pas",
+        "ApplyEffect": "Appliquer l’effet",
+        "Applied": "Effet appliqué",
+        "NotApplied": "Aucun effet appliqué"
+      },
+      "Fire": {
+        "Resistant": "Résistant 9+",
+        "Flammable": "Inflammable 7+",
+        "VeryFlammable": "Très inflammable 5+",
+        "ExtremelyFlammable": "Extrêmement inflammable 3+"
+      }
     }
   },
   "TYPES": {

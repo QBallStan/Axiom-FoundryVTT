@@ -974,6 +974,46 @@
       "StunnedRecovery": "Stunned Recovery",
       "StunnedResolved": "Recovered {recovered} stack(s)",
       "StunnedFormula": "Vigor roll {roll} vs {target}"
+    },
+    "Ammunition": {
+      "Details": "Ammunition Details",
+      "DamageModifier": "Damage Modifier",
+      "DamageModifierShort": "DMG Mod",
+      "ArmorPenetrationModifier": "AP Modifier",
+      "ArmorPenetrationModifierShort": "AP Mod",
+      "ModifierNote": "Ammunition modifiers are added to the weapon when this ammunition is selected for a ranged attack. Elemental damage from ammunition overrides the weapon elemental type unless set to None."
+    },
+    "Elemental": {
+      "Card": {
+        "Title": "Elemental Effect",
+        "FireTitle": "Ignition Check",
+        "FireDescription": "Fire hit. Roll ignition based on how flammable the target or surroundings are.",
+        "ColdTitle": "Cold Effect",
+        "ColdDescription": "Cold hit. Roll Vigor. On failure, apply Chilled. On Exceptional Failure, apply one additional stack.",
+        "ElectricTitle": "Electric Effect",
+        "ElectricDescription": "Electric hit. Roll Vigor. On failure, apply Distracted. On Exceptional Failure, apply one additional stack.",
+        "AcidTitle": "Acid Effect",
+        "AcidDescription": "Acid dealt damage. Apply Corroding.",
+        "CorruptionTitle": "Corruption Effect",
+        "CorruptionDescription": "Corruption dealt damage. Roll Fortitude + Resolve. On failure, gain Corruption. On Exceptional Failure, gain 2 Corruption.",
+        "PsychicTitle": "Psychic Effect",
+        "PsychicDescription": "Psychic dealt damage. Roll Willpower. On failure, apply Distracted. On Exceptional Failure, apply Stunned instead.",
+        "CorruptionResistance": "Fortitude + Resolve",
+        "RollResistance": "Roll Resistance",
+        "ResistanceRoll": "Resistance Roll",
+        "IgnitionRoll": "Ignition Roll",
+        "Ignites": "Ignites",
+        "DoesNotIgnite": "Does not ignite",
+        "ApplyEffect": "Apply Effect",
+        "Applied": "Effect applied",
+        "NotApplied": "No effect applied"
+      },
+      "Fire": {
+        "Resistant": "Resistant 9+",
+        "Flammable": "Flammable 7+",
+        "VeryFlammable": "Very Flammable 5+",
+        "ExtremelyFlammable": "Extremely Flammable 3+"
+      }
     }
   },
   "TYPES": {
