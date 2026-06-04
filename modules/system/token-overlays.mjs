@@ -13,10 +13,10 @@ const COLORS = {
   goldBottom: 0x7a4e12,
   empty: 0xe0d4b8,
   woundOutline: 0x160807,
-  grazing: 0xd6a935,
-  minor: 0xe26d28,
-  major: 0xa4492c,
-  critical: 0xb51e24,
+  grazing: 0x5fb7d7,
+  minor: 0x7b75dd,
+  major: 0xb85ca6,
+  critical: 0xc73a32,
 };
 
 const MOMENTUM_GRADIENT = [
@@ -207,9 +207,11 @@ function drawMomentumPipRow(current, tokenWidth, tokenHeight, position) {
   container.name = "axiom-momentum-pips";
   container.zIndex = 10;
   container.x = Math.round((tokenWidth - width) / 2);
+  const baseOffset = clamp(tokenHeight * 0.018, 3, 5);
+  const inwardOffset = 14;
   container.y = position === "bottom"
-    ? Math.round(tokenHeight + clamp(tokenHeight * 0.036, 5, 8))
-    : Math.round(-tickHeight - clamp(tokenHeight * 0.036, 5, 8));
+    ? Math.round(tokenHeight + baseOffset - inwardOffset)
+    : Math.round(-tickHeight - baseOffset + inwardOffset);
 
   for (let index = 0; index < current; index += 1) {
     const pip = drawResourceTick(tickWidth, tickHeight, COLORS.goldMid);
@@ -231,9 +233,11 @@ function drawActionPointPipRow(current, tokenWidth, tokenHeight, position) {
   container.name = "axiom-action-point-pips";
   container.zIndex = 20;
   container.x = Math.round((tokenWidth - width) / 2);
+  const baseOffset = clamp(tokenHeight * 0.02, 3, 5);
+  const inwardOffset = 14;
   container.y = position === "bottom"
-    ? Math.round(tokenHeight + clamp(tokenHeight * 0.04, 6, 9))
-    : Math.round(-tickHeight - clamp(tokenHeight * 0.04, 6, 9));
+    ? Math.round(tokenHeight + baseOffset - inwardOffset)
+    : Math.round(-tickHeight - baseOffset + inwardOffset);
 
   for (let index = 0; index < current; index += 1) {
     const pip = drawResourceTick(tickWidth, tickHeight, 0xff2a2a);
@@ -709,14 +713,17 @@ function drawWoundTracker(wounds, tokenWidth, tokenHeight) {
   const totalHeight = rows.reduce((sum, row) => sum + row.axiomHeight, 0)
     + Math.max(0, rows.length - 1) * gap;
 
+  const totalWidth = rows.reduce((max, row) => Math.max(max, row.axiomWidth ?? 0), 0);
+
   const container = new PIXI.Container();
   container.name = "axiom-wound-tracker";
   container.zIndex = 30;
-  container.x = Math.round(tokenWidth + clamp(tokenWidth * 0.062, 8, 13));
+  container.x = Math.round(tokenWidth + clamp(tokenWidth * 0.025, 4, 7) - 14 - totalWidth);
   container.y = Math.round((tokenHeight - totalHeight) / 2);
 
   let y = 0;
   for (const row of rows) {
+    row.x = Math.round(totalWidth - (row.axiomWidth ?? 0));
     row.y = y;
     container.addChild(row);
     y += row.axiomHeight + gap;

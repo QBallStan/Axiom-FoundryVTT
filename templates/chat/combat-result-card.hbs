@@ -15,9 +15,16 @@
     </div>
 
     <div class="combat-result-grid compact">
-      <div><span>{{localize "AXIOM.Combat.NetHits"}}</span><strong>{{card.netHitsDisplay}}</strong></div>
+      <div><span>{{localize "AXIOM.Combat.AttackHitsShort"}}</span><strong>{{card.attack.hitsDisplay}}</strong></div>
+      <div><span>{{localize "AXIOM.Combat.DefenseReduction"}}</span><strong>{{card.defense.reductionDisplay}}</strong></div>
       <div><span>{{localize "AXIOM.RollCard.Location"}}</span><strong>{{card.hitLocationText}}</strong></div>
     </div>
+
+    {{#if card.momentumGain}}
+      <div class="wound-applied-note">
+        {{card.momentumGain.actorName}} {{localize "AXIOM.Combat.MomentumGained"}}
+      </div>
+    {{/if}}
 
     {{#if card.canApplyWound}}
       <button type="button" class="apply-wound-button" data-action="applyCombatResultWound">
@@ -29,10 +36,71 @@
       <div class="wound-applied-note">{{localize "AXIOM.Combat.WoundApplied"}}</div>
     {{/if}}
 
+    {{#if card.counterattack}}
+      <section class="counterattack-result {{card.counterattack.outcomeCss}}">
+        <header class="counterattack-header">
+          <strong>{{localize "AXIOM.Combat.CounterattackResult"}}</strong>
+          <span>{{card.counterattack.attackerName}} → {{card.counterattack.defenderName}}</span>
+        </header>
+
+        <div class="combat-damage-focus {{card.counterattack.outcomeCss}}">
+          <span>{{localize "AXIOM.Combat.CounterattackDamage"}}</span>
+          <input type="number" min="0" step="1" value="{{card.counterattack.finalDamage}}" data-result-field="counterattack.finalDamageOverride" aria-label="{{localize 'AXIOM.Combat.CounterattackDamage'}}">
+          <em>{{localize card.counterattack.woundSeverityLabel}}</em>
+        </div>
+
+        <div class="combat-result-grid compact">
+          <div><span>{{localize "AXIOM.Combat.CounterattackHits"}}</span><strong>{{card.counterattack.attack.hitsDisplay}}</strong></div>
+          <div><span>{{localize "AXIOM.Combat.AttackerPressure"}}</span><strong>{{card.counterattack.defense.reductionDisplay}}</strong></div>
+          <div><span>{{localize "AXIOM.RollCard.Location"}}</span><strong>{{card.counterattack.hitLocationText}}</strong></div>
+        </div>
+
+        {{#if card.counterattack.momentumGain}}
+          <div class="wound-applied-note">
+            {{card.counterattack.momentumGain.actorName}} {{localize "AXIOM.Combat.MomentumGained"}}
+          </div>
+        {{/if}}
+
+        {{#if card.counterattack.canApplyWound}}
+          <button type="button" class="apply-wound-button" data-action="applyCounterattackWound">
+            <i class="fa-solid fa-kit-medical"></i> {{localize "AXIOM.Combat.ApplyCounterattackWound"}}
+          </button>
+        {{/if}}
+
+        {{#if card.counterattack.woundApplied}}
+          <div class="wound-applied-note">{{localize "AXIOM.Combat.CounterattackWoundApplied"}}</div>
+        {{/if}}
+
+        <details class="combat-damage-details breakdown compact-formula">
+          <summary>{{localize "AXIOM.Combat.CounterattackDetails"}}</summary>
+          <div class="damage-formula-line">
+            <span class="formula-term" title="{{card.counterattack.rawDamageTooltip}}">{{card.counterattack.incomingDamage}}</span>
+            <span class="formula-operator">-</span>
+            <span class="formula-term" title="{{card.counterattack.defenseTooltip}}">{{card.counterattack.defenseReduction}}</span>
+            <span class="formula-operator">-</span>
+            <span class="formula-term" title="{{card.counterattack.effectiveArmorTooltip}}">{{card.counterattack.effectiveArmor}}</span>
+            <span class="formula-operator">-</span>
+            <span class="formula-term" title="{{card.counterattack.toughnessTooltip}}">{{card.counterattack.values.toughness}}</span>
+            <span class="formula-operator">=</span>
+            <strong class="formula-result" title="{{card.counterattack.finalDamageTooltip}}">{{card.counterattack.finalDamage}}</strong>
+          </div>
+          <div class="damage-formula-labels">
+            <span>{{localize "AXIOM.Combat.IncomingDamage"}}</span>
+            <span>{{localize "AXIOM.Combat.AttackerPressure"}}</span>
+            <span>{{localize "AXIOM.Combat.EffectiveArmor"}}</span>
+            <span>{{localize "AXIOM.Combat.Toughness"}}</span>
+            <span>{{localize "AXIOM.Combat.FinalDamage"}}</span>
+          </div>
+        </details>
+      </section>
+    {{/if}}
+
     <details class="combat-damage-details breakdown compact-formula">
       <summary>{{localize "AXIOM.Combat.DamageDetails"}}</summary>
       <div class="damage-formula-line">
-        <span class="formula-term" title="{{card.rawDamageTooltip}}">{{card.rawDamage}}</span>
+        <span class="formula-term" title="{{card.rawDamageTooltip}}">{{card.incomingDamage}}</span>
+        <span class="formula-operator">-</span>
+        <span class="formula-term" title="{{card.defenseTooltip}}">{{card.defenseReduction}}</span>
         <span class="formula-operator">-</span>
         <span class="formula-term" title="{{card.effectiveArmorTooltip}}">{{card.effectiveArmor}}</span>
         <span class="formula-operator">-</span>
@@ -41,7 +109,8 @@
         <strong class="formula-result" title="{{card.finalDamageTooltip}}">{{card.finalDamage}}</strong>
       </div>
       <div class="damage-formula-labels">
-        <span>{{localize "AXIOM.Combat.RawDamage"}}</span>
+        <span>{{localize "AXIOM.Combat.IncomingDamage"}}</span>
+        <span>{{localize "AXIOM.Combat.Defense"}}</span>
         <span>{{localize "AXIOM.Combat.EffectiveArmor"}}</span>
         <span>{{localize "AXIOM.Combat.Toughness"}}</span>
         <span>{{localize "AXIOM.Combat.FinalDamage"}}</span>

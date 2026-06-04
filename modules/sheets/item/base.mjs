@@ -134,6 +134,7 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
     context.editorFields = this._prepareEditorFields();
     context.config = this._getConfig();
     context.isSkill = this.item.type === "skill";
+    context.showTechLevel = !context.isSkill;
     context.isArmor = this.item.type === "armor";
     context.isShield = isShieldItem(this.item);
     context.isWeapon = isWeaponItem(this.item);
@@ -236,6 +237,8 @@ export default class AxiomItemSheet extends HandlebarsApplicationMixin(ItemSheet
       ammunition: this._getAmmunitionOptions(),
       handsOptions,
       guard: ["full", "limited"].includes(system.guard) ? system.guard : "full",
+      isLimitedGuard: (["full", "limited"].includes(system.guard) ? system.guard : "full") === "limited",
+      effectiveParryBonus: (["full", "limited"].includes(system.guard) ? system.guard : "full") === "limited" ? 0 : Number(system.parryBonus ?? 0),
       guardOptions: this._getConfig()?.weaponGuard ?? {},
       stateOptions: this._prepareHandGearStateOptions(system.state),
       range,

@@ -1012,7 +1012,8 @@
     }
 
     strong,
-    input[data-result-field="finalDamageOverride"] {
+    input[data-result-field="finalDamageOverride"],
+    input[data-result-field="counterattack.finalDamageOverride"] {
       width: 76px;
       min-width: 0;
       height: 38px;
@@ -1028,7 +1029,8 @@
       text-align: center;
     }
 
-    input[data-result-field="finalDamageOverride"]:focus {
+    input[data-result-field="finalDamageOverride"]:focus,
+    input[data-result-field="counterattack.finalDamageOverride"]:focus {
       border-color: var(--axiom-gold);
       outline: none;
       box-shadow: 0 0 8px rgba(216, 198, 154, 0.2);
@@ -1379,4 +1381,24 @@
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+
+.axiom-chat-card.combat-result-card .counterattack-result {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(216, 198, 154, 0.22);
+}
+.axiom-chat-card.combat-result-card .counterattack-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: var(--axiom-gold);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.axiom-chat-card.combat-result-card .counterattack-header span {
+  color: var(--axiom-muted);
+  text-transform: none;
 }

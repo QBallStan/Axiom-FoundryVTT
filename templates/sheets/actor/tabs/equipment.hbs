@@ -48,7 +48,12 @@
   </div>
 
   <section class="equipment-gear-section combat-gear-section">
-    <h2 class="section-title"><i class="fa-solid fa-backpack"></i> {{localize "AXIOM.Actor.Equipment.Title"}}</h2>
+    <div class="section-title-row equipment-section-header">
+      <h2 class="section-title"><i class="fa-solid fa-backpack"></i> {{localize "AXIOM.Actor.Equipment.Title"}}</h2>
+      <div class="skill-sort-actions" aria-label="{{localize 'AXIOM.Actor.Equipment.Actions'}}">
+        <button class="skill-sort-button add-equipment-item-button" type="button" data-action="createEquipmentItem" title="{{localize 'AXIOM.Actor.Equipment.AddItem'}}" aria-label="{{localize 'AXIOM.Actor.Equipment.AddItem'}}"><i class="fa-solid fa-plus"></i></button>
+      </div>
+    </div>
 
     {{#if equipmentTab.equipment.length}}
       <div class="equipment-gear-list combat-gear-list">

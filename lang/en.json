@@ -111,6 +111,11 @@
         "NoExpertise": "No expertise skills on this actor.",
         "Edit": "Edit Skill",
         "Delete": "Remove Skill",
+        "HideZero": {
+          "Toggle": "Hide or show level 0 skills",
+          "Hide": "Hide level 0 skills",
+          "Show": "Show level 0 skills"
+        },
         "Presets": {
           "Label": "Presets",
           "Dodge": "Dodge",
@@ -130,7 +135,9 @@
           "LevelLow": "Sort by lowest level",
           "TargetHigh": "Sort by highest Success Target",
           "TargetLow": "Sort by lowest Success Target"
-        }
+        },
+        "AddExpertise": "Add Expertise Skill",
+        "NewExpertise": "New Expertise Skill"
       },
       "Tabs": {
         "Main": "Main",
@@ -193,7 +200,10 @@
         "EditItem": "Edit Item",
         "DeleteItem": "Delete Item",
         "Empty": "No equipment on this actor.",
-        "RollItem": "Roll Item"
+        "RollItem": "Roll Item",
+        "Actions": "Equipment Actions",
+        "AddItem": "Add Equipment Item",
+        "NewItem": "New Equipment"
       },
       "Details": {
         "Title": "Details",
@@ -507,7 +517,10 @@
         "PoorTools": "Poor Tools",
         "SneakAttack": "Sneak Attack",
         "MinorAdvantage": "Minor Advantage",
-        "SeriousDistraction": "Serious Distraction"
+        "SeriousDistraction": "Serious Distraction",
+        "GangingUpOne": "Ganging Up (+1 ally)",
+        "GangingUpTwo": "Ganging Up (+2 allies)",
+        "GangingUpThree": "Ganging Up (+3 allies)"
       },
       "RollTimeframe": "Roll Timeframe",
       "NoTimeframeSelected": "Select a timeframe first.",
@@ -735,7 +748,8 @@
         "Strength": "Effective Range: STR {modifier} = {range}m"
       },
       "StrengthBasedRangeShort": "STR-base range",
-      "StrengthRangeModifierShort": "STR mod"
+      "StrengthRangeModifierShort": "STR mod",
+      "ParryUnavailableLimitedGuard": "Limited Guard weapons always have Parry 0."
     },
     "Equipment": {
       "Skill": "Skill",
@@ -842,7 +856,30 @@
       "TieBreakerComplication": "Complication Tie-Break",
       "TieBreakerStalemate": "Exact Tie",
       "TieBreakerUnopposed": "Attack Roll",
-      "TieBreakerUnopposedFailure": "Attack Failed"
+      "TieBreakerUnopposedFailure": "Attack Failed",
+      "IncomingDamage": "Incoming Damage",
+      "DamageAfterDefense": "Damage After Defense",
+      "DefenseReduction": "Defense Reduction",
+      "MomentumGained": "gained 1 Momentum.",
+      "CounterattackResult": "Counterattack Result",
+      "CounterattackDamage": "Counter Damage",
+      "CounterattackHits": "Counterattack Hits",
+      "CounterattackMisses": "Counterattack Misses",
+      "AttackerPressure": "Attacker Pressure",
+      "ApplyCounterattackWound": "Apply Counterattack Wound",
+      "CounterattackWoundApplied": "Counterattack Wound Applied",
+      "CounterattackDetails": "Counterattack Details",
+      "Momentum": {
+        "PressTheAdvantage": "Press the Advantage",
+        "Counterattack": "Counterattack",
+        "AvoidOpenings": "Avoid Openings",
+        "Insufficient": "Not enough Momentum.",
+        "Gained": "Momentum +1",
+        "Capped": "Momentum maxed",
+        "PressTheAdvantageModifier": "Press the Advantage (+10)",
+        "GainedBy": "{actor} gains +1 Momentum.",
+        "CappedBy": "{actor} is already at maximum Momentum."
+      }
     },
     "Currency": {
       "DefaultName": "Credits",
@@ -872,13 +909,26 @@
         "Name": "Standard Currency Symbol",
         "Hint": "Symbol or currency code displayed next to standard currency values."
       },
-      "DodgeSkillName": {
-        "Name": "Combat Skill: Dodge",
-        "Hint": "Name of the Skill item used when a character dodges an attack. This lets each setting rename Dodge, such as Evasion, Reflexes, or Acrobatics."
-      },
       "UnarmedCombatSkillName": {
         "Name": "Combat Skill: Unarmed / Default Block",
         "Hint": "Name of the Skill item used for unarmed blocks, unarmed combat, and fallback melee defenses when no equipped melee weapon provides a skill."
+      },
+      "WoundScale": {
+        "Name": "Wound Scale",
+        "Hint": "Choose the damage thresholds used when converting final damage into wound severity.",
+        "Standard": "Standard: 1-2 / 3-4 / 5-6 / 7+",
+        "Expanded": "Expanded: 1-3 / 4-6 / 7-9 / 10+"
+      },
+      "NewProtagonistItemCompendium": {
+        "Name": "New Actor Core Skills",
+        "Hint": "Skill compendium to copy into every newly created Protagonist or NPC. Use this to preload the setting’s Core Skills.",
+        "None": "None",
+        "MissingPack": "The configured new actor core skill compendium could not be found: {pack}.",
+        "LoadError": "Could not load skills from {pack}."
+      },
+      "HideZeroLevelSkills": {
+        "Name": "Hide Level 0 Skills",
+        "Hint": "Hide Skills with a displayed level of 0 on Protagonist and NPC sheets."
       }
     },
     "CombatTracker": {

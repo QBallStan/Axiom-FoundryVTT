@@ -97,7 +97,6 @@ export default class AxiomActorBaseData extends foundry.abstract.TypeDataModel {
   }
 
   computeDerivedSubAttributes() {
-    const strength = this.attributes.strength.value;
     const agility = this.attributes.agility.value;
     const fortitude = this.attributes.fortitude.value;
     const resolve = this.attributes.resolve.value;
@@ -121,7 +120,7 @@ export default class AxiomActorBaseData extends foundry.abstract.TypeDataModel {
       "system.subAttributes.corruptionThreshold"
     );
     this.subAttributes.damageModifier = this.applyDerivedActiveEffects(
-      this.constructor.calculateDamageModifier(strength, size),
+      this.constructor.calculateDamageModifier(size),
       "system.subAttributes.damageModifier"
     );
   }
@@ -137,14 +136,23 @@ export default class AxiomActorBaseData extends foundry.abstract.TypeDataModel {
   }
 
   computeDerivedTrackers() {
+    const isNpc = this.parent?.type === "npc";
+
     const fate = this.trackers?.fate;
     if (fate) {
-      const current = Number(fate.current ?? fate.value ?? 0);
-      const rawMax = Number(fate.max ?? 0);
-      const max = Number.isFinite(rawMax) ? Math.max(0, rawMax) : 0;
-      fate.max = max;
-      if (Number.isFinite(current)) fate.current = Math.min(Math.max(Number(fate.min ?? 0), current), max);
-      fate.value = fate.current;
+      if (isNpc) {
+        fate.min = 0;
+        fate.max = 0;
+        fate.current = 0;
+        fate.value = 0;
+      } else {
+        const current = Number(fate.current ?? fate.value ?? 0);
+        const rawMax = Number(fate.max ?? 0);
+        const max = Number.isFinite(rawMax) ? Math.max(0, rawMax) : 0;
+        fate.max = max;
+        if (Number.isFinite(current)) fate.current = Math.min(Math.max(Number(fate.min ?? 0), current), max);
+        fate.value = fate.current;
+      }
     }
 
     const actionPoints = this.trackers?.actionPoints;
@@ -162,15 +170,16 @@ export default class AxiomActorBaseData extends foundry.abstract.TypeDataModel {
 
     const momentum = this.trackers?.momentum;
     if (momentum) {
-      const defaultMax = this.parent?.type === "npc" ? 1 : 3;
+      const defaultMax = isNpc ? 1 : 3;
       const sourceMax = foundry.utils.getProperty(this.parent?._source, "system.trackers.momentum.max");
       const storedMax = Number(sourceMax ?? momentum.max ?? defaultMax);
       // Older sheets stored Momentum as -5 to +5. Treat that legacy max as the
-      // new default unless the actor has been explicitly customized.
+      // new default unless the actor has been explicitly customized. NPCs are
+      // capped at 1 by the v4.2 rules.
       const baseMax = Number.isFinite(storedMax) && storedMax !== 5 ? Math.max(0, storedMax) : defaultMax;
       const effectiveMax = this.applyDerivedActiveEffects(baseMax, "system.trackers.momentum.max");
       momentum.min = 0;
-      momentum.max = Math.max(0, effectiveMax);
+      momentum.max = isNpc ? 1 : Math.max(0, effectiveMax);
 
       const current = Number(momentum.current ?? momentum.value ?? 0);
       if (Number.isFinite(current)) momentum.current = Math.min(Math.max(0, current), momentum.max);
@@ -246,15 +255,15 @@ export default class AxiomActorBaseData extends foundry.abstract.TypeDataModel {
   }
 
   static calculateToughness(fortitude) {
-    return Math.ceil(Number(fortitude ?? 0) / 5);
+    const value = Math.max(1, Number(fortitude ?? 0));
+    return Math.floor((value - 1) / 5) - 1;
   }
 
   static calculateCorruption(resolve) {
-    return 4 + Math.ceil(Number(resolve ?? 0) / 5);
+    return 4 + Math.floor(Number(resolve ?? 0) / 5);
   }
 
-  static calculateDamageModifier(strength, size = 0) {
-    const strengthValue = Math.max(Number(strength ?? 0), 1);
-    return Math.ceil(strengthValue / 5) - 3 + Number(size ?? 0);
+  static calculateDamageModifier(size = 0) {
+    return Number(size ?? 0);
   }
 }

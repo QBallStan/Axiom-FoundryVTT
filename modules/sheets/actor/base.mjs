@@ -280,13 +280,19 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
   }
 
   _prepareSkillTabData() {
+    const hideZeroLevelSkills = this.actor.getFlag?.("axiom", "hideZeroLevelSkills") === true;
     const skills = this.actor.items
       .filter(item => item.type === "skill")
       .map(item => this._prepareSkillRow(item))
       .sort((a, b) => a.name.localeCompare(b.name));
 
+    const coreSkills = skills.filter(skill => skill.category === "core");
+
     return {
-      core: skills.filter(skill => skill.category === "core"),
+      hideZeroLevelSkills,
+      core: hideZeroLevelSkills
+        ? coreSkills.filter(skill => Number(skill.level ?? 0) !== 0)
+        : coreSkills,
       expertise: skills.filter(skill => skill.category === "expertise"),
       attributeCheck: this._prepareAttributeCheckRow({
         id: "custom",
@@ -560,7 +566,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       meleeSkill: system.meleeSkill || system.skill || "Melee",
       rangedSkill: system.rangedSkill || system.skill || (category === "mixed" ? "Athletics" : "Marksmanship"),
       reach: Number(system.reach ?? 0),
-      parryBonus: Number(system.parryBonus ?? 0),
+      parryBonus: (["full", "limited"].includes(system.guard) ? system.guard : "full") === "limited" ? 0 : Number(system.parryBonus ?? 0),
       guard: ["full", "limited"].includes(system.guard) ? system.guard : "full",
       guardLabel: this._localizeConfigLabel(CONFIG.AXIOM?.weaponGuard?.[["full", "limited"].includes(system.guard) ? system.guard : "full"], system.guard ?? "full"),
       range,
@@ -911,7 +917,7 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
         }
       },
       trackers: {
-        fate: readTracker("fate", { current: 3, min: 0, max: 3 }),
+        fate: readTracker("fate", this.actor?.type === "npc" ? { current: 0, min: 0, max: 0 } : { current: 3, min: 0, max: 3 }),
         actionPoints: readTracker("actionPoints", { current: 3, min: 0, max: 3 }),
         momentum: readTracker("momentum", { current: 0, min: 0, max: this.actor?.type === "npc" ? 1 : 3 })
       },
@@ -970,6 +976,14 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
       element.addEventListener("click", this._onSortSkills.bind(this));
     });
 
+    this.element.querySelectorAll("[data-action='toggleZeroLevelSkills']").forEach(element => {
+      element.addEventListener("click", this._onToggleZeroLevelSkills.bind(this));
+    });
+
+    this.element.querySelectorAll("[data-action='createExpertiseSkill']").forEach(element => {
+      element.addEventListener("click", this._onCreateExpertiseSkill.bind(this));
+    });
+
     this.element.querySelectorAll("[data-action='rollAttributeCheck']").forEach(element => {
       element.addEventListener("click", this._onRollAttributeCheck.bind(this));
     });
@@ -996,6 +1010,10 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
 
     this.element.querySelectorAll("[data-action='updateCombatItemState']").forEach(element => {
       element.addEventListener(element.matches("select") ? "change" : "click", this._onUpdateCombatItemState.bind(this));
+    });
+
+    this.element.querySelectorAll("[data-action='createEquipmentItem']").forEach(element => {
+      element.addEventListener("click", this._onCreateEquipmentItem.bind(this));
     });
 
     this.element.querySelectorAll("[data-action='editEquipmentItem']").forEach(element => {
@@ -1236,6 +1254,24 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
   _getEquipmentItemFromEvent(event) {
     const itemId = event.currentTarget.closest("[data-item-id]")?.dataset.itemId;
     return itemId ? this.actor.items.get(itemId) : null;
+  }
+
+  async _onCreateEquipmentItem(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const [item] = await this.actor.createEmbeddedDocuments("Item", [{
+      name: game.i18n.localize("AXIOM.Actor.Equipment.NewItem"),
+      type: "equipment",
+      system: {
+        quantity: 1,
+        weight: 0,
+        state: "carried"
+      }
+    }]);
+
+    await this.render({ force: true });
+    item?.sheet?.render(true);
   }
 
   _onEditEquipmentItem(event) {
@@ -1653,6 +1689,33 @@ export default class AxiomActorSheet extends HandlebarsApplicationMixin(ActorShe
     }).render({ force: true });
   }
 
+
+  async _onToggleZeroLevelSkills(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const current = this.actor.getFlag?.("axiom", "hideZeroLevelSkills") === true;
+    await this.actor.setFlag("axiom", "hideZeroLevelSkills", !current);
+  }
+
+  async _onCreateExpertiseSkill(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const [item] = await this.actor.createEmbeddedDocuments("Item", [{
+      name: game.i18n.localize("AXIOM.Actor.Skills.NewExpertise"),
+      type: "skill",
+      system: {
+        level: 0,
+        category: "expertise",
+        attributeOne: "logic",
+        attributeTwo: "instinct"
+      }
+    }]);
+
+    await this.render({ force: true });
+    item?.sheet?.render(true);
+  }
 
   _onSortSkills(event) {
     event.preventDefault();

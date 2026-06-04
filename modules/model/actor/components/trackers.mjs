@@ -20,3 +20,13 @@ export class AxiomTrackersModel extends foundry.abstract.DataModel {
     };
   }
 }
+
+export class AxiomNpcTrackersModel extends foundry.abstract.DataModel {
+  static defineSchema() {
+    return {
+      momentum: trackerField({ current: 0, min: 0, max: 1 }),
+      fate: trackerField({ current: 0, min: 0, max: 0 }),
+      actionPoints: trackerField({ current: 3, min: 0, max: 3 })
+    };
+  }
+}

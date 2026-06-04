@@ -30,6 +30,7 @@
 .application.sheet.axiom.actor.npc .window-content {
   display: flex;
   flex-direction: column;
+  height: 100%;
   min-height: 0;
   padding: 12px;
   background: var(--axiom-bg);
@@ -96,6 +97,64 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--axiom-text);
+}
+.application.sheet.axiom.actor.protagonist .protagonist-sheet-top,
+.application.sheet.axiom.actor.npc .protagonist-sheet-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 30px;
+  gap: 6px;
+  align-items: center;
+}
+.application.sheet.axiom.actor.protagonist .actor-config-button,
+.application.sheet.axiom.actor.npc .actor-config-button {
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  background: #151519;
+  border: 1px solid var(--axiom-border);
+  border-radius: 5px;
+  color: var(--axiom-muted);
+  cursor: pointer;
+}
+.application.sheet.axiom.actor.protagonist .actor-config-button:hover,
+.application.sheet.axiom.actor.npc .actor-config-button:hover {
+  color: var(--axiom-gold);
+  border-color: var(--axiom-gold);
+}
+.application.sheet.axiom.actor.protagonist .actor-config-panel,
+.application.sheet.axiom.actor.npc .actor-config-panel {
+  margin-bottom: 10px;
+  padding: 8px;
+  background: var(--axiom-panel);
+  border: 1px solid var(--axiom-border);
+  border-radius: 6px;
+}
+.application.sheet.axiom.actor.protagonist .actor-config-grid,
+.application.sheet.axiom.actor.npc .actor-config-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+.application.sheet.axiom.actor.protagonist .actor-config-grid label,
+.application.sheet.axiom.actor.npc .actor-config-grid label {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.application.sheet.axiom.actor.protagonist .actor-config-grid span,
+.application.sheet.axiom.actor.npc .actor-config-grid span {
+  color: var(--axiom-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.application.sheet.axiom.actor.protagonist .actor-config-grid input,
+.application.sheet.axiom.actor.npc .actor-config-grid input {
+  height: 25px;
+  text-align: center;
+  font-family: "Roboto Mono", monospace;
 }
 .application.sheet.axiom.actor.protagonist .identity-row,
 .application.sheet.axiom.actor.npc .identity-row {
@@ -922,6 +981,18 @@
   border-color: var(--axiom-gold);
   box-shadow: 0 0 4px rgba(216, 198, 154, 0.3);
 }
+.application.sheet.axiom.actor.protagonist .skill-sort-button.hide-zero-skill-button.inactive,
+.application.sheet.axiom.actor.npc .skill-sort-button.hide-zero-skill-button.inactive {
+  opacity: 0.65;
+}
+.application.sheet.axiom.actor.protagonist .skill-sort-button.hide-zero-skill-button.active,
+.application.sheet.axiom.actor.npc .skill-sort-button.hide-zero-skill-button.active,
+.application.sheet.axiom.actor.protagonist .skill-sort-button.add-expertise-skill-button:hover,
+.application.sheet.axiom.actor.npc .skill-sort-button.add-expertise-skill-button:hover {
+  background: rgba(216, 198, 154, 0.12);
+  color: var(--axiom-gold);
+  border-color: var(--axiom-gold);
+}
 .application.sheet.axiom.actor.protagonist .skill-list,
 .application.sheet.axiom.actor.npc .skill-list {
   display: grid;
@@ -953,10 +1024,12 @@
 .application.sheet.axiom.actor.npc .expertise-skill-list {
   max-height: clamp(140px, 28vh, 280px);
 }
-.application.sheet.axiom.actor.protagonist .preset-attribute-check-list {
+.application.sheet.axiom.actor.protagonist .preset-attribute-check-list,
+.application.sheet.axiom.actor.npc .preset-attribute-check-list {
   margin-top: 5px;
 }
-.application.sheet.axiom.actor.protagonist .preset-attribute-check-row .skill-name {
+.application.sheet.axiom.actor.protagonist .preset-attribute-check-row .skill-name,
+.application.sheet.axiom.actor.npc .preset-attribute-check-row .skill-name {
   cursor: default;
 }
 .application.sheet.axiom.actor.protagonist .attribute-check-presets,
@@ -968,6 +1041,9 @@
 }
 .application.sheet.axiom.actor.protagonist .attribute-check-preset,
 .application.sheet.axiom.actor.npc .attribute-check-preset {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   min-height: 21px;
   margin: 0;
   padding: 1px 6px;
@@ -980,11 +1056,26 @@
   text-transform: uppercase;
   cursor: pointer;
 }
+.application.sheet.axiom.actor.protagonist .attribute-check-preset small,
+.application.sheet.axiom.actor.npc .attribute-check-preset small {
+  color: var(--axiom-faint);
+  font-size: 8px;
+}
+.application.sheet.axiom.actor.protagonist .attribute-check-preset strong,
+.application.sheet.axiom.actor.npc .attribute-check-preset strong {
+  color: var(--axiom-text);
+  font-size: 10px;
+  font-weight: 700;
+}
 .application.sheet.axiom.actor.protagonist .attribute-check-preset:hover,
 .application.sheet.axiom.actor.npc .attribute-check-preset:hover {
   color: var(--axiom-gold);
   border-color: var(--axiom-gold);
   box-shadow: 0 0 5px rgba(216, 198, 154, 0.3);
+}
+.application.sheet.axiom.actor.protagonist .attribute-check-preset:hover strong,
+.application.sheet.axiom.actor.npc .attribute-check-preset:hover strong {
+  color: var(--axiom-gold);
 }
 .application.sheet.axiom.actor.protagonist .skill-row,
 .application.sheet.axiom.actor.npc .skill-row {
@@ -2193,58 +2284,6 @@
 .application.sheet.axiom.actor.npc .effect-toggle input[type="checkbox"]:not(:checked) {
   color: #151519;
 }
-
-.application.sheet.axiom.actor.protagonist .protagonist-sheet-top {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 30px;
-  gap: 6px;
-  align-items: center;
-}
-.application.sheet.axiom.actor.protagonist .actor-config-button {
-  width: 30px;
-  height: 30px;
-  margin: 0;
-  padding: 0;
-  background: #151519;
-  border: 1px solid var(--axiom-border);
-  border-radius: 5px;
-  color: var(--axiom-muted);
-  cursor: pointer;
-}
-.application.sheet.axiom.actor.protagonist .actor-config-button:hover {
-  color: var(--axiom-gold);
-  border-color: var(--axiom-gold);
-}
-.application.sheet.axiom.actor.protagonist .actor-config-panel {
-  margin-bottom: 10px;
-  padding: 8px;
-  background: var(--axiom-panel);
-  border: 1px solid var(--axiom-border);
-  border-radius: 6px;
-}
-.application.sheet.axiom.actor.protagonist .actor-config-grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 6px;
-}
-.application.sheet.axiom.actor.protagonist .actor-config-grid label {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
-}
-.application.sheet.axiom.actor.protagonist .actor-config-grid span {
-  color: var(--axiom-muted);
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.application.sheet.axiom.actor.protagonist .actor-config-grid input {
-  height: 25px;
-  text-align: center;
-  font-family: "Roboto Mono", monospace;
-}
-
 /* ----------------------------------------- */
 /*  NPC Sheet                                */
 /* ----------------------------------------- */
@@ -2386,6 +2425,15 @@
 .application.sheet.axiom.actor.npc .npc-main-lower-grid {
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
 }
+.application.sheet.axiom.actor.npc .skill-subtitle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin: 0 0 5px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--axiom-border);
+}
 .application.sheet.axiom.actor.npc .skill-subtitle {
   margin: 0 0 5px;
   padding-bottom: 4px;
@@ -2396,11 +2444,16 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+.application.sheet.axiom.actor.npc .skill-subtitle-row .skill-subtitle {
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
 .application.sheet.axiom.actor.npc .skill-row {
   grid-template-columns: minmax(0, 1fr) 42px 38px 28px;
 }
 .application.sheet.axiom.actor.npc .attribute-check-row {
-  grid-template-columns: minmax(0, 1fr) 42px 28px;
+  grid-template-columns: minmax(0, 1fr) 42px 28px 28px;
 }
 .application.sheet.axiom.actor.npc .skill-attributes {
   display: none;
@@ -3028,7 +3081,6 @@
 .axiom-item-sheet .item-title-row {
   display: block;
 }
-
 .axiom.item-sheet .item-name,
 .axiom-item-sheet .item-name {
   width: 100%;
@@ -3078,7 +3130,6 @@
   height: 28px;
   padding: 2px 6px;
 }
-
 /* ----------------------------------------- */
 /*  Item Tech Level                          */
 /* ----------------------------------------- */
@@ -4172,6 +4223,108 @@
   font-size: 11px;
   line-height: 1.35;
 }
+.axiom.item-sheet .range-input-grid,
+.axiom-item-sheet .range-input-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 116px 116px;
+  gap: 8px;
+  align-items: end;
+}
+.axiom.item-sheet .checkbox-field,
+.axiom-item-sheet .checkbox-field {
+  align-items: center;
+  justify-content: center;
+}
+.axiom.item-sheet .checkbox-field input[type="checkbox"],
+.axiom-item-sheet .checkbox-field input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+}
+.axiom.item-sheet .range-formula-line,
+.axiom-item-sheet .range-formula-line {
+  margin-top: 8px;
+  padding: 5px 8px;
+  border: 1px solid var(--item-line-soft);
+  border-radius: 5px;
+  background: var(--item-panel-dark);
+  color: var(--item-bone);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.axiom.item-sheet .range-band-grid.five-bands,
+.axiom-item-sheet .range-band-grid.five-bands {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.axiom.item-sheet .ranged-range-panel,
+.axiom-item-sheet .ranged-range-panel,
+.axiom.item-sheet.ranged-weapon .ranged-range-panel,
+.axiom-item-sheet.rangedWeapon .ranged-range-panel,
+.axiom-item-sheet.ranged-weapon .ranged-range-panel {
+  display: block;
+}
+/* ----------------------------------------- */
+/*  Compact Ranged Weapon Layout             */
+/* ----------------------------------------- */
+.axiom.item-sheet .ranged-top-grid,
+.axiom-item-sheet .ranged-top-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px 112px;
+  gap: 8px;
+  align-items: end;
+}
+.axiom.item-sheet .range-row-grid,
+.axiom-item-sheet .range-row-grid {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 8px;
+  align-items: stretch;
+}
+.axiom.item-sheet .range-row-grid .range-band-grid,
+.axiom-item-sheet .range-row-grid .range-band-grid {
+  margin-top: 0;
+}
+.axiom.item-sheet .reload-ammo-grid,
+.axiom-item-sheet .reload-ammo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  align-items: end;
+}
+.axiom.item-sheet .reload-ammo-grid.with-shots,
+.axiom-item-sheet .reload-ammo-grid.with-shots {
+  grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
+}
+.axiom.item-sheet .reload-ammo-grid.with-reload-cost,
+.axiom-item-sheet .reload-ammo-grid.with-reload-cost {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 120px;
+}
+.axiom.item-sheet .reload-ammo-grid.with-shots.with-reload-cost,
+.axiom-item-sheet .reload-ammo-grid.with-shots.with-reload-cost {
+  grid-template-columns: minmax(0, 1fr) 138px minmax(0, 1fr) 112px;
+}
+.axiom.item-sheet .reload-ammo-grid > input[type="hidden"],
+.axiom-item-sheet .reload-ammo-grid > input[type="hidden"] {
+  display: none;
+}
+@media (max-width: 620px) {
+  .axiom.item-sheet .ranged-top-grid,
+  .axiom-item-sheet .ranged-top-grid,
+  .axiom.item-sheet .range-row-grid,
+  .axiom-item-sheet .range-row-grid,
+  .axiom.item-sheet .reload-ammo-grid,
+  .axiom-item-sheet .reload-ammo-grid,
+  .axiom.item-sheet .reload-ammo-grid.with-shots,
+  .axiom-item-sheet .reload-ammo-grid.with-shots,
+  .axiom.item-sheet .reload-ammo-grid.with-reload-cost,
+  .axiom-item-sheet .reload-ammo-grid.with-reload-cost,
+  .axiom.item-sheet .reload-ammo-grid.with-shots.with-reload-cost,
+  .axiom-item-sheet .reload-ammo-grid.with-shots.with-reload-cost {
+    grid-template-columns: 1fr;
+  }
+}
 /* ===== ROLL WINDOW ===== */
 .application.axiom.roll-window-app {
   --axiom-bg: #101012;
@@ -4720,7 +4873,7 @@
   overflow: hidden;
   padding: 0;
   background: radial-gradient(circle at top left, rgba(199, 58, 50, 0.12), transparent 16rem), var(--axiom-bg);
-  border: 1px solid rgba(216, 198, 154, 0.35);
+  border: 1px solid #050506;
   border-radius: 8px;
   color: var(--axiom-text);
   font-family: Marcellus, Georgia, serif;
@@ -5083,7 +5236,7 @@ body.system-axiom #players,
 body.system-axiom #scene-navigation,
 body.system-axiom #hotbar {
   background: radial-gradient(circle at top left, rgba(199, 58, 50, 0.1), transparent 17rem), var(--axiom-bg);
-  border: 1px solid rgba(216, 198, 154, 0.35);
+  border: 1px solid #050506;
   border-radius: 8px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(216, 198, 154, 0.06) inset;
   color: var(--axiom-text);
@@ -6957,7 +7110,9 @@ body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .jour
 .axiom-chat-card.opposed-test-card .combat-result-summary,
 .axiom-chat-card.combat-result-card .combat-result-summary,
 .axiom-chat-card.opposed-test-card .combat-damage-focus,
-.axiom-chat-card.combat-result-card .combat-damage-focus {
+.axiom-chat-card.combat-result-card .combat-damage-focus,
+.axiom-chat-card.opposed-test-card .opposed-result-focus,
+.axiom-chat-card.combat-result-card .opposed-result-focus {
   border: 1px solid var(--axiom-border);
   border-radius: 6px;
   background: var(--axiom-panel);
@@ -7186,7 +7341,11 @@ body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .jour
 .axiom-chat-card.opposed-test-card .combat-result-summary input[data-result-field="finalDamageOverride"],
 .axiom-chat-card.combat-result-card .combat-result-summary input[data-result-field="finalDamageOverride"],
 .axiom-chat-card.opposed-test-card .combat-damage-focus input[data-result-field="finalDamageOverride"],
-.axiom-chat-card.combat-result-card .combat-damage-focus input[data-result-field="finalDamageOverride"] {
+.axiom-chat-card.combat-result-card .combat-damage-focus input[data-result-field="finalDamageOverride"],
+.axiom-chat-card.opposed-test-card .combat-result-summary input[data-result-field="counterattack.finalDamageOverride"],
+.axiom-chat-card.combat-result-card .combat-result-summary input[data-result-field="counterattack.finalDamageOverride"],
+.axiom-chat-card.opposed-test-card .combat-damage-focus input[data-result-field="counterattack.finalDamageOverride"],
+.axiom-chat-card.combat-result-card .combat-damage-focus input[data-result-field="counterattack.finalDamageOverride"] {
   width: 76px;
   min-width: 0;
   height: 38px;
@@ -7204,60 +7363,43 @@ body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .jour
 .axiom-chat-card.opposed-test-card .combat-result-summary input[data-result-field="finalDamageOverride"]:focus,
 .axiom-chat-card.combat-result-card .combat-result-summary input[data-result-field="finalDamageOverride"]:focus,
 .axiom-chat-card.opposed-test-card .combat-damage-focus input[data-result-field="finalDamageOverride"]:focus,
-.axiom-chat-card.combat-result-card .combat-damage-focus input[data-result-field="finalDamageOverride"]:focus {
+.axiom-chat-card.combat-result-card .combat-damage-focus input[data-result-field="finalDamageOverride"]:focus,
+.axiom-chat-card.opposed-test-card .combat-result-summary input[data-result-field="counterattack.finalDamageOverride"]:focus,
+.axiom-chat-card.combat-result-card .combat-result-summary input[data-result-field="counterattack.finalDamageOverride"]:focus,
+.axiom-chat-card.opposed-test-card .combat-damage-focus input[data-result-field="counterattack.finalDamageOverride"]:focus,
+.axiom-chat-card.combat-result-card .combat-damage-focus input[data-result-field="counterattack.finalDamageOverride"]:focus {
   border-color: var(--axiom-gold);
   outline: none;
   box-shadow: 0 0 8px rgba(216, 198, 154, 0.2);
 }
-.axiom-chat-card.opposed-result-card {
-  --axiom-bg: #101012;
-  --axiom-panel: #1b1b1f;
-  --axiom-panel-2: #24242a;
-  --axiom-panel-3: #151519;
-  --axiom-border: #3a3a42;
-  --axiom-text: #e8e4dc;
-  --axiom-muted: #a7a198;
-  --axiom-accent: #c73a32;
-  --axiom-gold: #d8c69a;
-  --axiom-blue: #5fb7d7;
-  overflow: hidden;
-  background: radial-gradient(circle at top left, rgba(199, 58, 50, 0.12), transparent 20rem), var(--axiom-bg);
-  border: 1px solid rgba(216, 198, 154, 0.35);
-  border-radius: 8px;
-  color: var(--axiom-text);
-  font-family: Marcellus, Georgia, serif;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(216, 198, 154, 0.10) inset;
-}
-.axiom-chat-card.opposed-result-card .card-body {
-  padding: 10px;
-}
-.axiom-chat-card.opposed-result-card .opposed-result-focus {
-  border: 1px solid rgba(216, 198, 154, 0.24);
-  border-radius: 6px;
-  background: var(--axiom-panel);
+.axiom-chat-card.opposed-test-card .opposed-result-focus,
+.axiom-chat-card.combat-result-card .opposed-result-focus {
   display: grid;
   gap: 4px;
   padding: 9px;
   text-align: center;
   box-shadow: inset 0 -3px 0 var(--axiom-blue);
 }
-.axiom-chat-card.opposed-result-card .opposed-result-focus.hit {
+.axiom-chat-card.opposed-test-card .opposed-result-focus.hit,
+.axiom-chat-card.combat-result-card .opposed-result-focus.hit {
   box-shadow: inset 0 -3px 0 var(--axiom-accent);
 }
-.axiom-chat-card.opposed-result-card .opposed-result-focus span,
-.axiom-chat-card.opposed-result-card .opposed-result-focus em {
+.axiom-chat-card.opposed-test-card .opposed-result-focus span,
+.axiom-chat-card.combat-result-card .opposed-result-focus span,
+.axiom-chat-card.opposed-test-card .opposed-result-focus em,
+.axiom-chat-card.combat-result-card .opposed-result-focus em {
   color: var(--axiom-muted);
   font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
   font-style: normal;
 }
-.axiom-chat-card.opposed-result-card .opposed-result-focus strong {
+.axiom-chat-card.opposed-test-card .opposed-result-focus strong,
+.axiom-chat-card.combat-result-card .opposed-result-focus strong {
   color: var(--axiom-gold);
   font-size: 18px;
   font-weight: 900;
 }
-
 .axiom-chat-card.opposed-test-card .combat-edit-grid,
 .axiom-chat-card.combat-result-card .combat-edit-grid {
   display: grid;
@@ -7391,6 +7533,54 @@ body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .jour
   text-align: center;
   text-transform: uppercase;
 }
+.axiom-chat-card.opposed-result-card {
+  --axiom-bg: #101012;
+  --axiom-panel: #1b1b1f;
+  --axiom-panel-2: #24242a;
+  --axiom-panel-3: #151519;
+  --axiom-border: #3a3a42;
+  --axiom-text: #e8e4dc;
+  --axiom-muted: #a7a198;
+  --axiom-accent: #c73a32;
+  --axiom-gold: #d8c69a;
+  --axiom-blue: #5fb7d7;
+  overflow: hidden;
+  background: radial-gradient(circle at top left, rgba(199, 58, 50, 0.12), transparent 20rem), var(--axiom-bg);
+  border: 1px solid rgba(216, 198, 154, 0.35);
+  border-radius: 8px;
+  color: var(--axiom-text);
+  font-family: Marcellus, Georgia, serif;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(216, 198, 154, 0.1) inset;
+}
+.axiom-chat-card.opposed-result-card .card-body {
+  padding: 10px;
+}
+.axiom-chat-card.opposed-result-card .opposed-result-focus {
+  border: 1px solid rgba(216, 198, 154, 0.24);
+  border-radius: 6px;
+  background: var(--axiom-panel);
+  display: grid;
+  gap: 4px;
+  padding: 9px;
+  text-align: center;
+  box-shadow: inset 0 -3px 0 var(--axiom-blue);
+}
+.axiom-chat-card.opposed-result-card .opposed-result-focus.hit {
+  box-shadow: inset 0 -3px 0 var(--axiom-accent);
+}
+.axiom-chat-card.opposed-result-card .opposed-result-focus span,
+.axiom-chat-card.opposed-result-card .opposed-result-focus em {
+  color: var(--axiom-muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-style: normal;
+}
+.axiom-chat-card.opposed-result-card .opposed-result-focus strong {
+  color: var(--axiom-gold);
+  font-size: 18px;
+  font-weight: 900;
+}
 .chat-message.message:has(.axiom-chat-card.opposed-test-card),
 .chat-message.message:has(.axiom-chat-card.combat-result-card) {
   padding: 0;
@@ -7507,115 +7697,6 @@ body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .jour
 .axiom-chat-card.axiom-status-card .axiom-status-card-result.failure strong {
   color: var(--axiom-accent);
 }
-
-.axiom.item-sheet .range-input-grid,
-.axiom-item-sheet .range-input-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 116px 116px;
-  gap: 8px;
-  align-items: end;
-}
-
-.axiom.item-sheet .checkbox-field,
-.axiom-item-sheet .checkbox-field {
-  align-items: center;
-  justify-content: center;
-}
-
-.axiom.item-sheet .checkbox-field input[type="checkbox"],
-.axiom-item-sheet .checkbox-field input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  min-height: 18px;
-}
-
-.axiom.item-sheet .range-formula-line,
-.axiom-item-sheet .range-formula-line {
-  margin-top: 8px;
-  padding: 5px 8px;
-  border: 1px solid var(--item-line-soft);
-  border-radius: 5px;
-  background: var(--item-panel-dark);
-  color: var(--item-bone);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.axiom.item-sheet .range-band-grid.five-bands,
-.axiom-item-sheet .range-band-grid.five-bands {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-.axiom.item-sheet .ranged-range-panel,
-.axiom-item-sheet .ranged-range-panel,
-.axiom.item-sheet.ranged-weapon .ranged-range-panel,
-.axiom-item-sheet.rangedWeapon .ranged-range-panel,
-.axiom-item-sheet.ranged-weapon .ranged-range-panel {
-  display: block;
-}
-
-/* ----------------------------------------- */
-/*  Compact Ranged Weapon Layout             */
-/* ----------------------------------------- */
-.axiom.item-sheet .ranged-top-grid,
-.axiom-item-sheet .ranged-top-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 76px 112px;
-  gap: 8px;
-  align-items: end;
-}
-.axiom.item-sheet .range-row-grid,
-.axiom-item-sheet .range-row-grid {
-  display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
-  gap: 8px;
-  align-items: stretch;
-}
-.axiom.item-sheet .range-row-grid .range-band-grid,
-.axiom-item-sheet .range-row-grid .range-band-grid {
-  margin-top: 0;
-}
-.axiom.item-sheet .reload-ammo-grid,
-.axiom-item-sheet .reload-ammo-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  align-items: end;
-}
-.axiom.item-sheet .reload-ammo-grid.with-shots,
-.axiom-item-sheet .reload-ammo-grid.with-shots {
-  grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
-}
-.axiom.item-sheet .reload-ammo-grid.with-reload-cost,
-.axiom-item-sheet .reload-ammo-grid.with-reload-cost {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 120px;
-}
-.axiom.item-sheet .reload-ammo-grid.with-shots.with-reload-cost,
-.axiom-item-sheet .reload-ammo-grid.with-shots.with-reload-cost {
-  grid-template-columns: minmax(0, 1fr) 138px minmax(0, 1fr) 112px;
-}
-.axiom.item-sheet .reload-ammo-grid > input[type="hidden"],
-.axiom-item-sheet .reload-ammo-grid > input[type="hidden"] {
-  display: none;
-}
-@media (max-width: 620px) {
-  .axiom.item-sheet .ranged-top-grid,
-  .axiom-item-sheet .ranged-top-grid,
-  .axiom.item-sheet .range-row-grid,
-  .axiom-item-sheet .range-row-grid,
-  .axiom.item-sheet .reload-ammo-grid,
-  .axiom-item-sheet .reload-ammo-grid,
-  .axiom.item-sheet .reload-ammo-grid.with-shots,
-  .axiom-item-sheet .reload-ammo-grid.with-shots,
-  .axiom.item-sheet .reload-ammo-grid.with-reload-cost,
-  .axiom-item-sheet .reload-ammo-grid.with-reload-cost,
-  .axiom.item-sheet .reload-ammo-grid.with-shots.with-reload-cost,
-  .axiom-item-sheet .reload-ammo-grid.with-shots.with-reload-cost {
-    grid-template-columns: 1fr;
-  }
-}
 .axiom-chat-card.opposed-result-card .opposed-result-momentum {
   display: inline-flex;
   align-items: center;
@@ -7630,4 +7711,22 @@ body.system-axiom .application.sheet.journal-sheet.journal-entry-page.text .jour
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+.axiom-chat-card.combat-result-card .counterattack-result {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(216, 198, 154, 0.22);
+}
+.axiom-chat-card.combat-result-card .counterattack-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: var(--axiom-gold);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.axiom-chat-card.combat-result-card .counterattack-header span {
+  color: var(--axiom-muted);
+  text-transform: none;
 }

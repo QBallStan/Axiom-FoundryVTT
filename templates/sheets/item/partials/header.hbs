@@ -11,21 +11,25 @@
         placeholder="{{localize 'AXIOM.Item.NamePlaceholder'}}"
       />
 
-      <button
-        type="button"
-        class="item-tech-level-config"
-        data-action="configureTechLevel"
-        data-tooltip="{{localize 'AXIOM.Item.TechLevel.Configure'}}"
-        aria-label="{{localize 'AXIOM.Item.TechLevel.Configure'}}"
-      >
-        <i class="fa-solid fa-gear"></i>
-      </button>
+      {{#if showTechLevel}}
+        <button
+          type="button"
+          class="item-tech-level-config"
+          data-action="configureTechLevel"
+          data-tooltip="{{localize 'AXIOM.Item.TechLevel.Configure'}}"
+          aria-label="{{localize 'AXIOM.Item.TechLevel.Configure'}}"
+        >
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      {{/if}}
     </div>
 
-    {{#if techLevel.selected}}
-      <div class="item-tech-level-list" aria-label="{{localize 'AXIOM.Item.TechLevel.Label'}}">
-        <span class="item-tech-level-pill" data-tooltip="{{techLevel.selected.description}}">{{techLevel.selected.label}}</span>
-      </div>
+    {{#if showTechLevel}}
+      {{#if techLevel.selected}}
+        <div class="item-tech-level-list" aria-label="{{localize 'AXIOM.Item.TechLevel.Label'}}">
+          <span class="item-tech-level-pill" data-tooltip="{{techLevel.selected.description}}">{{techLevel.selected.label}}</span>
+        </div>
+      {{/if}}
     {{/if}}
 
     {{#if displayCommonFields}}

@@ -111,6 +111,11 @@
         "NoExpertise": "Aucune compétence d’expertise sur cet acteur.",
         "Edit": "Modifier la compétence",
         "Delete": "Retirer la compétence",
+        "HideZero": {
+          "Toggle": "Masquer ou afficher les compétences de niveau 0",
+          "Hide": "Masquer les compétences de niveau 0",
+          "Show": "Afficher les compétences de niveau 0"
+        },
         "Presets": {
           "Label": "Préréglages",
           "Dodge": "Esquive",
@@ -130,7 +135,9 @@
           "LevelLow": "Trier par niveau le plus bas",
           "TargetHigh": "Trier par Seuil de Réussite le plus élevé",
           "TargetLow": "Trier par Seuil de Réussite le plus bas"
-        }
+        },
+        "AddExpertise": "Ajouter une compétence d’expertise",
+        "NewExpertise": "Nouvelle compétence d’expertise"
       },
       "Tabs": {
         "Main": "Principal",
@@ -193,7 +200,10 @@
         "EditItem": "Modifier l’objet",
         "DeleteItem": "Supprimer l’objet",
         "Empty": "Aucun équipement sur cet acteur.",
-        "RollItem": "Lancer l’objet"
+        "RollItem": "Lancer l’objet",
+        "Actions": "Actions d’équipement",
+        "AddItem": "Ajouter un équipement",
+        "NewItem": "Nouvel équipement"
       },
       "Details": {
         "Title": "Détails",
@@ -507,7 +517,10 @@
         "PoorTools": "Outils médiocres",
         "SneakAttack": "Attaque sournoise",
         "MinorAdvantage": "Avantage mineur",
-        "SeriousDistraction": "Distraction sérieuse"
+        "SeriousDistraction": "Distraction sérieuse",
+        "GangingUpOne": "Surnombre (+1 allié)",
+        "GangingUpTwo": "Surnombre (+2 alliés)",
+        "GangingUpThree": "Surnombre (+3 alliés)"
       },
       "RollTimeframe": "Lancer la durée",
       "NoTimeframeSelected": "Sélectionnez d’abord une durée.",
@@ -735,7 +748,8 @@
         "Strength": "Portée effective : FOR {modifier} = {range}m"
       },
       "StrengthBasedRangeShort": "Portée FOR",
-      "StrengthRangeModifierShort": "Mod. FOR"
+      "StrengthRangeModifierShort": "Mod. FOR",
+      "ParryUnavailableLimitedGuard": "Les armes à garde limitée ont toujours Parade 0."
     },
     "Equipment": {
       "Skill": "Compétence",
@@ -842,7 +856,30 @@
       "TieBreakerComplication": "Départage par complication",
       "TieBreakerStalemate": "Égalité exacte",
       "TieBreakerUnopposed": "Jet d’attaque",
-      "TieBreakerUnopposedFailure": "Attaque ratée"
+      "TieBreakerUnopposedFailure": "Attaque ratée",
+      "IncomingDamage": "Dégâts entrants",
+      "DamageAfterDefense": "Dégâts après défense",
+      "DefenseReduction": "Réduction de défense",
+      "MomentumGained": "gagne 1 Momentum.",
+      "CounterattackResult": "Résultat de contre-attaque",
+      "CounterattackDamage": "Dégâts de contre",
+      "CounterattackHits": "Touches de contre-attaque",
+      "CounterattackMisses": "Contre-attaque manquée",
+      "AttackerPressure": "Pression de l’attaquant",
+      "ApplyCounterattackWound": "Appliquer la blessure de contre-attaque",
+      "CounterattackWoundApplied": "Blessure de contre-attaque appliquée",
+      "CounterattackDetails": "Détails de contre-attaque",
+      "Momentum": {
+        "PressTheAdvantage": "Presser l’avantage",
+        "Counterattack": "Contre-attaque",
+        "AvoidOpenings": "Éviter les ouvertures",
+        "Insufficient": "Momentum insuffisant.",
+        "Gained": "Momentum +1",
+        "Capped": "Momentum au maximum",
+        "PressTheAdvantageModifier": "Presser l’avantage (+10)",
+        "GainedBy": "{actor} gagne +1 Momentum.",
+        "CappedBy": "{actor} est déjà à son Momentum maximum."
+      }
     },
     "Currency": {
       "DefaultName": "Crédits",
@@ -872,13 +909,26 @@
         "Name": "Symbole de la monnaie standard",
         "Hint": "Symbole ou code monétaire affiché avec les valeurs de monnaie standard."
       },
-      "DodgeSkillName": {
-        "Name": "Compétence de combat : Esquive",
-        "Hint": "Nom de l'objet Compétence utilisé lorsqu'un personnage esquive une attaque. Cela permet à chaque cadre de jeu de renommer Esquive, par exemple Évasion, Réflexes ou Acrobaties."
-      },
       "UnarmedCombatSkillName": {
         "Name": "Compétence de combat : mains nues / blocage par défaut",
         "Hint": "Nom de l'objet Compétence utilisé pour les blocages à mains nues, le combat à mains nues et les défenses de mêlée par défaut lorsqu'aucune arme de mêlée équipée ne fournit de compétence."
+      },
+      "WoundScale": {
+        "Name": "Échelle de blessures",
+        "Hint": "Choisit les seuils de dégâts utilisés pour convertir les dégâts finaux en gravité de blessure.",
+        "Standard": "Standard : 1-2 / 3-4 / 5-6 / 7+",
+        "Expanded": "Étendue : 1-3 / 4-6 / 7-9 / 10+"
+      },
+      "NewProtagonistItemCompendium": {
+        "Name": "Compétences de base des nouveaux acteurs",
+        "Hint": "Compendium de compétences à copier dans chaque nouveau protagoniste ou PNJ. À utiliser pour précharger les compétences de base du cadre de jeu.",
+        "None": "Aucun",
+        "MissingPack": "Le compendium de compétences de base configuré pour les nouveaux acteurs est introuvable : {pack}.",
+        "LoadError": "Impossible de charger les compétences depuis {pack}."
+      },
+      "HideZeroLevelSkills": {
+        "Name": "Masquer les compétences niveau 0",
+        "Hint": "Masque les compétences dont le niveau affiché est 0 sur les fiches de protagoniste et de PNJ."
       }
     },
     "CombatTracker": {
@@ -953,12 +1003,12 @@
       "PressTheAdvantage": "Presser l’avantage",
       "Counterattack": "Contre-attaque",
       "AvoidOpenings": "Éviter les ouvertures",
-      "Insufficient": "Pas assez de Momentum.",
+      "Insufficient": "Momentum insuffisant.",
       "Gained": "Momentum +1",
       "Capped": "Momentum au maximum",
       "PressTheAdvantageModifier": "Presser l’avantage (+10)",
       "GainedBy": "{actor} gagne +1 Momentum.",
-      "CappedBy": "{actor} est déjà au maximum de Momentum."
+      "CappedBy": "{actor} est déjà à son Momentum maximum."
     }
   },
   "Actor": {

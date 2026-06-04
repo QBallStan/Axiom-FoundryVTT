@@ -70,6 +70,9 @@ const GENERAL_MODIFIERS = [
 const WEAPON_MODIFIERS = [
   { key: "higherGround", label: "AXIOM.Roll.PredefinedModifiers.HigherGround", value: 5 },
   { key: "flanking", label: "AXIOM.Roll.PredefinedModifiers.Flanking", value: 10 },
+  { key: "gangingUpOne", label: "AXIOM.Roll.PredefinedModifiers.GangingUpOne", value: 10 },
+  { key: "gangingUpTwo", label: "AXIOM.Roll.PredefinedModifiers.GangingUpTwo", value: 20 },
+  { key: "gangingUpThree", label: "AXIOM.Roll.PredefinedModifiers.GangingUpThree", value: 30 },
   { key: "attackingFromBehind", label: "AXIOM.Roll.PredefinedModifiers.AttackingFromBehind", value: 15 },
   { key: "rangedBehind", label: "AXIOM.Roll.PredefinedModifiers.RangedBehind", value: 20 },
   { key: "charge", label: "AXIOM.Roll.PredefinedModifiers.Charge", value: 10 },
@@ -1246,8 +1249,10 @@ export default class AxiomRollWindow extends HandlebarsApplicationMixin(Applicat
   }
 
   _getPressAdvantageRow() {
-    if (!this._isCombatRoll()) return null;
-    if (!AxiomCombat.canSpendMomentum(this.rollData.actor, 1)) return null;
+    const actor = this.rollData.actor;
+    const isCounterattack = this.rollData.combatDefense?.defenseType === "counterattack";
+    const requiredMomentum = isCounterattack ? 2 : 1;
+    if (!AxiomCombat.canSpendMomentum(actor, requiredMomentum)) return null;
     const existing = (this.rollData.modifierRows ?? []).find(row => row.id === "momentum-press-advantage");
     return {
       id: "momentum-press-advantage",

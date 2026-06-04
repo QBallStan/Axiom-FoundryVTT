@@ -97,9 +97,9 @@
             </select>
           </label>
 
-          <label class="field-group">
+          <label class="field-group" {{#if weapon.isLimitedGuard}}title="{{localize 'AXIOM.Weapon.ParryUnavailableLimitedGuard'}}"{{/if}}>
             <span>{{localize "AXIOM.Weapon.ParryBonus"}}</span>
-            <input type="number" name="system.parryBonus" value="{{system.parryBonus}}" step="5" />
+            <input type="number" name="system.parryBonus" value="{{weapon.effectiveParryBonus}}" step="5" {{#if weapon.isLimitedGuard}}disabled{{/if}} />
           </label>
         </div>
       </div>

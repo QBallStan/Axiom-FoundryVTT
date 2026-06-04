@@ -40,7 +40,7 @@
         <div class="wounds">
           <div class="wound-grid">
             <div class="wound-col">
-              <div class="wound-col-label">{{localize "AXIOM.Actor.Wounds.Grazing"}}</div>
+              <div class="wound-col-label grazing">{{localize "AXIOM.Actor.Wounds.Grazing"}}</div>
               <div class="wound-col-content">
                 {{#each mock.wounds.grazing}}
                   <div class="wound-slot">
@@ -53,7 +53,7 @@
             </div>
 
             <div class="wound-col">
-              <div class="wound-col-label">{{localize "AXIOM.Actor.Wounds.Minor"}} <strong>-5</strong></div>
+              <div class="wound-col-label minor">{{localize "AXIOM.Actor.Wounds.Minor"}} <strong>-5</strong></div>
               <div class="wound-col-content">
                 {{#each mock.wounds.minor}}
                   <div class="wound-slot">
@@ -66,7 +66,7 @@
             </div>
 
             <div class="wound-col">
-              <div class="wound-col-label">{{localize "AXIOM.Actor.Wounds.Major"}} <strong>-10</strong></div>
+              <div class="wound-col-label major">{{localize "AXIOM.Actor.Wounds.Major"}} <strong>-10</strong></div>
               <div class="wound-col-content">
                 {{#each mock.wounds.major}}
                   <div class="wound-slot">
